@@ -4,6 +4,8 @@ namespace Models;
 
 class Album extends DatabaseModel
 {
+    private static $DATE_FORMAT = 'Y-m-d';
+
     /**
      * @var $title string
      */
@@ -33,6 +35,16 @@ class Album extends DatabaseModel
      * @var Format $format
      */
     protected $format;
+
+    /**
+     * @var \DateTime $date
+     */
+    protected $date;
+
+    /**
+     * @var string $notes
+     */
+    protected $notes = '';
 
     /**
      * @return string
@@ -128,6 +140,47 @@ class Album extends DatabaseModel
     public function setFormat($format)
     {
         $this->format = $format;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDateString()
+    {
+        return date(self::$DATE_FORMAT, $this->date->getTimestamp());
+    }
+
+    /**
+     * @param string $date
+     */
+    public function setDate($date)
+    {
+        $datetime = \DateTime::createFromFormat(self::$DATE_FORMAT, $date);
+        $this->date = $datetime;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    /**
+     * @param string $notes
+     */
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
     }
 
 }

@@ -9,7 +9,7 @@ use Handlers\AlbumsHandler;
 use Templates\AlbumsTemplate;
 use Templates\AlbumTemplate;
 
-class AlbumsController
+class AlbumsController extends Controller
 {
     protected $container;
     protected $albumsHandler;
@@ -25,7 +25,7 @@ class AlbumsController
         $albumId = $args['albumId'];
         $album = $this->albumsHandler->getAlbum($albumId);
         $albumTemplate = new AlbumTemplate($album);
-        $response = $response->withJson($albumTemplate->getObject(), 200);
+        $response = $response->withJson($albumTemplate->getArray(), 200);
         return $response;
     }
 
@@ -33,7 +33,28 @@ class AlbumsController
     {
         $albums = $this->albumsHandler->getAlbums();
         $albumsTemplate = new AlbumsTemplate($albums);
-        $response = $response->withJson($albumsTemplate->getObject(), 200);
+        $response = $response->withJson($albumsTemplate->getArray(), 200);
+        return $response;
+    }
+
+    public function postAlbum(Request $request, Response $response, $args)
+    {
+        $body = $request->getParsedBody();
+        try {
+            $album = $this->albumsHandler->insertAlbum($body);
+        } catch (\Exception $e) {
+            return $this->showError($response, $e->getMessage(), $e->getCode());
+        }
+        $albumTemplate = new AlbumTemplate($album);
+        $response = $response->withJson($albumTemplate->getArray(), 200);
+        return $response;
+    }
+
+    public function putAlbum(Request $request, Response $response, $args)
+    {
+        $albumId = $args['albumId'];
+        $body = $request->getParsedBody();
+        $response = $response->withJson($body, 200);
         return $response;
     }
 }

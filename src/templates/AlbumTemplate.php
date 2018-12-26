@@ -4,7 +4,7 @@ namespace Templates;
 
 use Models\Album;
 
-class AlbumTemplate
+class AlbumTemplate implements TemplateInterface
 {
     /**
      * @var $album Album
@@ -23,15 +23,20 @@ class AlbumTemplate
     /**
      * @return array
      */
-    public function getObject() {
+    public function getArray()
+    {
         return [
-            'id' => $this->album->getId(),
-            'artist' => $this->album->getArtist()->getName(),
-            'title' => $this->album->getTitle(),
-            'year' => $this->album->getYear(),
-            'mood' => $this->album->getGenre()->getDescription(),
-            'label' => $this->album->getLabel()->getName(),
-            'format' => $this->album->getFormat()->getName(),
+            'album' => [
+                'id' => $this->album->getId(),
+                'title' => $this->album->getTitle(),
+                'year' => $this->album->getYear(),
+                'date' => $this->album->getDateString(),
+                'notes' => $this->album->getNotes(),
+                'artist' => (new ArtistTemplate($this->album->getArtist()))->getArray(),
+                'genre' => (new GenreTemplate($this->album->getGenre()))->getArray(),
+                'label' => (new LabelTemplate($this->album->getLabel()))->getArray(),
+                'format' => $this->album->getFormat()->getName(),
+            ]
         ];
     }
 }

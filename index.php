@@ -23,6 +23,12 @@ ContainerHandler::init($container);
 $app->get('/albums/{albumId}', AlbumsController::class . ':getAlbum');
 $app->get('/albums', AlbumsController::class . ':getAlbums');
 
+$app->post('/albums/{albumId}', AlbumsController::class . ':postAlbum');
+$app->put('/albums/{albumId}', AlbumsController::class . ':putAlbum');
+
+$app->get('/praatTegenMe/{watzegje}', AlbumsController::class . ':praatTegenMe');
+$app->get('/bereken/{een}/{twee}', AlbumsController::class . ':bereken');
+
 $app->get('/migrateArtists', MigrationController::class . ':migrateArtists');
 $app->get('/migrateLabels', MigrationController::class . ':migrateLabels');
 

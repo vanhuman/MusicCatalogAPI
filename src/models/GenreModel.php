@@ -12,7 +12,7 @@ class Genre extends DatabaseModel
     /**
      * @var string $notes
      */
-    protected $notes;
+    protected $notes = '';
 
     /**
      * @return string

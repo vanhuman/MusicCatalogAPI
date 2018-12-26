@@ -4,7 +4,7 @@ namespace Templates;
 
 use Models\Album;
 
-class AlbumsTemplate
+class AlbumsTemplate implements TemplateInterface
 {
     /**
      * @var $albums Album[]
@@ -23,10 +23,10 @@ class AlbumsTemplate
     /**
      * @return array
      */
-    public function getObject() {
+    public function getArray() {
         foreach ($this->albums as $album) {
             $albumTemplate = new AlbumTemplate($album);
-            $albumsObject[] = $albumTemplate->getObject();
+            $albumsObject[] = $albumTemplate->getArray();
         }
         return isset($albumsObject) ? $albumsObject : [];
     }
