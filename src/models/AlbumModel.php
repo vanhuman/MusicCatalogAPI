@@ -4,7 +4,7 @@ namespace Models;
 
 class Album extends DatabaseModel
 {
-    private static $DATE_FORMAT = 'Y-m-d';
+    private static $DATE_FORMAT = 'Y-m-d H:i:s';
 
     /**
      * @var $title string

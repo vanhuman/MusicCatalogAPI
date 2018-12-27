@@ -2,6 +2,8 @@
 
 namespace Models;
 
+use Symfony\Component\Debug\Tests\Fixtures\ClassAlias;
+
 class DatabaseModel
 {
     /**

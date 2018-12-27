@@ -22,6 +22,9 @@ class ArtistTemplate implements TemplateInterface
 
     public function getArray()
     {
+        if (!isset($this->artist)) {
+            return null;
+        }
         return [
             'id' => $this->artist->getId(),
             'name' => $this->artist->getName(),

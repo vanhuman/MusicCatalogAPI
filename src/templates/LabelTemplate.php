@@ -22,6 +22,9 @@ class LabelTemplate
 
     public function getArray()
     {
+        if (!isset($this->label)) {
+            return null;
+        }
         return [
             'id' => $this->label->getId(),
             'name' => $this->label->getName(),

@@ -25,6 +25,9 @@ class AlbumTemplate implements TemplateInterface
      */
     public function getArray()
     {
+        if (!isset($this->album)) {
+            return null;
+        }
         return [
             'album' => [
                 'id' => $this->album->getId(),
@@ -35,7 +38,7 @@ class AlbumTemplate implements TemplateInterface
                 'artist' => (new ArtistTemplate($this->album->getArtist()))->getArray(),
                 'genre' => (new GenreTemplate($this->album->getGenre()))->getArray(),
                 'label' => (new LabelTemplate($this->album->getLabel()))->getArray(),
-                'format' => $this->album->getFormat()->getName(),
+                'format' => (new FormatTemplate($this->album->getFormat()))->getArray(),
             ]
         ];
     }

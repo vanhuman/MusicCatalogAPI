@@ -22,6 +22,9 @@ class GenreTemplate implements TemplateInterface
 
     public function getArray()
     {
+        if (!isset($this->genre)) {
+            return null;
+        }
         return [
             'id' => $this->genre->getId(),
             'description' => $this->genre->getDescription(),
