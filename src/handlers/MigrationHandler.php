@@ -6,7 +6,6 @@ namespace Handlers;
 
 class MigrationHandler extends Database
 {
-
     /**
      * Migration to move label names from the album table into its own table
      * @return int | \Exception

@@ -11,7 +11,7 @@ class LabelsHandler extends Database
     /**
      * @param int $labelId
      * @throws \Exception
-     * @return Label $label
+     * @return Label $label | null
      */
     public function getLabel($labelId)
     {
@@ -22,6 +22,9 @@ class LabelsHandler extends Database
             throw new \Exception($e->getMessage(), 500);
         }
         $labelData = $result->fetch();
+        if (!$labelData) {
+            return null;
+        }
         return new Label($labelData);
     }
 }

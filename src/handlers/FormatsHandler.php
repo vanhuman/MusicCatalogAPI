@@ -11,7 +11,7 @@ class FormatsHandler extends Database
     /**
      * @param int $formatId
      * @throws \Exception
-     * @return Format $format
+     * @return Format $format | null
      */
     public function getFormat($formatId)
     {
@@ -22,6 +22,9 @@ class FormatsHandler extends Database
             throw new \Exception($e->getMessage(), 500);
         }
         $formatData = $result->fetch();
+        if (!$formatData) {
+            return null;
+        }
         return new Format($formatData);
     }
 }

@@ -11,7 +11,7 @@ class GenresHandler extends Database
     /**
      * @param int $genreId
      * @throws \Exception
-     * @return Genre $genre
+     * @return Genre $genre | null
      */
     public function getGenre($genreId)
     {
@@ -22,6 +22,9 @@ class GenresHandler extends Database
             throw new \Exception($e->getMessage(), 500);
         }
         $genreData = $result->fetch();
+        if (!$genreData) {
+            return null;
+        }
         return new Genre($genreData);
     }
 }

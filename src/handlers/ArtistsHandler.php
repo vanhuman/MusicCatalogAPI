@@ -11,7 +11,7 @@ class ArtistsHandler extends Database
     /**
      * @param int $artistId
      * @throws \Exception
-     * @return Artist $artist
+     * @return Artist $artist | null
      */
     public function getArtist($artistId)
     {
@@ -22,6 +22,9 @@ class ArtistsHandler extends Database
             throw new \Exception($e->getMessage(), 500);
         }
         $artistData = $result->fetch();
+        if (!$artistData) {
+            return null;
+        }
         return new Artist($artistData);
     }
 }
