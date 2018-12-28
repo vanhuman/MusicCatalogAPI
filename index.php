@@ -26,8 +26,10 @@ $app->get('/albums', AlbumsController::class . ':getAlbums');
 $app->post('/albums', AlbumsController::class . ':postAlbum');
 $app->put('/albums/{albumId}', AlbumsController::class . ':putAlbum');
 
+$app->get('/migrationPre', MigrationController::class . ':migrationPre');
 $app->get('/migrateArtists', MigrationController::class . ':migrateArtists');
 $app->get('/migrateLabels', MigrationController::class . ':migrateLabels');
+$app->get('/migrationPost', MigrationController::class . ':migrationPost');
 
 try {
     $app->run();

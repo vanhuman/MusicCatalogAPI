@@ -18,6 +18,16 @@ class MigrationController
         $this->migrationHandler = new MigrationHandler($this->container->get('db'));
     }
 
+    public function migrationPre(Request $request, Response $response, $args)
+    {
+        try {
+            $this->migrationHandler->migrationPre();
+        } catch (\Exception $e) {
+            return $response->withJson($e->getMessage(), $e->getCode());
+        }
+        return $response->withJson('Done', 200);
+    }
+
     public function migrateArtists(Request $request, Response $response, $args)
     {
         $numRecs = $this->migrationHandler->migrateArtists();
@@ -35,4 +45,15 @@ class MigrationController
         }
         return $response->withJson(['number of records' => $numRecs], 200);
     }
+
+    public function migrationPost(Request $request, Response $response, $args)
+    {
+        try {
+            $this->migrationHandler->migrationPost();
+        } catch (\Exception $e) {
+            return $response->withJson($e->getMessage(), $e->getCode());
+        }
+        return $response->withJson('Done', 200);
+    }
+
 }

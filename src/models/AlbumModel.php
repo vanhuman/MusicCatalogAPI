@@ -39,7 +39,7 @@ class Album extends DatabaseModel
     /**
      * @var \DateTime $date
      */
-    protected $date;
+    protected $dateAdded;
 
     /**
      * @var string $notes
@@ -145,26 +145,26 @@ class Album extends DatabaseModel
     /**
      * @return \DateTime
      */
-    public function getDate()
+    public function getDateAdded()
     {
-        return $this->date;
+        return $this->dateAdded;
     }
 
     /**
      * @return string
      */
-    public function getDateString()
+    public function getDateAddedString()
     {
-        return date(self::$DATE_FORMAT, $this->date->getTimestamp());
+        return date(self::$DATE_FORMAT, $this->dateAdded->getTimestamp());
     }
 
     /**
      * @param string $date
      */
-    public function setDate($date)
+    public function setDateAdded($date)
     {
         $datetime = \DateTime::createFromFormat(self::$DATE_FORMAT, $date);
-        $this->date = $datetime;
+        $this->dateAdded = $datetime;
     }
 
     /**

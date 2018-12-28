@@ -11,7 +11,7 @@ use Models\Album;
 
 class AlbumsHandler extends Database
 {
-    public const FIELDS = ['id', 'title', 'year', 'date', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'];
+    public const FIELDS = ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'];
 
     /**
      * @var ArtistsHandler $artistsHandler
@@ -44,6 +44,22 @@ class AlbumsHandler extends Database
         $this->genresHandler = new GenresHandler($db);
         $this->labelsHandler = new LabelsHandler($db);
         $this->formatsHandler = new FormatsHandler($db);
+    }
+
+    /**
+     * @param int $albumId
+     * @return boolean
+     * @throws \Exception
+     */
+    public function deleteAlbum($albumId)
+    {
+        $query = 'DELETE' . ' album WHERE id = ' . $albumId;
+        try {
+            $result = $this->db->query($query);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), 500);
+        };
+        return $result;
     }
 
     /**
@@ -100,6 +116,7 @@ class AlbumsHandler extends Database
      */
     public function getAlbum($albumId)
     {
+        std()->show($albumId);
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album WHERE id = ' . $albumId;
         try {
             $result = $this->db->query($query);
@@ -140,7 +157,7 @@ class AlbumsHandler extends Database
             'id' => $albumData['id'],
             'title' => $albumData['title'],
             'year' => $albumData['year'],
-            'date' => $albumData['date'],
+            'dateAdded' => $albumData['date_added'],
             'notes' => $albumData['notes'],
         ]);
         if (array_key_exists('artist_id', $albumData)) {

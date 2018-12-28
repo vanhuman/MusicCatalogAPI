@@ -33,7 +33,7 @@ class AlbumTemplate implements TemplateInterface
                 'id' => $this->album->getId(),
                 'title' => $this->album->getTitle(),
                 'year' => $this->album->getYear(),
-                'date' => $this->album->getDateString(),
+                'dateAdded' => $this->album->getDateAddedString(),
                 'notes' => $this->album->getNotes(),
                 'artist' => (new ArtistTemplate($this->album->getArtist()))->getArray(),
                 'genre' => (new GenreTemplate($this->album->getGenre()))->getArray(),
