@@ -12,6 +12,8 @@ use Models\Album;
 class AlbumsHandler extends Database
 {
     public const FIELDS = ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'];
+    public const SORT_FIELDS = ['id', 'title', 'year', 'date_added'];
+    public const SORT_DIRECTION = ['ASC', 'DESC'];
 
     /**
      * @var ArtistsHandler $artistsHandler
@@ -48,18 +50,18 @@ class AlbumsHandler extends Database
 
     /**
      * @param int $albumId
-     * @return boolean
+     * @return int
      * @throws \Exception
      */
     public function deleteAlbum($albumId)
     {
-        $query = 'DELETE' . ' album WHERE id = ' . $albumId;
+        $query = 'DELETE FROM' . ' album WHERE id = ' . $albumId;
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         };
-        return $result;
+        return $result->rowCount();
     }
 
     /**
@@ -116,7 +118,6 @@ class AlbumsHandler extends Database
      */
     public function getAlbum($albumId)
     {
-        std()->show($albumId);
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album WHERE id = ' . $albumId;
         try {
             $result = $this->db->query($query);
@@ -128,12 +129,21 @@ class AlbumsHandler extends Database
     }
 
     /**
+     * @param string $sortBy
+     * @param string $sortDirection
      * @return array
      * @throws \Exception
      */
-    public function getAlbums()
+    public function getAlbums($sortBy = 'date_added', $sortDirection = 'DESC')
     {
+        if (!in_array($sortBy, self::SORT_FIELDS)) {
+            $sortBy = 'date_added';
+        }
+        if (!in_array($sortDirection, self::SORT_DIRECTION)) {
+            $sortDirection = 'DESC';
+        }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
+        $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {
