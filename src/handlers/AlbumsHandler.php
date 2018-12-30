@@ -9,11 +9,10 @@ use Models\Album;
 //use Models\Label;
 //use Models\Genre;
 
-class AlbumsHandler extends Database
+class AlbumsHandler extends Handler
 {
-    public const FIELDS = ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'];
-    public const SORT_FIELDS = ['id', 'title', 'year', 'date_added'];
-    public const SORT_DIRECTION = ['ASC', 'DESC'];
+    private const FIELDS = ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'];
+    private const SORT_FIELDS = ['id', 'title', 'year', 'date_added'];
 
     /**
      * @var ArtistsHandler $artistsHandler
@@ -50,69 +49,6 @@ class AlbumsHandler extends Database
 
     /**
      * @param int $albumId
-     * @return int
-     * @throws \Exception
-     */
-    public function deleteAlbum($albumId)
-    {
-        $query = 'DELETE FROM' . ' album WHERE id = ' . $albumId;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
-        return $result->rowCount();
-    }
-
-    /**
-     * @param int $albumId
-     * @param $albumData
-     * @return Album | null
-     * @throws \Exception
-     */
-    public function updateAlbum($albumId, $albumData)
-    {
-        try {
-            $this->validatePostData($albumData);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
-        }
-        $postData = $this->formatPostdataForUpdate($albumData);
-        $query = 'UPDATE' . ' album SET ' . $postData . ' WHERE id = ' . $albumId;
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
-        return $this->getAlbum($albumId);
-    }
-
-    /**
-     * @param $albumData
-     * @return Album | null
-     * @throws \Exception
-     */
-    public function insertAlbum($albumData)
-    {
-        try {
-            $this->validatePostData($albumData);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
-        }
-        $postData = $this->formatPostdataForInsert($albumData);
-        $query = 'INSERT' . ' INTO album (' . $postData['keys'] . ')';
-        $query .= ' VALUES (' . $postData['values'] . ')';
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
-        $albumId = $this->getLastInsertedAlbumId();
-        return $this->getAlbum($albumId);
-    }
-
-    /**
-     * @param int $albumId
      * @return Album
      * @throws \Exception
      */
@@ -123,6 +59,9 @@ class AlbumsHandler extends Database
             $result = $this->db->query($query);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
+        }
+        if ($result->rowCount() === 0) {
+            throw new \Exception('ERROR: Album with id ' . $albumId . ' not found.', 500);
         }
         $albumData = $result->fetch();
         return $this->createModelFromDatabaseData($albumData);
@@ -155,6 +94,57 @@ class AlbumsHandler extends Database
             $albums[] = $newAlbum;
         }
         return isset($albums) ? $albums : [];
+    }
+
+    /**
+     * @param $albumData
+     * @return Album | null
+     * @throws \Exception
+     */
+    public function insertAlbum($albumData)
+    {
+        try {
+            $this->validatePostData($albumData);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), $e->getCode());
+        }
+        $postData = $this->formatPostdataForInsert($albumData);
+        $query = 'INSERT INTO album (' . $postData['keys'] . ')';
+        $query .= ' VALUES (' . $postData['values'] . ')';
+        try {
+            $this->db->query($query);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), 500);
+        };
+        try {
+            $albumId = $this->getLastInsertedRecordId('album');
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), 500);
+        }
+        return $this->getAlbum($albumId);
+    }
+
+    /**
+     * @param int $albumId
+     * @param $albumData
+     * @return Album | null
+     * @throws \Exception
+     */
+    public function updateAlbum($albumId, $albumData)
+    {
+        try {
+            $this->validatePostData($albumData);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), $e->getCode());
+        }
+        $postData = $this->formatPostdataForUpdate($albumData);
+        $query = 'UPDATE album SET ' . $postData . ' WHERE id = ' . $albumId;
+        try {
+            $this->db->query($query);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), 500);
+        };
+        return $this->getAlbum($albumId);
     }
 
     /**
@@ -198,40 +188,6 @@ class AlbumsHandler extends Database
     }
 
     /**
-     * @param $albumData
-     * @param bool $excludeId
-     * @return bool | array
-     */
-    private function formatPostdataForInsert($albumData)
-    {
-        foreach ($albumData as $key => $value) {
-            if ($key !== 'id') {
-                $keys[] = $key;
-                $values[] = $value;
-            }
-        }
-        $postData['keys'] = implode($keys, ',');
-        $postData['values'] = '"' . implode($values, '","') . '"';
-        return $postData;
-    }
-
-    /**
-     * @param $albumData
-     * @param bool $excludeId
-     * @return bool | array
-     */
-    private function formatPostdataForUpdate($albumData)
-    {
-        foreach ($albumData as $key => $value) {
-            if ($key !== 'id') {
-                $postData[] = $key . ' = "' . $value . '"';
-            }
-        }
-        $postData = implode(',', $postData);
-        return $postData;
-    }
-
-    /**
      * @param array $albumData
      * @throws \Exception
      */
@@ -265,7 +221,7 @@ class AlbumsHandler extends Database
             $genre = $this->genresHandler->getGenre($albumData['genre_id']);
             $format = $this->formatsHandler->getFormat($albumData['format_id']);
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
+            throw new \Exception($e->getMessage(), 400);
         }
         foreach (['artist' => $artist, 'label' => $label, 'genre' => $genre, 'format' => $format] as $key => $entity) {
             if (!isset($entity)) {
@@ -274,18 +230,6 @@ class AlbumsHandler extends Database
         }
     }
 
-    /**
-     * @return int
-     */
-    private function getLastInsertedAlbumId()
-    {
-        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album ORDER BY id DESC LIMIT 1';
-        $result = $this->db->query($query)->fetch();
-        if (empty($result) || !array_key_exists('id', $result)) {
-            return -1;
-        }
-        return $result['id'];
-    }
 
 ///// Select with joins instead of getting all related records as separate select statements ////////////////////
 //    /**

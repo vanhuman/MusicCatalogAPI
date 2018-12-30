@@ -2,7 +2,7 @@
 
 namespace Handlers;
 
-class MigrationHandler extends Database
+class MigrationHandler extends Handler
 {
     /**
      * @throws \Exception

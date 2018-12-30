@@ -4,7 +4,7 @@ namespace Handlers;
 
 use Models\Genre;
 
-class GenresHandler extends Database
+class GenresHandler extends Handler
 {
     const FIELDS = ['id', 'description', 'notes'];
 

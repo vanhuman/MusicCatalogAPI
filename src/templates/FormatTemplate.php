@@ -20,15 +20,25 @@ class FormatTemplate
         $this->format = $format;
     }
 
-    public function getArray()
+    /**
+     * @param bool $includeWrapper
+     * @return array|null
+     */
+    public function getArray($includeWrapper = true)
     {
         if (!isset($this->format)) {
             return null;
         }
-        return [
+        $format = [
             'id' => $this->format->getId(),
             'name' => $this->format->getName(),
             'description' => $this->format->getDescription(),
         ];
+        if ($includeWrapper) {
+            $format = [
+                'format' => $format
+            ];
+        }
+        return $format;
     }
 }

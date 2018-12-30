@@ -3,8 +3,8 @@
 namespace Controllers;
 
 use Psr\Container\ContainerInterface;
-use \Slim\Http\Request;
-use \Slim\Http\Response;
+use Slim\Http\Request;
+use Slim\Http\Response;
 use Handlers\AlbumsHandler;
 use Templates\AlbumsTemplate;
 use Templates\AlbumTemplate;
@@ -26,7 +26,7 @@ class AlbumsController extends Controller
         try {
             $album = $this->albumsHandler->getAlbum($albumId);
         } catch (\Exception $e) {
-            $this->showError($response, $e->getMessage(), $e->getCode());
+            return $this->showError($response, $e->getMessage(), $e->getCode());
         }
         $albumTemplate = new AlbumTemplate($album);
         $response = $response->withJson($albumTemplate->getArray(), 200);
@@ -35,32 +35,15 @@ class AlbumsController extends Controller
 
     public function getAlbums(Request $request, Response $response, $args)
     {
-        $sortBy = $args['sortBy'];
-        $sortDirection = $args['sortDirection'];
+        $sortBy = $request->getParam('sortBy');
+        $sortDirection = $request->getParam('sortDirection');
         try {
             $albums = $this->albumsHandler->getAlbums($sortBy, $sortDirection);
         } catch (\Exception $e) {
-            $this->showError($response, $e->getMessage(), $e->getCode());
+            return $this->showError($response, $e->getMessage(), $e->getCode());
         }
         $albumsTemplate = new AlbumsTemplate($albums);
         $response = $response->withJson($albumsTemplate->getArray(), 200);
-        return $response;
-    }
-
-    public function deleteAlbum(Request $request, Response $response, $args)
-    {
-        $albumId = $args['albumId'];
-        try {
-            $result = $this->albumsHandler->deleteAlbum($albumId);
-        } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
-        }
-        if ($result === 0) {
-            $result = 'Album with id ' . $albumId . ' not found.';
-        } else {
-            $result = 'Album with id ' . $albumId . ' deleted.';
-        }
-        $response = $response->withJson($result, 200);
         return $response;
     }
 
@@ -89,6 +72,19 @@ class AlbumsController extends Controller
         }
         $albumTemplate = new AlbumTemplate($album);
         $response = $response->withJson($albumTemplate->getArray(), 200);
+        return $response;
+    }
+
+    public function deleteAlbum(Request $request, Response $response, $args)
+    {
+        $albumId = $args['albumId'];
+        try {
+            $result = $this->albumsHandler->deleteRecord('album', $albumId);
+        } catch (\Exception $e) {
+            return $this->showError($response, $e->getMessage(), $e->getCode());
+        }
+        $result = 'Album with id ' . $albumId . ' deleted.';
+        $response = $response->withJson($result, 200);
         return $response;
     }
 }

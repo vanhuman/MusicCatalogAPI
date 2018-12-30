@@ -35,10 +35,10 @@ class AlbumTemplate implements TemplateInterface
                 'year' => $this->album->getYear(),
                 'dateAdded' => $this->album->getDateAddedString(),
                 'notes' => $this->album->getNotes(),
-                'artist' => (new ArtistTemplate($this->album->getArtist()))->getArray(),
-                'genre' => (new GenreTemplate($this->album->getGenre()))->getArray(),
-                'label' => (new LabelTemplate($this->album->getLabel()))->getArray(),
-                'format' => (new FormatTemplate($this->album->getFormat()))->getArray(),
+                'artist' => (new ArtistTemplate($this->album->getArtist()))->getArray(false),
+                'genre' => (new GenreTemplate($this->album->getGenre()))->getArray(false),
+                'label' => (new LabelTemplate($this->album->getLabel()))->getArray(false),
+                'format' => (new FormatTemplate($this->album->getFormat()))->getArray(false),
             ]
         ];
     }

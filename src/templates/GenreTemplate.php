@@ -20,15 +20,25 @@ class GenreTemplate implements TemplateInterface
         $this->genre = $genre;
     }
 
-    public function getArray()
+    /**
+     * @param bool $includeWrapper
+     * @return array|null
+     */
+    public function getArray($includeWrapper = true)
     {
         if (!isset($this->genre)) {
             return null;
         }
-        return [
+        $genre = [
             'id' => $this->genre->getId(),
             'description' => $this->genre->getDescription(),
             'notes' => $this->genre->getNotes(),
         ];
+        if ($includeWrapper) {
+            $genre = [
+                'genre' => $genre
+            ];
+        }
+        return $genre;
     }
 }

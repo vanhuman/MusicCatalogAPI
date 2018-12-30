@@ -20,14 +20,24 @@ class LabelTemplate
         $this->label = $label;
     }
 
-    public function getArray()
+    /**
+     * @param bool $includeWrapper
+     * @return array|null
+     */
+    public function getArray($includeWrapper = true)
     {
         if (!isset($this->label)) {
             return null;
         }
-        return [
+        $label = [
             'id' => $this->label->getId(),
             'name' => $this->label->getName(),
         ];
+        if ($includeWrapper) {
+            $label = [
+                'label' => $label
+            ];
+        }
+        return $label;
     }
 }

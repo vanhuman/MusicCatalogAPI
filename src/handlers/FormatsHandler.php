@@ -4,7 +4,7 @@ namespace Handlers;
 
 use Models\Format;
 
-class FormatsHandler extends Database
+class FormatsHandler extends Handler
 {
     const FIELDS = ['id', 'name', 'description'];
 
