@@ -17,31 +17,13 @@ class LabelsController extends Controller
         $this->handler = new LabelsHandler($this->container->get('db'));
     }
 
-    public function getLabel(Request $request, Response $response, $args)
+    protected function newTemplate($labels)
     {
-        $id = $args['id'];
-        try {
-            $label = $this->handler->getLabel($id);
-        } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
+        if (is_array($labels)) {
+            return new LabelsTemplate($labels);
+        } else {
+            return new LabelTemplate($labels);
         }
-        $labelTemplate = new LabelTemplate($label);
-        $response = $response->withJson($labelTemplate->getArray(), 200);
-        return $response;
-    }
-
-    public function getLabels(Request $request, Response $response, $args)
-    {
-        $sortBy = $request->getParam('sortBy');
-        $sortDirection = $request->getParam('sortDirection');
-        try {
-            $labels = $this->handler->getLabels($sortBy, $sortDirection);
-        } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
-        }
-        $labelsTemplate = new LabelsTemplate($labels);
-        $response = $response->withJson($labelsTemplate->getArray(), 200);
-        return $response;
     }
 
     public function postLabel(Request $request, Response $response, $args)

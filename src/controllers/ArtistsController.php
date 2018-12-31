@@ -17,31 +17,13 @@ class ArtistsController extends Controller
         $this->handler = new ArtistsHandler($this->container->get('db'));
     }
 
-    public function getArtist(Request $request, Response $response, $args)
+    protected function newTemplate($artists)
     {
-        $id = $args['id'];
-        try {
-            $artist = $this->handler->getArtist($id);
-        } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
+        if (is_array($artists)) {
+            return new ArtistsTemplate($artists);
+        } else {
+            return new ArtistTemplate($artists);
         }
-        $artistTemplate = new ArtistTemplate($artist);
-        $response = $response->withJson($artistTemplate->getArray(), 200);
-        return $response;
-    }
-
-    public function getArtists(Request $request, Response $response, $args)
-    {
-        $sortBy = $request->getParam('sortBy');
-        $sortDirection = $request->getParam('sortDirection');
-        try {
-            $artists = $this->handler->getArtists($sortBy, $sortDirection);
-        } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
-        }
-        $artistsTemplate = new ArtistsTemplate($artists);
-        $response = $response->withJson($artistsTemplate->getArray(), 200);
-        return $response;
     }
 
     public function postArtist(Request $request, Response $response, $args)

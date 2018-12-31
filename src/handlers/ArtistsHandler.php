@@ -10,32 +10,13 @@ class ArtistsHandler extends DatabaseHandler
     private const SORT_FIELDS = ['id', 'name'];
 
     /**
-     * @param int $artistId
-     * @throws \Exception
-     * @return Artist $artist | null
-     */
-    public function getArtist($artistId)
-    {
-        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM artist WHERE id = ' . $artistId;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
-        $artistData = $result->fetch();
-        if ($result->rowCount() === 0) {
-            throw new \Exception('ERROR: Artist with id ' . $artistId . ' not found.', 500);
-        }
-        return  $this->createModelFromDatabaseData($artistData);
-    }
-
-    /**
+     * @param int $id
      * @param string $sortBy
      * @param string $sortDirection
      * @throws \Exception
-     * @return Artist[] $artist | null
+     * @return Artist | Artist[]
      */
-    public function getArtists($sortBy = 'name', $sortDirection = 'ASC')
+    public function get($id, $sortBy = 'name', $sortDirection = 'ASC')
     {
         if (!in_array($sortBy, self::SORT_FIELDS)) {
             $sortBy = 'name';
@@ -44,18 +25,30 @@ class ArtistsHandler extends DatabaseHandler
             $sortDirection = 'ASC';
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM artist';
-        $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        if (isset($id)) {
+            $query .= ' WHERE id = ' . $id;
+        } else {
+            $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        }
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
-        $artistsData = $result->fetchAll();
-        foreach ($artistsData as $artistData) {
-            $newArtist = $this->createModelFromDatabaseData($artistData);
-            $artists[] = $newArtist;
+        if (isset($id)) {
+            $artistData = $result->fetch();
+            if ($result->rowCount() === 0) {
+                throw new \Exception('ERROR: Artist with id ' . $id . ' not found.', 500);
+            }
+            return  $this->createModelFromDatabaseData($artistData);
+        } else {
+            $artistsData = $result->fetchAll();
+            foreach ($artistsData as $artistData) {
+                $newArtist = $this->createModelFromDatabaseData($artistData);
+                $artists[] = $newArtist;
+            }
+            return isset($artists) ? $artists : [];
         }
-        return isset($artists) ? $artists : [];
     }
 
     /**
@@ -79,16 +72,16 @@ class ArtistsHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), 500);
         };
         $artistId = $this->getLastInsertedRecordId('artist');
-        return $this->getArtist($artistId);
+        return $this->get($artistId);
     }
 
     /**
-     * @param $artistId
+     * @param $id
      * @param $artistData
      * @return Artist
      * @throws \Exception
      */
-    public function updateArtist($artistId, $artistData)
+    public function updateArtist($id, $artistData)
     {
         try {
             $this->validatePostData($artistData);
@@ -96,13 +89,13 @@ class ArtistsHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), $e->getCode());
         }
         $postData = $this->formatPostdataForUpdate($artistData);
-        $query = 'UPDATE artist SET ' . $postData . ' WHERE id = ' . $artistId;
+        $query = 'UPDATE artist SET ' . $postData . ' WHERE id = ' . $id;
         try {
             $this->db->query($query);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         };
-        return $this->getArtist($artistId);
+        return $this->get($id);
     }
 
     /**

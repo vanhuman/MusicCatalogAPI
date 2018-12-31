@@ -6,25 +6,62 @@ use Models\Format;
 
 class FormatsHandler extends DatabaseHandler
 {
-    const FIELDS = ['id', 'name', 'description'];
+    private const FIELDS = ['id', 'name', 'description'];
+    private const SORT_FIELDS = ['id', 'name'];
 
     /**
-     * @param int $formatId
+     * @param int $id
+     * @param string $sortBy
+     * @param string $sortDirection
      * @throws \Exception
-     * @return Format $format | null
+     * @return Format | Format[]
      */
-    public function getFormat($formatId)
+    public function get($id, $sortBy = 'id', $sortDirection = 'ASC')
     {
-        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM format WHERE id = ' . $formatId;
+        if (!in_array($sortBy, self::SORT_FIELDS)) {
+            $sortBy = 'id';
+        }
+        if (!in_array($sortDirection, self::SORT_DIRECTION)) {
+            $sortDirection = 'ASC';
+        }
+        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM format';
+        if (isset($id)) {
+            $query .= ' WHERE id = ' . $id;
+        } else {
+            $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        }
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
-        $formatData = $result->fetch();
-        if (!$formatData) {
-            return null;
+        if (isset($id)) {
+            $formatData = $result->fetch();
+            if ($result->rowCount() === 0) {
+                throw new \Exception('ERROR: Label with id ' . $id . ' not found.', 500);
+            }
+            return $this->createModelFromDatabaseData($formatData);
+        } else {
+            $formatsData = $result->fetchAll();
+            foreach ($formatsData as $formatData) {
+                $newFormat = $this->createModelFromDatabaseData($formatData);
+                $formats[] = $newFormat;
+            }
+            return isset($formats) ? $formats : [];
         }
-        return new Format($formatData);
+    }
+
+    /**
+     * @param $formatData
+     * @return Format
+     */
+    private function createModelFromDatabaseData($formatData)
+    {
+        $newFormat = new Format([
+            'id' => $formatData['id'],
+            'name' => $formatData['name'],
+            'description' => $formatData['description'],
+        ]);
+        return $newFormat;
     }
 }

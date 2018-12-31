@@ -16,6 +16,8 @@ abstract class DatabaseHandler {
         $this->db = $db;
     }
 
+    abstract public function get($id, $sortBy, $sortDirection);
+
     /**
      * @param string $table
      * @param int $id

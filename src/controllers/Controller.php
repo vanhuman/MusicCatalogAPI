@@ -6,8 +6,9 @@ use Handlers\DatabaseHandler;
 use Psr\Container\ContainerInterface;
 use \Slim\Http\Response;
 use Slim\Http\Request;
+use Templates\TemplateInterface;
 
-class Controller
+abstract class Controller
 {
     /**
      * @var ContainerInterface $container
@@ -18,6 +19,24 @@ class Controller
      * @var DatabaseHandler $handler
      */
     protected $handler;
+
+    abstract protected function newTemplate($models);
+
+    public function get(Request $request, Response $response, $args)
+    {
+        $id = $args['id'];
+        $sortBy = $request->getParam('sortBy');
+        $sortDirection = $request->getParam('sortDirection');
+        try {
+            $records = $this->handler->get($id, $sortBy, $sortDirection);
+        } catch (\Exception $e) {
+            return $this->showError($response, $e->getMessage(), $e->getCode());
+        }
+        /* @var TemplateInterface $template */
+        $template = $this->newTemplate($records);
+        $response = $response->withJson($template->getArray(), 200);
+        return $response;
+    }
 
     public function delete(Request $request, Response $response, $args)
     {

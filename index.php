@@ -6,6 +6,8 @@ use Handlers\ContainerHandler;
 use Controllers\AlbumsController;
 use Controllers\ArtistsController;
 use Controllers\LabelsController;
+use Controllers\GenresController;
+use Controllers\FormatsController;
 use Controllers\MigrationController;
 
 $config['displayErrorDetails'] = true;
@@ -22,26 +24,19 @@ $container = $app->getContainer();
 
 ContainerHandler::init($container);
 
-/* album routes */
-$app->get('/albums/{id}', AlbumsController::class . ':getAlbum');
-$app->get('/albums', AlbumsController::class . ':getAlbums');
-$app->post('/albums', AlbumsController::class . ':postAlbum');
-$app->put('/albums/{id}', AlbumsController::class . ':putAlbum');
-$app->delete('/albums/{id}', AlbumsController::class . ':delete');
-
-/* artist routes */
-$app->get('/artists/{id}', ArtistsController::class . ':getArtist');
-$app->get('/artists', ArtistsController::class . ':getArtists');
-$app->post('/artists', ArtistsController::class . ':postArtist');
-$app->put('/artists/{id}', ArtistsController::class . ':putArtist');
-$app->delete('/artists/{id}', ArtistsController::class . ':delete');
-
-/* label routes */
-$app->get('/labels/{id}', LabelsController::class . ':getLabel');
-$app->get('/labels', LabelsController::class . ':getLabels');
-$app->post('/labels', LabelsController::class . ':postLabel');
-$app->put('/labels/{id}', LabelsController::class . ':putLabel');
-$app->delete('/labels/{id}', LabelsController::class . ':delete');
+foreach ([
+             '/albums' => AlbumsController::class,
+             '/artists' => ArtistsController::class,
+             '/labels' => LabelsController::class,
+             '/formats' => FormatsController::class,
+             '/genres' => GenresController::class
+         ] as $route => $controller) {
+    $app->get($route . '/{id}', $controller . ':get');
+    $app->get($route, $controller . ':get');
+    $app->post($route, $controller . ':postAlbum');
+    $app->put($route . '/{id}', $controller . ':putAlbum');
+    $app->delete($route . '/{id}', $controller . ':delete');
+}
 
 /* migration routes */
 $app->get('/migrationPre', MigrationController::class . ':migrationPre');

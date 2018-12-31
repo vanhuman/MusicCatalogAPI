@@ -10,32 +10,13 @@ class LabelsHandler extends DatabaseHandler
     private const SORT_FIELDS = ['id', 'name'];
 
     /**
-     * @param int $labelId
-     * @throws \Exception
-     * @return Label $label | null
-     */
-    public function getLabel($labelId)
-    {
-        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM label WHERE id = ' . $labelId;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
-        $labelData = $result->fetch();
-        if ($result->rowCount() === 0) {
-            throw new \Exception('ERROR: Label with id ' . $labelId . ' not found.', 500);
-        }
-        return $this->createModelFromDatabaseData($labelData);
-    }
-
-    /**
+     * @param int $id
      * @param string $sortBy
      * @param string $sortDirection
-     * @return array
      * @throws \Exception
+     * @return Label | Label[]
      */
-    public function getLabels($sortBy = 'name', $sortDirection = 'ASC')
+    public function get($id, $sortBy = 'name', $sortDirection = 'ASC')
     {
         if (!in_array($sortBy, self::SORT_FIELDS)) {
             $sortBy = 'name';
@@ -44,18 +25,30 @@ class LabelsHandler extends DatabaseHandler
             $sortDirection = 'ASC';
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM label';
-        $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        if (isset($id)) {
+            $query .= ' WHERE id = ' . $id;
+        } else {
+            $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        }
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
-        $labelsData = $result->fetchAll();
-        foreach ($labelsData as $labelData) {
-            $newLabel = $this->createModelFromDatabaseData($labelData);
-            $labels[] = $newLabel;
+        if (isset($id)) {
+            $labelData = $result->fetch();
+            if ($result->rowCount() === 0) {
+                throw new \Exception('ERROR: Label with id ' . $id . ' not found.', 500);
+            }
+            return $this->createModelFromDatabaseData($labelData);
+        } else {
+            $labelsData = $result->fetchAll();
+            foreach ($labelsData as $labelData) {
+                $newLabel = $this->createModelFromDatabaseData($labelData);
+                $labels[] = $newLabel;
+            }
+            return isset($labels) ? $labels : [];
         }
-        return isset($labels) ? $labels : [];
     }
 
     /**
@@ -79,16 +72,16 @@ class LabelsHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), 500);
         };
         $labelId = $this->getLastInsertedRecordId('label');
-        return $this->getLabel($labelId);
+        return $this->get($labelId);
     }
 
     /**
-     * @param int $labelId
+     * @param int $id
      * @param $labelData
      * @return Label
      * @throws \Exception
      */
-    public function updateLabel($labelId, $labelData)
+    public function updateLabel($id, $labelData)
     {
         try {
             $this->validatePostData($labelData);
@@ -96,13 +89,13 @@ class LabelsHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), $e->getCode());
         }
         $postData = $this->formatPostdataForUpdate($labelData);
-        $query = 'UPDATE label SET ' . $postData . ' WHERE id = ' . $labelId;
+        $query = 'UPDATE label SET ' . $postData . ' WHERE id = ' . $id;
         try {
             $this->db->query($query);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         };
-        return $this->getLabel($labelId);
+        return $this->get($id);
     }
 
     /**

@@ -4,11 +4,6 @@ namespace Handlers;
 
 use Models\Album;
 
-//use Models\Artist;
-//use Models\Format;
-//use Models\Label;
-//use Models\Genre;
-
 class AlbumsHandler extends DatabaseHandler
 {
     private const FIELDS = ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'];
@@ -48,52 +43,46 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param int $albumId
-     * @return Album
-     * @throws \Exception
-     */
-    public function getAlbum($albumId)
-    {
-        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album WHERE id = ' . $albumId;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
-        if ($result->rowCount() === 0) {
-            throw new \Exception('ERROR: Album with id ' . $albumId . ' not found.', 500);
-        }
-        $albumData = $result->fetch();
-        return $this->createModelFromDatabaseData($albumData);
-    }
-
-    /**
+     * @param int $id
      * @param string $sortBy
      * @param string $sortDirection
-     * @return array
+     * @return Album | Album[]
      * @throws \Exception
      */
-    public function getAlbums($sortBy = 'date_added', $sortDirection = 'DESC')
+    public function get($id, $sortBy = 'year', $sortDirection = 'DESC')
     {
         if (!in_array($sortBy, self::SORT_FIELDS)) {
-            $sortBy = 'date_added';
+            $sortBy = 'year';
         }
         if (!in_array($sortDirection, self::SORT_DIRECTION)) {
             $sortDirection = 'DESC';
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
-        $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        if (isset($id)) {
+            $query .= ' WHERE id = ' . $id;
+        } else {
+            $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        }
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
-        $albumsData = $result->fetchAll();
-        foreach ($albumsData as $albumData) {
-            $newAlbum = $this->createModelFromDatabaseData($albumData);
-            $albums[] = $newAlbum;
+        if (isset($id)) {
+            if ($result->rowCount() === 0) {
+                throw new \Exception('ERROR: Album with id ' . $id . ' not found.', 500);
+            }
+            $albumData = $result->fetch();
+            return $this->createModelFromDatabaseData($albumData);
+        } else {
+            $albumsData = $result->fetchAll();
+            foreach ($albumsData as $albumData) {
+                $newAlbum = $this->createModelFromDatabaseData($albumData);
+                $albums[] = $newAlbum;
+            }
+            return isset($albums) ? $albums : [];
         }
-        return isset($albums) ? $albums : [];
+
     }
 
     /**
@@ -121,16 +110,16 @@ class AlbumsHandler extends DatabaseHandler
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
-        return $this->getAlbum($albumId);
+        return $this->get($albumId);
     }
 
     /**
-     * @param int $albumId
+     * @param int $id
      * @param $albumData
-     * @return Album | null
+     * @return Album
      * @throws \Exception
      */
-    public function updateAlbum($albumId, $albumData)
+    public function updateAlbum($id, $albumData)
     {
         try {
             $this->validatePostData($albumData);
@@ -138,13 +127,13 @@ class AlbumsHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), $e->getCode());
         }
         $postData = $this->formatPostdataForUpdate($albumData);
-        $query = 'UPDATE album SET ' . $postData . ' WHERE id = ' . $albumId;
+        $query = 'UPDATE album SET ' . $postData . ' WHERE id = ' . $id;
         try {
             $this->db->query($query);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         };
-        return $this->getAlbum($albumId);
+        return $this->get($id);
     }
 
     /**
@@ -162,27 +151,27 @@ class AlbumsHandler extends DatabaseHandler
         ]);
         if (array_key_exists('artist_id', $albumData)) {
             try {
-                $newAlbum->setArtist($this->artistsHandler->getArtist($albumData['artist_id']));
+                $newAlbum->setArtist($this->artistsHandler->get($albumData['artist_id']));
             } catch (\Exception $e) {
             }
         }
         if (array_key_exists('genre_id', $albumData)) {
             try {
-                $newAlbum->setGenre($this->genresHandler->getGenre($albumData['genre_id']));
+                $newAlbum->setGenre($this->genresHandler->get($albumData['genre_id']));
             } catch (\Exception $e) {
             }
         }
-        try {
-            if (array_key_exists('label_id', $albumData)) {
-                $newAlbum->setLabel($this->labelsHandler->getLabel($albumData['label_id']));
+        if (array_key_exists('label_id', $albumData)) {
+            try {
+                $newAlbum->setLabel($this->labelsHandler->get($albumData['label_id']));
+            } catch (\Exception $e) {
             }
-        } catch (\Exception $e) {
         }
-        try {
-            if (array_key_exists('format_id', $albumData)) {
-                $newAlbum->setFormat($this->formatsHandler->getFormat($albumData['format_id']));
+        if (array_key_exists('format_id', $albumData)) {
+            try {
+                $newAlbum->setFormat($this->formatsHandler->get($albumData['format_id']));
+            } catch (\Exception $e) {
             }
-        } catch (\Exception $e) {
         }
         return $newAlbum;
     }
@@ -216,10 +205,10 @@ class AlbumsHandler extends DatabaseHandler
         }
         // check existence of artist, genre, label and format
         try {
-            $artist = $this->artistsHandler->getArtist($albumData['artist_id']);
-            $label = $this->labelsHandler->getLabel($albumData['label_id']);
-            $genre = $this->genresHandler->getGenre($albumData['genre_id']);
-            $format = $this->formatsHandler->getFormat($albumData['format_id']);
+            $artist = $this->artistsHandler->get($albumData['artist_id']);
+            $label = $this->labelsHandler->get($albumData['label_id']);
+            $genre = $this->genresHandler->get($albumData['genre_id']);
+            $format = $this->formatsHandler->get($albumData['format_id']);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 400);
         }

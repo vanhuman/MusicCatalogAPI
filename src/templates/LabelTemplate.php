@@ -4,7 +4,7 @@ namespace Templates;
 
 use Models\Label;
 
-class LabelTemplate
+class LabelTemplate implements TemplateInterface
 {
     /**
      * @var Label $label

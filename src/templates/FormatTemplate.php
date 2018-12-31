@@ -4,7 +4,7 @@ namespace Templates;
 
 use Models\Format;
 
-class FormatTemplate
+class FormatTemplate implements TemplateInterface
 {
     /**
      * @var Format $format

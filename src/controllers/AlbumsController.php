@@ -17,31 +17,13 @@ class AlbumsController extends Controller
         $this->handler = new AlbumsHandler($this->container->get('db'));
     }
 
-    public function getAlbum(Request $request, Response $response, $args)
+    protected function newTemplate($albums)
     {
-        $id = $args['id'];
-        try {
-            $album = $this->handler->getAlbum($id);
-        } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
+        if (is_array($albums)) {
+            return new AlbumsTemplate($albums);
+        } else {
+            return new AlbumTemplate($albums);
         }
-        $albumTemplate = new AlbumTemplate($album);
-        $response = $response->withJson($albumTemplate->getArray(), 200);
-        return $response;
-    }
-
-    public function getAlbums(Request $request, Response $response, $args)
-    {
-        $sortBy = $request->getParam('sortBy');
-        $sortDirection = $request->getParam('sortDirection');
-        try {
-            $albums = $this->handler->getAlbums($sortBy, $sortDirection);
-        } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
-        }
-        $albumsTemplate = new AlbumsTemplate($albums);
-        $response = $response->withJson($albumsTemplate->getArray(), 200);
-        return $response;
     }
 
     public function postAlbum(Request $request, Response $response, $args)
