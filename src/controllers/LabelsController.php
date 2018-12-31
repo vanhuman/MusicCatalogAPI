@@ -11,20 +11,17 @@ use Templates\LabelTemplate;
 
 class LabelsController extends Controller
 {
-    protected $container;
-    protected $labelsHandler;
-
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->labelsHandler = new LabelsHandler($this->container->get('db'));
+        $this->handler = new LabelsHandler($this->container->get('db'));
     }
 
     public function getLabel(Request $request, Response $response, $args)
     {
-        $labelId = $args['labelId'];
+        $id = $args['id'];
         try {
-            $label = $this->labelsHandler->getLabel($labelId);
+            $label = $this->handler->getLabel($id);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
@@ -38,7 +35,7 @@ class LabelsController extends Controller
         $sortBy = $request->getParam('sortBy');
         $sortDirection = $request->getParam('sortDirection');
         try {
-            $labels = $this->labelsHandler->getLabels($sortBy, $sortDirection);
+            $labels = $this->handler->getLabels($sortBy, $sortDirection);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
@@ -51,7 +48,7 @@ class LabelsController extends Controller
     {
         $body = $request->getParsedBody();
         try {
-            $label = $this->labelsHandler->insertLabel($body);
+            $label = $this->handler->insertLabel($body);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
@@ -62,10 +59,10 @@ class LabelsController extends Controller
 
     public function putLabel(Request $request, Response $response, $args)
     {
-        $labelId = $args['labelId'];
+        $id = $args['id'];
         $body = $request->getParsedBody();
         try {
-            $label = $this->labelsHandler->updateLabel($labelId, $body);
+            $label = $this->handler->updateLabel($id, $body);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
@@ -73,18 +70,4 @@ class LabelsController extends Controller
         $response = $response->withJson($labelTemplate->getArray(), 200);
         return $response;
     }
-
-    public function deleteLabel(Request $request, Response $response, $args)
-    {
-        $labelId = $args['labelId'];
-        try {
-            $result = $this->labelsHandler->deleteRecord('label', $labelId);
-        } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
-        }
-        $result = 'Label with id ' . $labelId . ' deleted.';
-        $response = $response->withJson($result, 200);
-        return $response;
-    }
-
 }

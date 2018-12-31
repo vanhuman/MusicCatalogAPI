@@ -4,7 +4,7 @@ namespace Handlers;
 
 use Models\Label;
 
-class LabelsHandler extends Handler
+class LabelsHandler extends DatabaseHandler
 {
     private const FIELDS = ['id', 'name'];
     private const SORT_FIELDS = ['id', 'name'];

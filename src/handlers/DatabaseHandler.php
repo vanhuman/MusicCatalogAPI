@@ -2,7 +2,7 @@
 
 namespace Handlers;
 
-abstract class Handler {
+abstract class DatabaseHandler {
     public const SORT_DIRECTION = ['ASC', 'DESC'];
 
     /* @var \PDO $db */
@@ -22,7 +22,7 @@ abstract class Handler {
      * @return int
      * @throws \Exception
      */
-    public function deleteRecord($table, $id)
+    public function delete($table, $id)
     {
         $query = 'DELETE FROM ' . $table . ' WHERE id = ' . $id;
         try {

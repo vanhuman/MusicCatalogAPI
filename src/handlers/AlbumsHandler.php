@@ -9,7 +9,7 @@ use Models\Album;
 //use Models\Label;
 //use Models\Genre;
 
-class AlbumsHandler extends Handler
+class AlbumsHandler extends DatabaseHandler
 {
     private const FIELDS = ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'];
     private const SORT_FIELDS = ['id', 'title', 'year', 'date_added'];

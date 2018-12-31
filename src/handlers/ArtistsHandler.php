@@ -4,7 +4,7 @@ namespace Handlers;
 
 use Models\Artist;
 
-class ArtistsHandler extends Handler
+class ArtistsHandler extends DatabaseHandler
 {
     private const FIELDS = ['id', 'name'];
     private const SORT_FIELDS = ['id', 'name'];

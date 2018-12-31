@@ -11,20 +11,17 @@ use Templates\AlbumTemplate;
 
 class AlbumsController extends Controller
 {
-    protected $container;
-    protected $albumsHandler;
-
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->albumsHandler = new AlbumsHandler($this->container->get('db'));
+        $this->handler = new AlbumsHandler($this->container->get('db'));
     }
 
     public function getAlbum(Request $request, Response $response, $args)
     {
-        $albumId = $args['albumId'];
+        $id = $args['id'];
         try {
-            $album = $this->albumsHandler->getAlbum($albumId);
+            $album = $this->handler->getAlbum($id);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
@@ -38,7 +35,7 @@ class AlbumsController extends Controller
         $sortBy = $request->getParam('sortBy');
         $sortDirection = $request->getParam('sortDirection');
         try {
-            $albums = $this->albumsHandler->getAlbums($sortBy, $sortDirection);
+            $albums = $this->handler->getAlbums($sortBy, $sortDirection);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
@@ -51,7 +48,7 @@ class AlbumsController extends Controller
     {
         $body = $request->getParsedBody();
         try {
-            $album = $this->albumsHandler->insertAlbum($body);
+            $album = $this->handler->insertAlbum($body);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
@@ -63,28 +60,15 @@ class AlbumsController extends Controller
 
     public function putAlbum(Request $request, Response $response, $args)
     {
-        $albumId = $args['albumId'];
+        $id = $args['id'];
         $body = $request->getParsedBody();
         try {
-            $album = $this->albumsHandler->updateAlbum($albumId, $body);
+            $album = $this->handler->updateAlbum($id, $body);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
         $albumTemplate = new AlbumTemplate($album);
         $response = $response->withJson($albumTemplate->getArray(), 200);
-        return $response;
-    }
-
-    public function deleteAlbum(Request $request, Response $response, $args)
-    {
-        $albumId = $args['albumId'];
-        try {
-            $result = $this->albumsHandler->deleteRecord('album', $albumId);
-        } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
-        }
-        $result = 'Album with id ' . $albumId . ' deleted.';
-        $response = $response->withJson($result, 200);
         return $response;
     }
 }

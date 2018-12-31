@@ -11,20 +11,17 @@ use Templates\ArtistTemplate;
 
 class ArtistsController extends Controller
 {
-    protected $container;
-    protected $artistsHandler;
-
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->artistsHandler = new ArtistsHandler($this->container->get('db'));
+        $this->handler = new ArtistsHandler($this->container->get('db'));
     }
 
     public function getArtist(Request $request, Response $response, $args)
     {
-        $artistId = $args['artistId'];
+        $id = $args['id'];
         try {
-            $artist = $this->artistsHandler->getArtist($artistId);
+            $artist = $this->handler->getArtist($id);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
@@ -38,7 +35,7 @@ class ArtistsController extends Controller
         $sortBy = $request->getParam('sortBy');
         $sortDirection = $request->getParam('sortDirection');
         try {
-            $artists = $this->artistsHandler->getArtists($sortBy, $sortDirection);
+            $artists = $this->handler->getArtists($sortBy, $sortDirection);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
@@ -51,7 +48,7 @@ class ArtistsController extends Controller
     {
         $body = $request->getParsedBody();
         try {
-            $artist = $this->artistsHandler->insertArtist($body);
+            $artist = $this->handler->insertArtist($body);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
@@ -62,10 +59,10 @@ class ArtistsController extends Controller
 
     public function putArtist(Request $request, Response $response, $args)
     {
-        $artistId = $args['artistId'];
+        $id = $args['id'];
         $body = $request->getParsedBody();
         try {
-            $artist = $this->artistsHandler->updateArtist($artistId, $body);
+            $artist = $this->handler->updateArtist($id, $body);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
@@ -73,18 +70,4 @@ class ArtistsController extends Controller
         $response = $response->withJson($artistTemplate->getArray(), 200);
         return $response;
     }
-
-    public function deleteArtist(Request $request, Response $response, $args)
-    {
-        $artistId = $args['artistId'];
-        try {
-            $result = $this->artistsHandler->deleteRecord('artist', $artistId);
-        } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
-        }
-        $result = 'Artist with id ' . $artistId . ' deleted.';
-        $response = $response->withJson($result, 200);
-        return $response;
-    }
-
 }

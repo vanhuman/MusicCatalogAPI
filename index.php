@@ -23,25 +23,25 @@ $container = $app->getContainer();
 ContainerHandler::init($container);
 
 /* album routes */
-$app->get('/albums/{albumId}', AlbumsController::class . ':getAlbum');
+$app->get('/albums/{id}', AlbumsController::class . ':getAlbum');
 $app->get('/albums', AlbumsController::class . ':getAlbums');
 $app->post('/albums', AlbumsController::class . ':postAlbum');
-$app->put('/albums/{albumId}', AlbumsController::class . ':putAlbum');
-$app->delete('/albums/{albumId}', AlbumsController::class . ':deleteAlbum');
+$app->put('/albums/{id}', AlbumsController::class . ':putAlbum');
+$app->delete('/albums/{id}', AlbumsController::class . ':delete');
 
 /* artist routes */
-$app->get('/artists/{artistId}', ArtistsController::class . ':getArtist');
+$app->get('/artists/{id}', ArtistsController::class . ':getArtist');
 $app->get('/artists', ArtistsController::class . ':getArtists');
 $app->post('/artists', ArtistsController::class . ':postArtist');
-$app->put('/artists/{artistId}', ArtistsController::class . ':putArtist');
-$app->delete('/artists/{artistId}', ArtistsController::class . ':deleteArtist');
+$app->put('/artists/{id}', ArtistsController::class . ':putArtist');
+$app->delete('/artists/{id}', ArtistsController::class . ':delete');
 
 /* label routes */
-$app->get('/labels/{labelId}', LabelsController::class . ':getLabel');
+$app->get('/labels/{id}', LabelsController::class . ':getLabel');
 $app->get('/labels', LabelsController::class . ':getLabels');
 $app->post('/labels', LabelsController::class . ':postLabel');
-$app->put('/labels/{labelId}', LabelsController::class . ':putLabel');
-$app->delete('/labels/{labelId}', LabelsController::class . ':deleteLabel');
+$app->put('/labels/{id}', LabelsController::class . ':putLabel');
+$app->delete('/labels/{id}', LabelsController::class . ':delete');
 
 /* migration routes */
 $app->get('/migrationPre', MigrationController::class . ':migrationPre');
