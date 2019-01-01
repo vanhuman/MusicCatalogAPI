@@ -1,8 +1,8 @@
 <?php
 
-namespace Handlers;
+namespace Helpers;
 
-class ContainerHandler
+class ContainerHelper
 {
     public static function init($container)
     {

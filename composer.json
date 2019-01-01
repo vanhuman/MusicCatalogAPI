@@ -12,7 +12,8 @@
             "Models\\": "src/models/",
             "Handlers\\": "src/handlers/",
             "Controllers\\": "src/controllers/",
-            "Templates\\": "src/templates/"
+            "Templates\\": "src/templates/",
+            "Helpers\\": "src/helpers/"
         }
     }
 }

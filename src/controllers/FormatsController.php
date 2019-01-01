@@ -4,6 +4,8 @@ namespace Controllers;
 
 use Handlers\FormatsHandler;
 use Psr\Container\ContainerInterface;
+use Slim\Http\Request;
+use Slim\Http\Response;
 use Templates\FormatsTemplate;
 use Templates\FormatTemplate;
 
@@ -23,4 +25,32 @@ class FormatsController extends Controller
             return new FormatTemplate($formats);
         }
     }
+
+    public function postFormat(Request $request, Response $response, $args)
+    {
+        $body = $request->getParsedBody();
+        try {
+            $format = $this->handler->insertFormat($body);
+        } catch (\Exception $e) {
+            return $this->showError($response, $e->getMessage(), $e->getCode());
+        }
+        $formatTemplate = new FormatTemplate($format);
+        $response = $response->withJson($formatTemplate->getArray(), 200);
+        return $response;
+    }
+
+    public function putFormat(Request $request, Response $response, $args)
+    {
+        $id = $args['id'];
+        $body = $request->getParsedBody();
+        try {
+            $format = $this->handler->updateFormat($id, $body);
+        } catch (\Exception $e) {
+            return $this->showError($response, $e->getMessage(), $e->getCode());
+        }
+        $formatTemplate = new FormatTemplate($format);
+        $response = $response->withJson($formatTemplate->getArray(), 200);
+        return $response;
+    }
+
 }

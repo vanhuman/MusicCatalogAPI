@@ -8,6 +8,8 @@ class ArtistsHandler extends DatabaseHandler
 {
     private const FIELDS = ['id', 'name'];
     private const SORT_FIELDS = ['id', 'name'];
+    private const DEFAULT_SORT_FIELD = 'name';
+    private const DEFAULT_SORT_DIRECTION = 'ASC';
 
     /**
      * @param int $id
@@ -16,13 +18,13 @@ class ArtistsHandler extends DatabaseHandler
      * @throws \Exception
      * @return Artist | Artist[]
      */
-    public function get($id, $sortBy = 'name', $sortDirection = 'ASC')
+    public function get($id, $sortBy = self::DEFAULT_SORT_FIELD, $sortDirection = self::DEFAULT_SORT_DIRECTION)
     {
         if (!in_array($sortBy, self::SORT_FIELDS)) {
-            $sortBy = 'name';
+            $sortBy = self::DEFAULT_SORT_FIELD;
         }
         if (!in_array($sortDirection, self::SORT_DIRECTION)) {
-            $sortDirection = 'ASC';
+            $sortDirection = self::DEFAULT_SORT_DIRECTION;
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM artist';
         if (isset($id)) {
@@ -71,8 +73,8 @@ class ArtistsHandler extends DatabaseHandler
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         };
-        $artistId = $this->getLastInsertedRecordId('artist');
-        return $this->get($artistId);
+        $id = $this->getLastInsertedRecordId('artist');
+        return $this->get($id);
     }
 
     /**

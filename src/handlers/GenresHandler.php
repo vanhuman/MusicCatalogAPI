@@ -8,21 +8,23 @@ class GenresHandler extends DatabaseHandler
 {
     private const FIELDS = ['id', 'description', 'notes'];
     private const SORT_FIELDS = ['id', 'description'];
+    private const DEFAULT_SORT_FIELD = 'id';
+    private const DEFAULT_SORT_DIRECTION = 'ASC';
 
     /**
      * @param int $id
      * @param string $sortBy
      * @param string $sortDirection
      * @throws \Exception
-     * @return Genre $genre | null
+     * @return Genre | Genre[]
      */
-    public function get($id, $sortBy = 'id', $sortDirection = 'ASC')
+    public function get($id, $sortBy = self::DEFAULT_SORT_FIELD, $sortDirection = self::DEFAULT_SORT_DIRECTION)
     {
         if (!in_array($sortBy, self::SORT_FIELDS)) {
-            $sortBy = 'id';
+            $sortBy = self::DEFAULT_SORT_FIELD;
         }
         if (!in_array($sortDirection, self::SORT_DIRECTION)) {
-            $sortDirection = 'ASC';
+            $sortDirection = self::DEFAULT_SORT_DIRECTION;
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM genre';
         if (isset($id)) {
@@ -38,7 +40,7 @@ class GenresHandler extends DatabaseHandler
         if (isset($id)) {
             $genreData = $result->fetch();
             if ($result->rowCount() === 0) {
-                throw new \Exception('ERROR: Label with id ' . $id . ' not found.', 500);
+                throw new \Exception('ERROR: Genre with id ' . $id . ' not found.', 500);
             }
             return $this->createModelFromDatabaseData($genreData);
         } else {
@@ -50,7 +52,54 @@ class GenresHandler extends DatabaseHandler
             return isset($genres) ? $genres : [];
         }
     }
-    
+
+    /**
+     * @param $genreData
+     * @return Genre
+     * @throws \Exception
+     */
+    public function insertGenre($genreData)
+    {
+        try {
+            $this->validatePostData($genreData);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), $e->getCode());
+        }
+        $postData = $this->formatPostdataForInsert($genreData);
+        $query = 'INSERT INTO genre (' . $postData['keys'] . ')';
+        $query .= ' VALUES (' . $postData['values'] . ')';
+        try {
+            $this->db->query($query);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), 500);
+        };
+        $id = $this->getLastInsertedRecordId('genre');
+        return $this->get($id);
+    }
+
+    /**
+     * @param $id
+     * @param $genreData
+     * @return Genre
+     * @throws \Exception
+     */
+    public function updateGenre($id, $genreData)
+    {
+        try {
+            $this->validatePostData($genreData);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), $e->getCode());
+        }
+        $postData = $this->formatPostdataForUpdate($genreData);
+        $query = 'UPDATE genre SET ' . $postData . ' WHERE id = ' . $id;
+        try {
+            $this->db->query($query);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), 500);
+        };
+        return $this->get($id);
+    }
+
     /**
      * @param $genreData
      * @return Genre
@@ -64,4 +113,23 @@ class GenresHandler extends DatabaseHandler
         ]);
         return $newGenre;
     }
+
+    /**
+     * @param $genreData
+     * @throws \Exception
+     */
+    private function validatePostData($genreData)
+    {
+        // name is mandatory
+        if (!array_key_exists('description', $genreData)) {
+            throw new \Exception('Description is a mandatory field.', 400);
+        }
+        // other keys than the database fields are not allowed
+        foreach ($genreData as $key => $value) {
+            if (!in_array($key, self::FIELDS)) {
+                throw new \Exception($key . ' is not a valid field for this endpoint.', 400);
+            }
+        }
+    }
+
 }

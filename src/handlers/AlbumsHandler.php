@@ -8,6 +8,8 @@ class AlbumsHandler extends DatabaseHandler
 {
     private const FIELDS = ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'];
     private const SORT_FIELDS = ['id', 'title', 'year', 'date_added'];
+    private const DEFAULT_SORT_FIELD = 'year';
+    private const DEFAULT_SORT_DIRECTION = 'DESC';
 
     /**
      * @var ArtistsHandler $artistsHandler
@@ -49,13 +51,13 @@ class AlbumsHandler extends DatabaseHandler
      * @return Album | Album[]
      * @throws \Exception
      */
-    public function get($id, $sortBy = 'year', $sortDirection = 'DESC')
+    public function get($id, $sortBy = self::DEFAULT_SORT_FIELD, $sortDirection = self::DEFAULT_SORT_DIRECTION)
     {
         if (!in_array($sortBy, self::SORT_FIELDS)) {
-            $sortBy = 'year';
+            $sortBy = self::DEFAULT_SORT_FIELD;
         }
         if (!in_array($sortDirection, self::SORT_DIRECTION)) {
-            $sortDirection = 'DESC';
+            $sortDirection = self::DEFAULT_SORT_DIRECTION;
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
         if (isset($id)) {
@@ -106,11 +108,11 @@ class AlbumsHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), 500);
         };
         try {
-            $albumId = $this->getLastInsertedRecordId('album');
+            $id = $this->getLastInsertedRecordId('album');
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
-        return $this->get($albumId);
+        return $this->get($id);
     }
 
     /**
