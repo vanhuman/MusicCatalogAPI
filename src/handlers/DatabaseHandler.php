@@ -4,7 +4,8 @@ namespace Handlers;
 
 use Helpers\DatabaseConnection;
 
-abstract class DatabaseHandler extends DatabaseConnection {
+abstract class DatabaseHandler extends DatabaseConnection
+{
     public const SORT_DIRECTION = ['ASC', 'DESC'];
 
     abstract public function get($params);
@@ -30,7 +31,7 @@ abstract class DatabaseHandler extends DatabaseConnection {
     }
 
     /**
-     * @param $postData
+     * @param array $postData
      * @return mixed
      */
     protected function formatPostdataForInsert($postData)
@@ -47,7 +48,7 @@ abstract class DatabaseHandler extends DatabaseConnection {
     }
 
     /**
-     * @param $postData
+     * @param array $postData
      * @return bool | array
      */
     protected function formatPostdataForUpdate($postData)
@@ -80,4 +81,49 @@ abstract class DatabaseHandler extends DatabaseConnection {
         return $result['id'];
     }
 
+    /**
+     * @param array | int $params
+     * @return mixed | null
+     */
+    protected function getIdFromParams(&$params)
+    {
+        if (!is_array($params)) {
+            $id = $params;
+            $params = [];
+        } else {
+            $id = array_key_exists('id', $params) ? $params['id'] : null;
+        }
+        return $id;
+    }
+
+    /**
+     * @param array $params
+     * @param array $sortFields
+     * @param string $defaultSortField
+     * @return string
+     */
+    protected function getSortByFromParams($params, $sortFields, $defaultSortField)
+    {
+        if (!array_key_exists('sortBy', $params) || !in_array($params['sortBy'], $sortFields)) {
+            $sortBy = $defaultSortField;
+        } else {
+            $sortBy = $params['sortBy'];
+        }
+        return $sortBy;
+    }
+
+    /**
+     * @param array $params
+     * @param string $defaultSortDirection
+     * @return string
+     */
+    protected function getSortDirectionFromParams($params, $defaultSortDirection)
+    {
+        if (!array_key_exists('sortDirection', $params) || !in_array($params['sortDirection'], self::SORT_DIRECTION)) {
+            $sortDirection = $defaultSortDirection;
+        } else {
+            $sortDirection = $params['sortDirection'];
+        }
+        return $sortDirection;
+    }
 }

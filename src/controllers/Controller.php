@@ -24,12 +24,7 @@ abstract class Controller
 
     public function get(Request $request, Response $response, $args)
     {
-        $params = [
-            'id' => array_key_exists('id', $args) ? $args['id'] : null,
-            'sortBy' => $request->getParam('sortby'),
-            'sortDirection' => $request->getParam('sortdirection'),
-        ];
-        std()->show($params);
+        $params = $this->collectParams($request, $args);
         try {
             $records = $this->handler->get($params);
         } catch (\Exception $e) {
@@ -60,6 +55,21 @@ abstract class Controller
         $result = ucfirst($table) . ' with id ' . $id . ' deleted.';
         $response = $response->withJson($result, 200);
         return $response;
+    }
+
+    protected function collectParams(Request $request, $args)
+    {
+        return [
+            'id' => array_key_exists('id', $args) ? $args['id'] : null,
+            'sortBy' => $request->getParam('sortby'),
+            'sortDirection' => $request->getParam('sortdirection'),
+            'filter' => [
+                'artist_id' => $request->getParam('artist_id'),
+                'label_id' => $request->getParam('label_id'),
+                'genre_id' => $request->getParam('genre_id'),
+                'format_id' => $request->getParam('format_id'),
+            ]
+        ];
     }
 
     /**

@@ -30,10 +30,7 @@ class AlbumsController extends Controller
 
     public function getAlbumsSortedOnRelatedTable(Request $request, Response $response, $args)
     {
-        $params = [
-            'sortBy' => $request->getParam('sortby'),
-            'sortDirection' => $request->getParam('sortdirection'),
-        ];
+        $params = $this->collectParams($request, $args);
         try {
             $records = $this->handler->getAlbumsSortedOnRelatedTable($params);
         } catch (\Exception $e) {

@@ -12,23 +12,15 @@ class LabelsHandler extends DatabaseHandler
     private const DEFAULT_SORT_DIRECTION = 'ASC';
 
     /**
-     * @param array $params
+     * @param array | int $params
      * @throws \Exception
      * @return Label | Label[]
      */
     public function get($params)
     {
-        $id = array_key_exists('id', $params) ? $params['id'] : null;
-        if (!array_key_exists('sortBy', $params) || !in_array($params['sortBy'], self::SORT_FIELDS)) {
-            $sortBy = self::DEFAULT_SORT_FIELD;
-        } else {
-            $sortBy = $params['sortBy'];
-        }
-        if (!array_key_exists('sortDirection', $params) || !in_array($params['sortDirection'], self::SORT_DIRECTION)) {
-            $sortDirection = self::DEFAULT_SORT_DIRECTION;
-        } else {
-            $sortDirection = $params['sortDirection'];
-        }
+        $id = $this->getIdFromParams($params);
+        $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
+        $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM label';
         if (isset($id)) {
             $query .= ' WHERE id = ' . $id;
