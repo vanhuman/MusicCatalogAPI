@@ -2,7 +2,9 @@
 
 namespace Handlers;
 
-class MigrationHandler extends DatabaseHandler
+use Helpers\DatabaseConnection;
+
+class MigrationHandler extends DatabaseConnection
 {
     /**
      * @throws \Exception
@@ -54,6 +56,17 @@ class MigrationHandler extends DatabaseHandler
             // change album date field: format, name and default
             $query = 'ALTER TABLE album CHANGE date date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP';
             $this->db->query($query);
+
+            // add indexes
+            $query = 'ALTER TABLE genre ADD INDEX(description)';
+            $this->db->query($query);
+            $query = 'ALTER TABLE label ADD INDEX(name)';
+            $this->db->query($query);
+            $query = 'ALTER TABLE format ADD INDEX(name)';
+            $this->db->query($query);
+            $query = 'ALTER TABLE artist ADD INDEX(name)';
+            $this->db->query($query);
+
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }

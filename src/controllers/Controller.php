@@ -24,9 +24,9 @@ abstract class Controller
 
     public function get(Request $request, Response $response, $args)
     {
-        $id = $args['id'];
-        $sortBy = $request->getParam('sortBy');
-        $sortDirection = $request->getParam('sortDirection');
+        $id = array_key_exists('id', $args) ? $args['id'] : null;
+        $sortBy = $request->getParam('sortby');
+        $sortDirection = $request->getParam('sortdirection');
         try {
             $records = $this->handler->get($id, $sortBy, $sortDirection);
         } catch (\Exception $e) {

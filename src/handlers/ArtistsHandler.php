@@ -42,7 +42,7 @@ class ArtistsHandler extends DatabaseHandler
             if ($result->rowCount() === 0) {
                 throw new \Exception('ERROR: Artist with id ' . $id . ' not found.', 500);
             }
-            return  $this->createModelFromDatabaseData($artistData);
+            return $this->createModelFromDatabaseData($artistData);
         } else {
             $artistsData = $result->fetchAll();
             foreach ($artistsData as $artistData) {
@@ -98,6 +98,13 @@ class ArtistsHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), 500);
         };
         return $this->get($id);
+    }
+
+    private function getSelectFields()
+    {
+        foreach (self::FIELDS as $field) {
+            $selectFieldsArray[] = 'artist.' . $field . ' as ' . 'artist_' . $field;
+        }
     }
 
     /**

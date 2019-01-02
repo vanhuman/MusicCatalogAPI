@@ -2,19 +2,10 @@
 
 namespace Handlers;
 
-abstract class DatabaseHandler {
+use Helpers\DatabaseConnection;
+
+abstract class DatabaseHandler extends DatabaseConnection {
     public const SORT_DIRECTION = ['ASC', 'DESC'];
-
-    /* @var \PDO $db */
-    protected $db;
-
-    /**
-     * Handler constructor.
-     * @param $db
-     */
-    public function __construct($db) {
-        $this->db = $db;
-    }
 
     abstract public function get($id, $sortBy, $sortDirection);
 

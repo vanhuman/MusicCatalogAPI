@@ -6,10 +6,12 @@ use Models\Album;
 
 class AlbumsHandler extends DatabaseHandler
 {
+    public const RELATED_SORT_FIELDS = ['artist_name', 'label_name', 'genre_description', 'format_name'];
     private const FIELDS = ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'];
     private const SORT_FIELDS = ['id', 'title', 'year', 'date_added'];
     private const DEFAULT_SORT_FIELD = 'year';
     private const DEFAULT_SORT_DIRECTION = 'DESC';
+    private const DEFAULT_RELATED_SORT_DIRECTION = 'ASC';
 
     /**
      * @var ArtistsHandler $artistsHandler
@@ -85,6 +87,41 @@ class AlbumsHandler extends DatabaseHandler
             return isset($albums) ? $albums : [];
         }
 
+    }
+
+    /**
+     * @param int $artist_id
+     * @param string $sortBy
+     * @param string $sortDirection
+     * @return array
+     * @throws \Exception
+     */
+    public function getAlbumsSortedOnRelatedTable($sortBy = 'id', $sortDirection = self::DEFAULT_SORT_DIRECTION)
+    {
+        if (!in_array($sortBy, self::RELATED_SORT_FIELDS)) {
+            $sortBy = 'id';
+        }
+        if (!in_array($sortDirection, self::SORT_DIRECTION)) {
+            $sortDirection = self::DEFAULT_RELATED_SORT_DIRECTION;
+        }
+        // sortBy is always formatted as table_field
+        $relatedTable = explode('_', $sortBy)[0];
+        $sortField = str_replace('_', '.', $sortBy);
+        $query = 'SELECT * FROM album';
+        $query .= ' JOIN ' . $relatedTable . ' ON ' . $relatedTable . '.id = album.' . $relatedTable . '_id';
+        $query .= ' ORDER BY ' . $sortField . ' ' . $sortDirection;
+        std()->show($query, 'Database query');
+        try {
+            $result = $this->db->query($query);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), 500);
+        }
+        $albumsData = $result->fetchAll();
+        foreach ($albumsData as $albumData) {
+            $newAlbum = $this->createModelFromDatabaseData($albumData);
+            $albums[] = $newAlbum;
+        }
+        return isset($albums) ? $albums : [];
     }
 
     /**

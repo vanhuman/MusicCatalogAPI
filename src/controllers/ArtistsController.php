@@ -17,15 +17,6 @@ class ArtistsController extends Controller
         $this->handler = new ArtistsHandler($this->container->get('db'));
     }
 
-    protected function newTemplate($artists)
-    {
-        if (is_array($artists)) {
-            return new ArtistsTemplate($artists);
-        } else {
-            return new ArtistTemplate($artists);
-        }
-    }
-
     public function postArtist(Request $request, Response $response, $args)
     {
         $body = $request->getParsedBody();
@@ -51,5 +42,14 @@ class ArtistsController extends Controller
         $artistTemplate = new ArtistTemplate($artist);
         $response = $response->withJson($artistTemplate->getArray(), 200);
         return $response;
+    }
+
+    protected function newTemplate($artists)
+    {
+        if (is_array($artists)) {
+            return new ArtistsTemplate($artists);
+        } else {
+            return new ArtistTemplate($artists);
+        }
     }
 }
