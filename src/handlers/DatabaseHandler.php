@@ -7,7 +7,7 @@ use Helpers\DatabaseConnection;
 abstract class DatabaseHandler extends DatabaseConnection {
     public const SORT_DIRECTION = ['ASC', 'DESC'];
 
-    abstract public function get($id, $sortBy, $sortDirection);
+    abstract public function get($params);
 
     /**
      * @param string $table

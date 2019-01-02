@@ -24,11 +24,14 @@ abstract class Controller
 
     public function get(Request $request, Response $response, $args)
     {
-        $id = array_key_exists('id', $args) ? $args['id'] : null;
-        $sortBy = $request->getParam('sortby');
-        $sortDirection = $request->getParam('sortdirection');
+        $params = [
+            'id' => array_key_exists('id', $args) ? $args['id'] : null,
+            'sortBy' => $request->getParam('sortby'),
+            'sortDirection' => $request->getParam('sortdirection'),
+        ];
+        std()->show($params);
         try {
-            $records = $this->handler->get($id, $sortBy, $sortDirection);
+            $records = $this->handler->get($params);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }

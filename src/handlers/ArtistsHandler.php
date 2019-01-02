@@ -12,19 +12,22 @@ class ArtistsHandler extends DatabaseHandler
     private const DEFAULT_SORT_DIRECTION = 'ASC';
 
     /**
-     * @param int $id
-     * @param string $sortBy
-     * @param string $sortDirection
+     * @param array $params
      * @throws \Exception
      * @return Artist | Artist[]
      */
-    public function get($id, $sortBy = self::DEFAULT_SORT_FIELD, $sortDirection = self::DEFAULT_SORT_DIRECTION)
+    public function get($params)
     {
-        if (!in_array($sortBy, self::SORT_FIELDS)) {
+        $id = array_key_exists('id', $params) ? $params['id'] : null;
+        if (!array_key_exists('sortBy', $params) || !in_array($params['sortBy'], self::SORT_FIELDS)) {
             $sortBy = self::DEFAULT_SORT_FIELD;
+        } else {
+            $sortBy = $params['sortBy'];
         }
-        if (!in_array($sortDirection, self::SORT_DIRECTION)) {
+        if (!array_key_exists('sortDirection', $params) || !in_array($params['sortDirection'], self::SORT_DIRECTION)) {
             $sortDirection = self::DEFAULT_SORT_DIRECTION;
+        } else {
+            $sortDirection = $params['sortDirection'];
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM artist';
         if (isset($id)) {

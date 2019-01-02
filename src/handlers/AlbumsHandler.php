@@ -47,19 +47,22 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param int $id
-     * @param string $sortBy
-     * @param string $sortDirection
+     * @param array $params
      * @return Album | Album[]
      * @throws \Exception
      */
-    public function get($id, $sortBy = self::DEFAULT_SORT_FIELD, $sortDirection = self::DEFAULT_SORT_DIRECTION)
+    public function get($params)
     {
-        if (!in_array($sortBy, self::SORT_FIELDS)) {
+        $id = array_key_exists('id', $params) ? $params['id'] : null;
+        if (!array_key_exists('sortBy', $params) || !in_array($params['sortBy'], self::SORT_FIELDS)) {
             $sortBy = self::DEFAULT_SORT_FIELD;
+        } else {
+            $sortBy = $params['sortBy'];
         }
-        if (!in_array($sortDirection, self::SORT_DIRECTION)) {
+        if (!array_key_exists('sortDirection', $params) || !in_array($params['sortDirection'], self::SORT_DIRECTION)) {
             $sortDirection = self::DEFAULT_SORT_DIRECTION;
+        } else {
+            $sortDirection = $params['sortDirection'];
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
         if (isset($id)) {
@@ -90,19 +93,21 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param int $artist_id
-     * @param string $sortBy
-     * @param string $sortDirection
+     * @param array $params
      * @return array
      * @throws \Exception
      */
-    public function getAlbumsSortedOnRelatedTable($sortBy = 'id', $sortDirection = self::DEFAULT_SORT_DIRECTION)
+    public function getAlbumsSortedOnRelatedTable($params)
     {
-        if (!in_array($sortBy, self::RELATED_SORT_FIELDS)) {
+        if (!array_key_exists('sortBy', $params) || !in_array($params['sortBy'], self::RELATED_SORT_FIELDS)) {
             $sortBy = 'id';
+        } else {
+            $sortBy = $params['sortBy'];
         }
-        if (!in_array($sortDirection, self::SORT_DIRECTION)) {
+        if (!array_key_exists('sortDirection', $params) || !in_array($params['sortDirection'], self::SORT_DIRECTION)) {
             $sortDirection = self::DEFAULT_RELATED_SORT_DIRECTION;
+        } else {
+            $sortDirection = $params['sortDirection'];
         }
         // sortBy is always formatted as table_field
         $relatedTable = explode('_', $sortBy)[0];
@@ -190,25 +195,25 @@ class AlbumsHandler extends DatabaseHandler
         ]);
         if (array_key_exists('artist_id', $albumData)) {
             try {
-                $newAlbum->setArtist($this->artistsHandler->get($albumData['artist_id']));
+                $newAlbum->setArtist($this->artistsHandler->get(['id' => $albumData['artist_id']]));
             } catch (\Exception $e) {
             }
         }
         if (array_key_exists('genre_id', $albumData)) {
             try {
-                $newAlbum->setGenre($this->genresHandler->get($albumData['genre_id']));
+                $newAlbum->setGenre($this->genresHandler->get(['id' => $albumData['genre_id']]));
             } catch (\Exception $e) {
             }
         }
         if (array_key_exists('label_id', $albumData)) {
             try {
-                $newAlbum->setLabel($this->labelsHandler->get($albumData['label_id']));
+                $newAlbum->setLabel($this->labelsHandler->get(['id' => $albumData['label_id']]));
             } catch (\Exception $e) {
             }
         }
         if (array_key_exists('format_id', $albumData)) {
             try {
-                $newAlbum->setFormat($this->formatsHandler->get($albumData['format_id']));
+                $newAlbum->setFormat($this->formatsHandler->get(['id' => $albumData['format_id']]));
             } catch (\Exception $e) {
             }
         }
