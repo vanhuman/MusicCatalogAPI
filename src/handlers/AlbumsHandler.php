@@ -7,6 +7,8 @@ use Models\Album;
 class AlbumsHandler extends DatabaseHandler
 {
     private const FIELDS = ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'];
+    private const MANDATORY_FIELDS = ['title', 'artist_id', 'format_id'];
+
     private const SORT_FIELDS = ['id', 'title', 'year', 'date_added'];
     private const DEFAULT_SORT_FIELD = 'year';
     private const DEFAULT_SORT_DIRECTION = 'DESC';
@@ -245,44 +247,45 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $albumData
+     * @param array $postData
      * @throws \Exception
      */
-    private function validatePostData($albumData)
+    private function validatePostData($postData)
     {
-        // title is mandatory
-        if (!array_key_exists('title', $albumData)) {
-            throw new \Exception('Title is a mandatory field.', 400);
-        }
-        // artist_id is mandatory
-        if (!array_key_exists('artist_id', $albumData)) {
-            throw new \Exception('Artist_id is a mandatory field.', 400);
+        // general validation
+        try {
+            $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
+            $this->validateKeys($postData, self::FIELDS);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), $e->getCode());
         }
         // year should be 4 digits
-        if (array_key_exists('year', $albumData)) {
-            $year = $albumData['year'];
+        if (array_key_exists('year', $postData)) {
+            $year = $postData['year'];
             if (!is_numeric($year) || (int)$year < 1900 || (int)$year > 4000) {
                 throw new \Exception('Year should be a 4 digit number between 1900 and 4000.', 400);
             }
         }
-        // other keys than the database fields are not allowed
-        foreach ($albumData as $key => $value) {
-            if (!in_array($key, self::FIELDS)) {
-                throw new \Exception($key . ' is not a valid field for this endpoint.', 400);
-            }
-        }
         // check existence of artist, genre, label and format
         try {
-            $artist = $this->artistsHandler->get($albumData['artist_id']);
-            $label = $this->labelsHandler->get($albumData['label_id']);
-            $genre = $this->genresHandler->get($albumData['genre_id']);
-            $format = $this->formatsHandler->get($albumData['format_id']);
+            $artist = $this->artistsHandler->get($postData['artist_id']);
+            $format = $this->formatsHandler->get($postData['format_id']);
+            if (array_key_exists('label_id', $postData)) {
+                $label = $this->labelsHandler->get($postData['label_id']);
+            } else {
+                $label = false;
+            }
+            if (array_key_exists('genre_id', $postData)) {
+                $genre = $this->genresHandler->get($postData['genre_id']);
+            } else {
+                $genre = false;
+            }
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 400);
         }
         foreach (['artist' => $artist, 'label' => $label, 'genre' => $genre, 'format' => $format] as $key => $entity) {
             if (!isset($entity)) {
-                throw new \Exception(ucfirst($key) . ' with id ' . $albumData[$key . '_id'] . ' cannot be found.', 400);
+                throw new \Exception(ucfirst($key) . ' with id ' . $postData[$key . '_id'] . ' cannot be found.', 400);
             }
         }
     }

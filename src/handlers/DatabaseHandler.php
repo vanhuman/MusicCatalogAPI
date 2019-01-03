@@ -126,4 +126,34 @@ abstract class DatabaseHandler extends DatabaseConnection
         }
         return $sortDirection;
     }
+
+    /**
+     * @param array $postData
+     * @param array $mandatoryFields
+     * @throws \Exception
+     */
+    protected function validateMandatoryFields($postData, $mandatoryFields)
+    {
+        foreach($mandatoryFields as $field) {
+            if (!array_key_exists($field, $postData)) {
+                throw new \Exception(ucfirst($field) . ' is a mandatory field.', 400);
+            }
+        }
+    }
+
+    /**
+     * @param array $postData
+     * @param array $fields
+     * @throws \Exception
+     */
+    protected function validateKeys($postData, $fields)
+    {
+        // other keys than the database fields are not allowed
+        foreach ($postData as $key => $value) {
+            if (!in_array($key, $fields)) {
+                throw new \Exception($key . ' is not a valid field for this endpoint.', 400);
+            }
+        }
+    }
+
 }

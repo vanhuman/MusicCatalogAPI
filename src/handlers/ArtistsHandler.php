@@ -7,6 +7,8 @@ use Models\Artist;
 class ArtistsHandler extends DatabaseHandler
 {
     private const FIELDS = ['id', 'name'];
+    private const MANDATORY_FIELDS = ['name'];
+
     private const SORT_FIELDS = ['id', 'name'];
     private const DEFAULT_SORT_FIELD = 'name';
     private const DEFAULT_SORT_DIRECTION = 'ASC';
@@ -108,20 +110,16 @@ class ArtistsHandler extends DatabaseHandler
     }
 
     /**
-     * @param $artistData
+     * @param array $postData
      * @throws \Exception
      */
-    private function validatePostData($artistData)
+    private function validatePostData($postData)
     {
-        // name is mandatory
-        if (!array_key_exists('name', $artistData)) {
-            throw new \Exception('Name is a mandatory field.', 400);
-        }
-        // other keys than the database fields are not allowed
-        foreach ($artistData as $key => $value) {
-            if (!in_array($key, self::FIELDS)) {
-                throw new \Exception($key . ' is not a valid field for this endpoint.', 400);
-            }
+        try {
+            $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
+            $this->validateKeys($postData, self::FIELDS);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), $e->getCode());
         }
     }
 }

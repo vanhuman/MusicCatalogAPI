@@ -7,6 +7,8 @@ use Models\Genre;
 class GenresHandler extends DatabaseHandler
 {
     private const FIELDS = ['id', 'description', 'notes'];
+    private const MANDATORY_FIELDS = ['description'];
+
     private const SORT_FIELDS = ['id', 'description'];
     private const DEFAULT_SORT_FIELD = 'id';
     private const DEFAULT_SORT_DIRECTION = 'ASC';
@@ -110,20 +112,16 @@ class GenresHandler extends DatabaseHandler
     }
 
     /**
-     * @param $genreData
+     * @param array $postData
      * @throws \Exception
      */
-    private function validatePostData($genreData)
+    private function validatePostData($postData)
     {
-        // name is mandatory
-        if (!array_key_exists('description', $genreData)) {
-            throw new \Exception('Description is a mandatory field.', 400);
-        }
-        // other keys than the database fields are not allowed
-        foreach ($genreData as $key => $value) {
-            if (!in_array($key, self::FIELDS)) {
-                throw new \Exception($key . ' is not a valid field for this endpoint.', 400);
-            }
+        try {
+            $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
+            $this->validateKeys($postData, self::FIELDS);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), $e->getCode());
         }
     }
 
