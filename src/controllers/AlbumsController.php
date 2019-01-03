@@ -49,7 +49,6 @@ class AlbumsController extends Controller
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
-        std()->show($album);
         $albumTemplate = new AlbumTemplate($album);
         $response = $response->withJson($albumTemplate->getArray(), 200);
         return $response;

@@ -26,9 +26,8 @@ class LabelsHandler extends DatabaseHandler
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM label';
         if (isset($id)) {
             $query .= ' WHERE id = ' . $id;
-        } else {
-            $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         }
+        $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {

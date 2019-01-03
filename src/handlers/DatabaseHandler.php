@@ -87,11 +87,15 @@ abstract class DatabaseHandler extends DatabaseConnection
      */
     protected function getIdFromParams(&$params)
     {
+        if (!isset($params)) {
+            $params = [];
+            return 0;
+        }
         if (!is_array($params)) {
             $id = $params;
             $params = [];
         } else {
-            $id = array_key_exists('id', $params) ? $params['id'] : null;
+            $id = array_key_exists('id', $params) ? $params['id'] : 0;
         }
         return $id;
     }

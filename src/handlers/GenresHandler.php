@@ -26,19 +26,18 @@ class GenresHandler extends DatabaseHandler
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM genre';
         if (isset($id)) {
             $query .= ' WHERE id = ' . $id;
-        } else {
-            $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         }
+        $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
         if (isset($id)) {
-            $genreData = $result->fetch();
             if ($result->rowCount() === 0) {
                 throw new \Exception('ERROR: Genre with id ' . $id . ' not found.', 500);
             }
+            $genreData = $result->fetch();
             return $this->createModelFromDatabaseData($genreData);
         } else {
             $genresData = $result->fetchAll();
@@ -51,7 +50,7 @@ class GenresHandler extends DatabaseHandler
     }
 
     /**
-     * @param $genreData
+     * @param array $genreData
      * @return Genre
      * @throws \Exception
      */

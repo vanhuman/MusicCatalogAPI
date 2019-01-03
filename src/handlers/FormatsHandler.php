@@ -26,9 +26,8 @@ class FormatsHandler extends DatabaseHandler
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM format';
         if (isset($id)) {
             $query .= ' WHERE id = ' . $id;
-        } else {
-            $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         }
+        $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {
@@ -51,7 +50,7 @@ class FormatsHandler extends DatabaseHandler
     }
 
     /**
-     * @param $formatData
+     * @param array $formatData
      * @return Format|Format[]
      * @throws \Exception
      */

@@ -108,7 +108,6 @@ class MigrationHandler extends DatabaseConnection
                 // create label record
                 $queryInsertLabel = 'INSERT' . ' INTO label (name)';
                 $queryInsertLabel .= ' VALUES ("' . $labelName . '")';
-                std()->show($queryInsertLabel);
                 $this->db->query($queryInsertLabel);
                 $label = $this->db->query($queryGetLabel)->fetch();
             }
@@ -117,7 +116,6 @@ class MigrationHandler extends DatabaseConnection
             $queryUpdateAlbum = 'UPDATE album';
             $queryUpdateAlbum .= ' SET album.label_id = ' . $labelId;
             $queryUpdateAlbum .= ' WHERE album.id = ' . $album['id'];
-            std()->show($queryUpdateAlbum);
             $this->db->query($queryUpdateAlbum);
         }
         return sizeof($albums);
@@ -143,7 +141,6 @@ class MigrationHandler extends DatabaseConnection
                 // create artist record
                 $queryInsertArtist = 'INSERT' . ' INTO artist (name)';
                 $queryInsertArtist .= ' VALUES ("' . $artistName . '")';
-                std()->show($queryInsertArtist);
                 $this->db->query($queryInsertArtist);
                 $artist = $this->db->query($queryGetArtist)->fetch();
             }
@@ -152,7 +149,6 @@ class MigrationHandler extends DatabaseConnection
             $queryUpdateAlbum = 'UPDATE album';
             $queryUpdateAlbum .= ' SET album.artist_id = ' . $artistId;
             $queryUpdateAlbum .= ' WHERE album.id = ' . $album['id'];
-            std()->show($queryUpdateAlbum);
             $this->db->query($queryUpdateAlbum);
         }
         return sizeof($albums);

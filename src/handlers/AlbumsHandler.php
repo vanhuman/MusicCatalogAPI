@@ -67,7 +67,6 @@ class AlbumsHandler extends DatabaseHandler
         }
         $query .= $this->getFilterClause($params);
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
-        std()->show($query);
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {
@@ -78,7 +77,6 @@ class AlbumsHandler extends DatabaseHandler
                 throw new \Exception('ERROR: Album with specified id and optional filter settings not found.', 500);
             }
             $albumData = $result->fetch();
-            std()->show($albumData);
             return $this->createModelFromDatabaseData($albumData);
         } else {
             $albumsData = $result->fetchAll();
@@ -115,7 +113,6 @@ class AlbumsHandler extends DatabaseHandler
         }
         $query .= $this->getFilterClause($params);
         $query .= ' ORDER BY ' . $sortField . ' ' . $sortDirection;
-        std()->show($query, 'Database query');
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {
@@ -123,7 +120,6 @@ class AlbumsHandler extends DatabaseHandler
         }
         $albumsData = $result->fetchAll();
         foreach ($albumsData as $albumData) {
-            std()->show($albumData);
             $newAlbum = $this->createModelFromDatabaseData($albumData);
             $albums[] = $newAlbum;
         }
