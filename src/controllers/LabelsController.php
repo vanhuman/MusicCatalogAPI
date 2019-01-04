@@ -15,6 +15,7 @@ class LabelsController extends Controller
     {
         $this->container = $container;
         $this->handler = new LabelsHandler($this->container->get('db'));
+        $this->setPageSize();
     }
 
     protected function newTemplate($labels)

@@ -15,6 +15,7 @@ class AlbumsController extends Controller
     {
         $this->container = $container;
         $this->handler = new AlbumsHandler($this->container->get('db'));
+        $this->setPageSize();
     }
 
     public function get(Request $request, Response $response, $args)
@@ -37,7 +38,8 @@ class AlbumsController extends Controller
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
         $template = new AlbumsTemplate($records);
-        $response = $response->withJson($template->getArray(), 200);
+        $returnObject = $this->buildReturnObject($params, $template);
+        $response = $response->withJson($returnObject, 200);
         return $response;
     }
 

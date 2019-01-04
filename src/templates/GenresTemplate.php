@@ -26,9 +26,15 @@ class GenresTemplate implements TemplateInterface
     public function getArray() {
         foreach ($this->genres as $genre) {
             $genreTemplate = new GenreTemplate($genre);
-            $genresArray[] = $genreTemplate->getArray();
+            $genresArray[] = $genreTemplate->getArray(false);
         }
-        return isset($genresArray) ? $genresArray : [];
+        if (!isset($genresArray)) {
+            $genresArray = [];
+        }
+        $genres = [
+            'genres' => $genresArray
+        ];
+        return $genres;
     }
 
 }

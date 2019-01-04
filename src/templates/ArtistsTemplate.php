@@ -26,9 +26,15 @@ class ArtistsTemplate implements TemplateInterface
     public function getArray() {
         foreach ($this->artists as $artist) {
             $artistTemplate = new ArtistTemplate($artist);
-            $artistsArray[] = $artistTemplate->getArray();
+            $artistsArray[] = $artistTemplate->getArray(false);
         }
-        return isset($artistsArray) ? $artistsArray : [];
+        if (!isset($artistsArray)) {
+            $artistsArray = [];
+        }
+        $artists = [
+            'artists' => $artistsArray
+        ];
+        return $artists;
     }
 
 }

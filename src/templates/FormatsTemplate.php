@@ -26,9 +26,15 @@ class FormatsTemplate implements TemplateInterface
     public function getArray() {
         foreach ($this->formats as $format) {
             $formatTemplate = new FormatTemplate($format);
-            $formatsArray[] = $formatTemplate->getArray();
+            $formatsArray[] = $formatTemplate->getArray(false);
         }
-        return isset($formatsArray) ? $formatsArray : [];
+        if (!isset($formatsArray)) {
+            $formatsArray = [];
+        }
+        $formats = [
+            'formats' => $formatsArray
+        ];
+        return $formats;
     }
 
 }

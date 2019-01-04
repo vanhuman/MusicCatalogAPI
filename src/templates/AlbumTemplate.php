@@ -21,25 +21,30 @@ class AlbumTemplate implements TemplateInterface
     }
 
     /**
+     * @param boolean $includeWrapper
      * @return array
      */
-    public function getArray()
+    public function getArray($includeWrapper = true)
     {
         if (!isset($this->album)) {
             return null;
         }
-        return [
-            'album' => [
-                'id' => $this->album->getId(),
-                'title' => $this->album->getTitle(),
-                'year' => $this->album->getYear(),
-                'dateAdded' => $this->album->getDateAddedString(),
-                'notes' => $this->album->getNotes(),
-                'artist' => (new ArtistTemplate($this->album->getArtist()))->getArray(false),
-                'genre' => (new GenreTemplate($this->album->getGenre()))->getArray(false),
-                'label' => (new LabelTemplate($this->album->getLabel()))->getArray(false),
-                'format' => (new FormatTemplate($this->album->getFormat()))->getArray(false),
-            ]
+        $album = [
+            'id' => $this->album->getId(),
+            'title' => $this->album->getTitle(),
+            'year' => $this->album->getYear(),
+            'date_added' => $this->album->getDateAddedString(),
+            'notes' => $this->album->getNotes(),
+            'artist' => (new ArtistTemplate($this->album->getArtist()))->getArray(false),
+            'genre' => (new GenreTemplate($this->album->getGenre()))->getArray(false),
+            'label' => (new LabelTemplate($this->album->getLabel()))->getArray(false),
+            'format' => (new FormatTemplate($this->album->getFormat()))->getArray(false),
         ];
+        if ($includeWrapper) {
+            $album = [
+                'album' => $album
+            ];
+        }
+        return $album;
     }
 }

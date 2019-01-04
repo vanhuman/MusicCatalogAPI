@@ -26,9 +26,15 @@ class AlbumsTemplate implements TemplateInterface
     public function getArray() {
         foreach ($this->albums as $album) {
             $albumTemplate = new AlbumTemplate($album);
-            $albumsArray[] = $albumTemplate->getArray();
+            $albumsArray[] = $albumTemplate->getArray(false);
         }
-        return isset($albumsArray) ? $albumsArray : [];
+        if (!isset($albumsArray)) {
+            $albumsArray = [];
+        }
+        $albums = [
+            'albums' => $albumsArray
+        ];
+        return $albums;
     }
 
 }

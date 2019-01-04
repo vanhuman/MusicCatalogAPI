@@ -15,6 +15,7 @@ class GenresController extends Controller
     {
         $this->container = $container;
         $this->handler = new GenresHandler($this->container->get('db'));
+        $this->setPageSize();
     }
 
     protected function newTemplate($genres)

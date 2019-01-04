@@ -26,9 +26,15 @@ class LabelsTemplate implements TemplateInterface
     public function getArray() {
         foreach ($this->labels as $label) {
             $labelTemplate = new LabelTemplate($label);
-            $labelsArray[] = $labelTemplate->getArray();
+            $labelsArray[] = $labelTemplate->getArray(false);
         }
-        return isset($labelsArray) ? $labelsArray : [];
+        if (!isset($labelsArray)) {
+            $labelsArray = [];
+        }
+        $labels = [
+            'labels' => $labelsArray
+        ];
+        return $labels;
     }
 
 }

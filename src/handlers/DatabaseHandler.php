@@ -108,10 +108,10 @@ abstract class DatabaseHandler extends DatabaseConnection
      */
     protected function getSortByFromParams($params, $sortFields, $defaultSortField)
     {
-        if (!array_key_exists('sortBy', $params) || !in_array($params['sortBy'], $sortFields)) {
+        if (!array_key_exists('sortby', $params) || !in_array($params['sortby'], $sortFields)) {
             $sortBy = $defaultSortField;
         } else {
-            $sortBy = $params['sortBy'];
+            $sortBy = $params['sortby'];
         }
         return $sortBy;
     }
@@ -123,10 +123,11 @@ abstract class DatabaseHandler extends DatabaseConnection
      */
     protected function getSortDirectionFromParams($params, $defaultSortDirection)
     {
-        if (!array_key_exists('sortDirection', $params) || !in_array($params['sortDirection'], self::SORT_DIRECTION)) {
+        if (!array_key_exists('sortdirection', $params)
+            || !in_array(strtoupper($params['sortdirection']), self::SORT_DIRECTION)) {
             $sortDirection = $defaultSortDirection;
         } else {
-            $sortDirection = $params['sortDirection'];
+            $sortDirection = strtoupper($params['sortdirection']);
         }
         return $sortDirection;
     }

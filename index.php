@@ -14,6 +14,8 @@ $config['db']['user'] = 'user';
 $config['db']['pass'] = 'password';
 $config['db']['dbname'] = 'media_manager';
 
+$config['pageSize'] = 50;
+
 $app = new App(['settings' => $config]);
 $container = $app->getContainer();
 

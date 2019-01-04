@@ -60,6 +60,8 @@ class AlbumsHandler extends DatabaseHandler
         $id = $this->getIdFromParams($params);
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
+        $page = $params['page'];
+        $pageSize = $params['page_size'];
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
         $query .= ' WHERE true';
         if (isset($id)) {
@@ -67,6 +69,7 @@ class AlbumsHandler extends DatabaseHandler
         }
         $query .= $this->getFilterClause($params);
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        $query .= ' LIMIT ' . ($pageSize * ($page - 1))  . ',' . $pageSize;
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {
@@ -105,6 +108,8 @@ class AlbumsHandler extends DatabaseHandler
           return 'album.' . $field;
         };
         $selectFields = implode(array_map($selectFunc, self::FIELDS), ',');
+        $page = $params['page'];
+        $pageSize = $params['page_size'];
         $query = 'SELECT ' . $selectFields . ' FROM album';
         $query .= ' JOIN ' . $relatedTable . ' ON ' . $relatedTable . '.id = album.' . $relatedTable . '_id';
         $query .= ' WHERE true';
@@ -113,6 +118,7 @@ class AlbumsHandler extends DatabaseHandler
         }
         $query .= $this->getFilterClause($params);
         $query .= ' ORDER BY ' . $sortField . ' ' . $sortDirection;
+        $query .= ' LIMIT ' . ($pageSize * ($page - 1))  . ',' . $pageSize;
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {
@@ -179,7 +185,7 @@ class AlbumsHandler extends DatabaseHandler
 
     private function getFilterClause($params)
     {
-        $where = '';
+        $filterClause = '';
         if (array_key_exists('filter', $params)) {
             $filter = $params['filter'];
             $artist_id = array_key_exists('artist_id', $filter) ? $filter['artist_id'] : null;
@@ -187,19 +193,19 @@ class AlbumsHandler extends DatabaseHandler
             $genre_id = array_key_exists('genre_id', $filter) ? $filter['genre_id'] : null;
             $format_id = array_key_exists('format_id', $filter) ? $filter['format_id'] : null;
             if (isset($artist_id) && is_numeric($artist_id)) {
-                $where .= ' AND artist_id = ' . $artist_id;
+                $filterClause .= ' AND artist_id = ' . $artist_id;
             }
-            if (isset($label_id)) {
-                $where .= ' AND label_id = ' . $label_id;
+            if (isset($label_id) && is_numeric($label_id)) {
+                $filterClause .= ' AND label_id = ' . $label_id;
             }
-            if (isset($genre_id)) {
-                $where .= ' AND genre_id = ' . $genre_id;
+            if (isset($genre_id) && is_numeric($genre_id)) {
+                $filterClause .= ' AND genre_id = ' . $genre_id;
             }
             if (isset($format_id) && is_numeric($format_id)) {
-                $where .= ' AND format_id = ' . $format_id;
+                $filterClause .= ' AND format_id = ' . $format_id;
             }
         }
-        return $where;
+        return $filterClause;
     }
 
     /**
