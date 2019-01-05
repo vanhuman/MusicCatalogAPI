@@ -15,7 +15,6 @@ class ArtistsController extends Controller
     {
         $this->container = $container;
         $this->handler = new ArtistsHandler($this->container->get('db'));
-        $this->setPageSize();
     }
 
     public function postArtist(Request $request, Response $response, $args)

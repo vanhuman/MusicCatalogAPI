@@ -5,19 +5,30 @@ namespace Controllers;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
+
 use Handlers\AlbumsHandler;
 use Templates\AlbumsTemplate;
 use Templates\AlbumTemplate;
 
 class AlbumsController extends Controller
 {
+    /**
+     * AlbumsController constructor.
+     * @param ContainerInterface $container
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->handler = new AlbumsHandler($this->container->get('db'));
-        $this->setPageSize();
     }
 
+    /**
+     * For GET requests to the albums endpoint
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function get(Request $request, Response $response, $args)
     {
         $id = array_key_exists('id', $args) ? $args['id'] : null;
@@ -29,45 +40,50 @@ class AlbumsController extends Controller
         }
     }
 
+    /**
+     * For GET requests to the albums endpoint that use sorting on related tables.
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
     public function getAlbumsSortedOnRelatedTable(Request $request, Response $response, $args)
     {
-        $params = $this->collectParams($request, $args);
+        $params = $this->collectGetParams($request, $args);
         try {
-            $records = $this->handler->getAlbumsSortedOnRelatedTable($params);
+            $result = $this->handler->getAlbumsSortedOnRelatedTable($params);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
-        $template = new AlbumsTemplate($records);
-        $returnObject = $this->buildReturnObject($params, $template);
-        $response = $response->withJson($returnObject, 200);
-        return $response;
+        $template = new AlbumsTemplate($result['body']);
+        $templateArray = $template->getArray();
+        $returnObject = $this->buildGetReturnObject($params, $result, $templateArray);
+        return $response->withJson($returnObject, 200);
     }
 
-    public function postAlbum(Request $request, Response $response, $args)
+    public function post(Request $request, Response $response, $args)
     {
         $body = $request->getParsedBody();
         try {
-            $album = $this->handler->insertAlbum($body);
+            $result = $this->handler->insert($body);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
-        $albumTemplate = new AlbumTemplate($album);
-        $response = $response->withJson($albumTemplate->getArray(), 200);
-        return $response;
+        $template = $this->newTemplate($result['body']);
+        return $response->withJson($template->getArray(), 200);
     }
 
-    public function putAlbum(Request $request, Response $response, $args)
+    public function put(Request $request, Response $response, $args)
     {
         $id = $args['id'];
         $body = $request->getParsedBody();
         try {
-            $album = $this->handler->updateAlbum($id, $body);
+            $result = $this->handler->update($id, $body);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
-        $albumTemplate = new AlbumTemplate($album);
-        $response = $response->withJson($albumTemplate->getArray(), 200);
-        return $response;
+        $template = $this->newTemplate($result['body']);
+        return $response->withJson($template->getArray(), 200);
     }
 
     protected function newTemplate($albums)

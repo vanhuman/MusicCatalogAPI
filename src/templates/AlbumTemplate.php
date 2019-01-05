@@ -38,6 +38,8 @@ class AlbumTemplate implements TemplateInterface
                 'label' => (new LabelTemplate($this->album->getLabel()))->getArray(false),
                 'format' => (new FormatTemplate($this->album->getFormat()))->getArray(false),
             ];
+        } else {
+            $album = null;
         }
         if ($includeWrapper) {
             $album = [

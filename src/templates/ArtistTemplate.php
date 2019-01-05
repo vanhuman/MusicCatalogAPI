@@ -31,6 +31,8 @@ class ArtistTemplate implements TemplateInterface
                 'id' => $this->artist->getId(),
                 'name' => $this->artist->getName(),
             ];
+        } else {
+            $artist = null;
         }
         if ($includeWrapper) {
             $artist = [

@@ -32,6 +32,8 @@ class GenreTemplate implements TemplateInterface
                 'description' => $this->genre->getDescription(),
                 'notes' => $this->genre->getNotes(),
             ];
+        } else {
+            $genre = null;
         }
         if ($includeWrapper) {
             $genre = [

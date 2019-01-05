@@ -30,25 +30,38 @@ class FormatsHandler extends DatabaseHandler
             $query .= ' WHERE id = ' . $id;
         }
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1))  . ',' . $pageSize;
         try {
             $result = $this->db->query($query);
+            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
+        $object = [
+            'total_number_of_records' => $resultWithoutLimit->rowCount(),
+            'query' => $query,
+            'sortby' => $sortBy,
+            'sortdirection' => $sortDirection,
+        ];
         if (isset($id)) {
             $formatData = $result->fetch();
             if ($result->rowCount() === 0) {
-                throw new \Exception('ERROR: Format with id ' . $id . ' not found.', 500);
+                $format = null;
+            } else {
+                $format = $this->createModelFromDatabaseData($formatData);
             }
-            return $this->createModelFromDatabaseData($formatData);
+            $object['body'] = $format;
+            return $object;
         } else {
             $formatsData = $result->fetchAll();
             foreach ($formatsData as $formatData) {
                 $newFormat = $this->createModelFromDatabaseData($formatData);
                 $formats[] = $newFormat;
             }
-            return isset($formats) ? $formats : [];
+            $formats = isset($formats) ? $formats : [];
+            $object['body'] = $formats;
+            return $object;
         }
     }
 

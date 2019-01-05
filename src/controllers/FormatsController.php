@@ -15,7 +15,6 @@ class FormatsController extends Controller
     {
         $this->container = $container;
         $this->handler = new FormatsHandler($this->container->get('db'));
-        $this->setPageSize();
     }
 
     protected function newTemplate($formats)

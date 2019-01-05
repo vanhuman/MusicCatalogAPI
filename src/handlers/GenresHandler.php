@@ -16,7 +16,7 @@ class GenresHandler extends DatabaseHandler
     /**
      * @param array | int $params
      * @throws \Exception
-     * @return Genre | Genre[]
+     * @return array
      */
     public function get($params)
     {
@@ -30,25 +30,38 @@ class GenresHandler extends DatabaseHandler
             $query .= ' WHERE id = ' . $id;
         }
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1))  . ',' . $pageSize;
         try {
             $result = $this->db->query($query);
+            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
+        $object = [
+            'total_number_of_records' => $resultWithoutLimit->rowCount(),
+            'query' => $query,
+            'sortby' => $sortBy,
+            'sortdirection' => $sortDirection,
+        ];
         if (isset($id)) {
             if ($result->rowCount() === 0) {
-                throw new \Exception('ERROR: Genre with id ' . $id . ' not found.', 500);
+                $genre = null;
+            } else {
+                $genreData = $result->fetch();
+                $genre = $this->createModelFromDatabaseData($genreData);
             }
-            $genreData = $result->fetch();
-            return $this->createModelFromDatabaseData($genreData);
+            $object['body'] = $genre;
+            return $object;
         } else {
             $genresData = $result->fetchAll();
             foreach ($genresData as $genreData) {
                 $newGenre = $this->createModelFromDatabaseData($genreData);
                 $genres[] = $newGenre;
             }
-            return isset($genres) ? $genres : [];
+            $genres = isset($genres) ? $genres : [];
+            $object['body'] = $genres;
+            return $object;
         }
     }
 

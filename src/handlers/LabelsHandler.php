@@ -30,25 +30,38 @@ class LabelsHandler extends DatabaseHandler
             $query .= ' WHERE id = ' . $id;
         }
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1))  . ',' . $pageSize;
         try {
             $result = $this->db->query($query);
+            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
+        $object = [
+            'total_number_of_records' => $resultWithoutLimit->rowCount(),
+            'query' => $query,
+            'sortby' => $sortBy,
+            'sortdirection' => $sortDirection,
+        ];
         if (isset($id)) {
-            $labelData = $result->fetch();
             if ($result->rowCount() === 0) {
-                throw new \Exception('ERROR: Label with id ' . $id . ' not found.', 500);
+                $label = null;
+            } else {
+                $labelData = $result->fetch();
+                $label = $this->createModelFromDatabaseData($labelData);
             }
-            return $this->createModelFromDatabaseData($labelData);
+            $object['body'] = $label;
+            return $object;
         } else {
             $labelsData = $result->fetchAll();
             foreach ($labelsData as $labelData) {
                 $newLabel = $this->createModelFromDatabaseData($labelData);
                 $labels[] = $newLabel;
             }
-            return isset($labels) ? $labels : [];
+            $labels = isset($labels) ? $labels : [];
+            $object['body'] = $labels;
+            return $object;
         }
     }
 

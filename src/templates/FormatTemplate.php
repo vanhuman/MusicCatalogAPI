@@ -32,6 +32,8 @@ class FormatTemplate implements TemplateInterface
                 'name' => $this->format->getName(),
                 'description' => $this->format->getDescription(),
             ];
+        } else {
+            $format = null;
         }
         if ($includeWrapper) {
             $format = [

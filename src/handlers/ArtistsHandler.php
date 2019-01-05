@@ -16,7 +16,7 @@ class ArtistsHandler extends DatabaseHandler
     /**
      * @param array | int $params
      * @throws \Exception
-     * @return Artist | Artist[]
+     * @return array
      */
     public function get($params)
     {
@@ -30,25 +30,38 @@ class ArtistsHandler extends DatabaseHandler
             $query .= ' WHERE id = ' . $id;
         }
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
-        $query .= ' LIMIT ' . ($pageSize * ($page - 1))  . ',' . $pageSize;
+        $queryWithoutLimit = $query;
+        $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
         try {
             $result = $this->db->query($query);
+            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
+        $object = [
+            'total_number_of_records' => $resultWithoutLimit->rowCount(),
+            'query' => $query,
+            'sortby' => $sortBy,
+            'sortdirection' => $sortDirection,
+        ];
         if (isset($id)) {
-            $artistData = $result->fetch();
             if ($result->rowCount() === 0) {
-                throw new \Exception('ERROR: Artist with id ' . $id . ' not found.', 500);
+                $artist = null;
+            } else {
+                $artistData = $result->fetch();
+                $artist = $this->createModelFromDatabaseData($artistData);
             }
-            return $this->createModelFromDatabaseData($artistData);
+            $object['body'] = $artist;
+            return $object;
         } else {
             $artistsData = $result->fetchAll();
             foreach ($artistsData as $artistData) {
                 $newArtist = $this->createModelFromDatabaseData($artistData);
                 $artists[] = $newArtist;
             }
-            return isset($artists) ? $artists : [];
+            $artists = isset($artists) ? $artists : [];
+            $object['body'] = $artists;
+            return $object;
         }
     }
 

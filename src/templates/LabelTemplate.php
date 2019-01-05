@@ -31,6 +31,8 @@ class LabelTemplate implements TemplateInterface
                 'id' => $this->label->getId(),
                 'name' => $this->label->getName(),
             ];
+        } else {
+            $label = null;
         }
         if ($includeWrapper) {
             $label = [

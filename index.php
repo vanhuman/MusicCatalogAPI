@@ -2,9 +2,10 @@
 
 require 'vendor/autoload.php';
 
+use Slim\App;
+
 use Helpers\ContainerHelper;
 use Helpers\Routes;
-use Slim\App;
 
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
@@ -15,6 +16,8 @@ $config['db']['pass'] = 'password';
 $config['db']['dbname'] = 'media_manager';
 
 $config['pageSize'] = 50;
+$config['showDebug'] = true;
+$config['showParams'] = true;
 
 $app = new App(['settings' => $config]);
 $container = $app->getContainer();
