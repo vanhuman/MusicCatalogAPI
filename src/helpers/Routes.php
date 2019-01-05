@@ -10,7 +10,7 @@ use Controllers\GenresController;
 use Controllers\FormatsController;
 use Controllers\MigrationController;
 
-class RoutesHelper
+class Routes
 {
     /**
      * @param App $app

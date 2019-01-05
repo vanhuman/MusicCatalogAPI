@@ -3,7 +3,7 @@
 require 'vendor/autoload.php';
 
 use Helpers\ContainerHelper;
-use Helpers\RoutesHelper;
+use Helpers\Routes;
 use Slim\App;
 
 $config['displayErrorDetails'] = true;
@@ -20,7 +20,7 @@ $app = new App(['settings' => $config]);
 $container = $app->getContainer();
 
 ContainerHelper::init($container);
-RoutesHelper::init($app);
+Routes::init($app);
 
 try {
     $app->run();

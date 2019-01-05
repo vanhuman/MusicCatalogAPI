@@ -3,6 +3,7 @@
 namespace Handlers;
 
 use Models\Album;
+use Helpers\TypeUtility;
 
 class AlbumsHandler extends DatabaseHandler
 {
@@ -60,8 +61,8 @@ class AlbumsHandler extends DatabaseHandler
         $id = $this->getIdFromParams($params);
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
-        $page = $params['page'];
-        $pageSize = $params['page_size'];
+        $page = array_key_exists('page', $params) ? $params['page'] : 1;
+        $pageSize = array_key_exists('page_size', $params) ? $params['page_size'] : 50;
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
         $query .= ' WHERE true';
         if (isset($id)) {
@@ -108,8 +109,8 @@ class AlbumsHandler extends DatabaseHandler
           return 'album.' . $field;
         };
         $selectFields = implode(array_map($selectFunc, self::FIELDS), ',');
-        $page = $params['page'];
-        $pageSize = $params['page_size'];
+        $page = array_key_exists('page', $params) ? $params['page'] : 1;
+        $pageSize = array_key_exists('page_size', $params) ? $params['page_size'] : 50;
         $query = 'SELECT ' . $selectFields . ' FROM album';
         $query .= ' JOIN ' . $relatedTable . ' ON ' . $relatedTable . '.id = album.' . $relatedTable . '_id';
         $query .= ' WHERE true';
@@ -192,16 +193,16 @@ class AlbumsHandler extends DatabaseHandler
             $label_id = array_key_exists('label_id', $filter) ? $filter['label_id'] : null;
             $genre_id = array_key_exists('genre_id', $filter) ? $filter['genre_id'] : null;
             $format_id = array_key_exists('format_id', $filter) ? $filter['format_id'] : null;
-            if (isset($artist_id) && is_numeric($artist_id)) {
+            if (isset($artist_id) && TypeUtility::isInteger($artist_id)) {
                 $filterClause .= ' AND artist_id = ' . $artist_id;
             }
-            if (isset($label_id) && is_numeric($label_id)) {
+            if (isset($label_id) && TypeUtility::isInteger($label_id)) {
                 $filterClause .= ' AND label_id = ' . $label_id;
             }
-            if (isset($genre_id) && is_numeric($genre_id)) {
+            if (isset($genre_id) && TypeUtility::isInteger($genre_id)) {
                 $filterClause .= ' AND genre_id = ' . $genre_id;
             }
-            if (isset($format_id) && is_numeric($format_id)) {
+            if (isset($format_id) && TypeUtility::isInteger($format_id)) {
                 $filterClause .= ' AND format_id = ' . $format_id;
             }
         }
@@ -264,7 +265,7 @@ class AlbumsHandler extends DatabaseHandler
         // year should be 4 digits
         if (array_key_exists('year', $postData)) {
             $year = $postData['year'];
-            if (!is_numeric($year) || (int)$year < 1900 || (int)$year > 4000) {
+            if (!TypeUtility::isInteger($year) || (int)$year < 1900 || (int)$year > 4000) {
                 throw new \Exception('Year should be a 4 digit number between 1900 and 4000.', 400);
             }
         }

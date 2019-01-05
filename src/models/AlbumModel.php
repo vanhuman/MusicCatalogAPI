@@ -91,7 +91,7 @@ class Album extends DatabaseModel
      */
     public function setYear($year)
     {
-        $this->year = $year;
+        $this->year = (int)$year;
     }
 
     /**

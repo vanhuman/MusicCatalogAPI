@@ -23,8 +23,8 @@ class LabelsHandler extends DatabaseHandler
         $id = $this->getIdFromParams($params);
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
-        $page = $params['page'];
-        $pageSize = $params['page_size'];
+        $page = array_key_exists('page', $params) ? $params['page'] : 1;
+        $pageSize = array_key_exists('page_size', $params) ? $params['page_size'] : 50;
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM label';
         if (isset($id)) {
             $query .= ' WHERE id = ' . $id;

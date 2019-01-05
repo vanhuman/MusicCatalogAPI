@@ -6,8 +6,8 @@ use Handlers\DatabaseHandler;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Response;
 use Slim\Http\Request;
-use Templates\AlbumsTemplate;
 use Templates\TemplateInterface;
+use Helpers\TypeUtility;
 
 abstract class Controller
 {
@@ -67,7 +67,7 @@ abstract class Controller
     protected function collectParams(Request $request, $args)
     {
         $page = $request->getParam('page');
-        if (!isset($page) || !is_numeric($page)) {
+        if (!isset($page) || TypeUtility::isInteger($page)) {
             $page = 1;
         }
         $page = (int)$page;

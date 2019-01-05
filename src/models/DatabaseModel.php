@@ -2,8 +2,6 @@
 
 namespace Models;
 
-use Symfony\Component\Debug\Tests\Fixtures\ClassAlias;
-
 class DatabaseModel
 {
     /**
@@ -33,7 +31,7 @@ class DatabaseModel
      */
     public function setId($id)
     {
-        $this->id = $id;
+        $this->id = (int)$id;
     }
 
     /**
