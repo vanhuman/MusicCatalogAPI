@@ -26,13 +26,12 @@ class ArtistTemplate implements TemplateInterface
      */
     public function getArray($includeWrapper = true)
     {
-        if (!isset($this->artist)) {
-            return null;
+        if (isset($this->artist)) {
+            $artist = [
+                'id' => $this->artist->getId(),
+                'name' => $this->artist->getName(),
+            ];
         }
-        $artist = [
-            'id' => $this->artist->getId(),
-            'name' => $this->artist->getName(),
-        ];
         if ($includeWrapper) {
             $artist = [
                 'artist' => $artist

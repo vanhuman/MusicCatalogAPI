@@ -26,13 +26,12 @@ class LabelTemplate implements TemplateInterface
      */
     public function getArray($includeWrapper = true)
     {
-        if (!isset($this->label)) {
-            return null;
+        if (isset($this->label)) {
+            $label = [
+                'id' => $this->label->getId(),
+                'name' => $this->label->getName(),
+            ];
         }
-        $label = [
-            'id' => $this->label->getId(),
-            'name' => $this->label->getName(),
-        ];
         if ($includeWrapper) {
             $label = [
                 'label' => $label

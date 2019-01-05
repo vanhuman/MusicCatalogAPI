@@ -26,14 +26,13 @@ class FormatTemplate implements TemplateInterface
      */
     public function getArray($includeWrapper = true)
     {
-        if (!isset($this->format)) {
-            return null;
+        if (isset($this->format)) {
+            $format = [
+                'id' => $this->format->getId(),
+                'name' => $this->format->getName(),
+                'description' => $this->format->getDescription(),
+            ];
         }
-        $format = [
-            'id' => $this->format->getId(),
-            'name' => $this->format->getName(),
-            'description' => $this->format->getDescription(),
-        ];
         if ($includeWrapper) {
             $format = [
                 'format' => $format

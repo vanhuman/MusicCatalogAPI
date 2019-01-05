@@ -26,20 +26,19 @@ class AlbumTemplate implements TemplateInterface
      */
     public function getArray($includeWrapper = true)
     {
-        if (!isset($this->album)) {
-            return null;
+        if (isset($this->album)) {
+            $album = [
+                'id' => $this->album->getId(),
+                'title' => $this->album->getTitle(),
+                'year' => $this->album->getYear(),
+                'date_added' => $this->album->getDateAddedString(),
+                'notes' => $this->album->getNotes(),
+                'artist' => (new ArtistTemplate($this->album->getArtist()))->getArray(false),
+                'genre' => (new GenreTemplate($this->album->getGenre()))->getArray(false),
+                'label' => (new LabelTemplate($this->album->getLabel()))->getArray(false),
+                'format' => (new FormatTemplate($this->album->getFormat()))->getArray(false),
+            ];
         }
-        $album = [
-            'id' => $this->album->getId(),
-            'title' => $this->album->getTitle(),
-            'year' => $this->album->getYear(),
-            'date_added' => $this->album->getDateAddedString(),
-            'notes' => $this->album->getNotes(),
-            'artist' => (new ArtistTemplate($this->album->getArtist()))->getArray(false),
-            'genre' => (new GenreTemplate($this->album->getGenre()))->getArray(false),
-            'label' => (new LabelTemplate($this->album->getLabel()))->getArray(false),
-            'format' => (new FormatTemplate($this->album->getFormat()))->getArray(false),
-        ];
         if ($includeWrapper) {
             $album = [
                 'album' => $album

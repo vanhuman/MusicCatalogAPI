@@ -38,7 +38,8 @@ abstract class Controller
         }
         /* @var TemplateInterface $template */
         $template = $this->newTemplate($records);
-        $returnObject = $this->buildReturnObject($params, $template);
+        $templateArray = $template->getArray();
+        $returnObject = $this->buildReturnObject($params, $templateArray);
         $response = $response->withJson($returnObject, 200);
         return $response;
     }
@@ -88,12 +89,11 @@ abstract class Controller
 
     /**
      * @param array $params
-     * @param TemplateInterface $template
+     * @param array $template
      * @return array
      */
-    protected function buildReturnObject($params, $template)
+    protected function buildReturnObject($params, $templateArray)
     {
-        $templateArray = $template->getArray();
         /*
          * in case of the albumsController, current($templateArray) is one album or an array with albums
          * and current(current($templateArray)) is a specific album id or the first album object, which is an array
@@ -124,7 +124,7 @@ abstract class Controller
                $returnArray['parameters'][$key] = $value;
             }
         }
-        $returnArray = array_merge($returnArray, $template->getArray());
+        $returnArray = array_merge($returnArray, $templateArray);
         return $returnArray;
     }
 

@@ -78,7 +78,8 @@ class AlbumsHandler extends DatabaseHandler
         }
         if (isset($id)) {
             if ($result->rowCount() === 0) {
-                throw new \Exception('ERROR: Album with specified id and optional filter settings not found.', 500);
+                return null;
+//                throw new \Exception('ERROR: Album with specified id and optional filter settings not found.', 500);
             }
             $albumData = $result->fetch();
             return $this->createModelFromDatabaseData($albumData);

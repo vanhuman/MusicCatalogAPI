@@ -26,14 +26,13 @@ class GenreTemplate implements TemplateInterface
      */
     public function getArray($includeWrapper = true)
     {
-        if (!isset($this->genre)) {
-            return null;
+        if (isset($this->genre)) {
+            $genre = [
+                'id' => $this->genre->getId(),
+                'description' => $this->genre->getDescription(),
+                'notes' => $this->genre->getNotes(),
+            ];
         }
-        $genre = [
-            'id' => $this->genre->getId(),
-            'description' => $this->genre->getDescription(),
-            'notes' => $this->genre->getNotes(),
-        ];
         if ($includeWrapper) {
             $genre = [
                 'genre' => $genre
