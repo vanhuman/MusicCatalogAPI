@@ -28,18 +28,22 @@ class LabelsHandler extends DatabaseHandler
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM label';
         if (isset($id)) {
             $query .= ' WHERE id = ' . $id;
+        } else {
+            $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+            $queryWithoutLimit = $query;
+            $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
         }
-        $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
-        $queryWithoutLimit = $query;
-        $query .= ' LIMIT ' . ($pageSize * ($page - 1))  . ',' . $pageSize;
         try {
             $result = $this->db->query($query);
-            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
+            if (isset($queryWithoutLimit)) {
+                $resultWithoutLimit = $this->db->query($queryWithoutLimit);
+            }
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
+        $totalRecords = isset($queryWithoutLimit) ? $resultWithoutLimit->rowCount() : 1;
         $object = [
-            'total_number_of_records' => $resultWithoutLimit->rowCount(),
+            'total_number_of_records' => $totalRecords,
             'query' => $query,
             'sortby' => $sortBy,
             'sortdirection' => $sortDirection,

@@ -111,6 +111,7 @@ abstract class DatabaseHandler extends DatabaseConnection
     }
 
     /**
+     * Get the sortby parameter or get the default.
      * @param array $params
      * @param array $sortFields
      * @param string $defaultSortField
@@ -126,6 +127,7 @@ abstract class DatabaseHandler extends DatabaseConnection
     }
 
     /**
+     * Get the sortdirection parameter or get the default.
      * @param array $params
      * @param string $defaultSortDirection
      * @return string
@@ -141,6 +143,7 @@ abstract class DatabaseHandler extends DatabaseConnection
     }
 
     /**
+     * Validate fields indicated in the specific handlers as mandatory.
      * @param array $postData
      * @param array $mandatoryFields
      * @throws \Exception
@@ -155,6 +158,7 @@ abstract class DatabaseHandler extends DatabaseConnection
     }
 
     /**
+     * Validate that the postdata only holds permitted fields.
      * @param array $postData
      * @param array $fields
      * @throws \Exception

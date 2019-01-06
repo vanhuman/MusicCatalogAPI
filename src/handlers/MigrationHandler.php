@@ -7,6 +7,7 @@ use Helpers\DatabaseConnection;
 class MigrationHandler extends DatabaseConnection
 {
     /**
+     * Actions prior to migrating artists and labels.
      * @throws \Exception
      */
     public function migrationPre()
@@ -73,6 +74,7 @@ class MigrationHandler extends DatabaseConnection
     }
 
     /**
+     * Closing migration actions, to rename artist and label fields in album table.
      * @throws \Exception
      */
     public function migrationPost()

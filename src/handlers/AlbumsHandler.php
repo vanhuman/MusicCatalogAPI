@@ -65,28 +65,32 @@ class AlbumsHandler extends DatabaseHandler
         $pageSize = array_key_exists('page_size', $params) ? $params['page_size'] : 50;
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
         $query .= ' WHERE true';
+        $query .= $this->getFilterClause($params);
         if (isset($id)) {
             $query .= ' AND id = ' . $id;
+        } else {
+            $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+            $queryWithoutLimit = $query;
+            $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
         }
-        $query .= $this->getFilterClause($params);
-        $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
-        $queryWithoutLimit = $query;
-        $query .= ' LIMIT ' . ($pageSize * ($page - 1))  . ',' . $pageSize;
         try {
             $result = $this->db->query($query);
-            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
+            if (isset($queryWithoutLimit)) {
+                $resultWithoutLimit = $this->db->query($queryWithoutLimit);
+            }
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
+        $totalRecords = isset($queryWithoutLimit) ? $resultWithoutLimit->rowCount() : 1;
         $object = [
-            'total_number_of_records' => $resultWithoutLimit->rowCount(),
+            'total_number_of_records' => $totalRecords,
             'query' => $query,
             'sortby' => $sortBy,
             'sortdirection' => $sortDirection,
         ];
         if (isset($id)) {
             if ($result->rowCount() === 0) {
-                $artist = null;
+                $album = null;
             } else {
                 $albumData = $result->fetch();
                 $album = $this->createModelFromDatabaseData($albumData);
@@ -119,7 +123,7 @@ class AlbumsHandler extends DatabaseHandler
         $relatedTable = explode('_', $sortBy)[0];
         $sortField = str_replace('_', '.', $sortBy);
         $selectFunc = function ($field) {
-          return 'album.' . $field;
+            return 'album.' . $field;
         };
         $selectFields = implode(array_map($selectFunc, self::FIELDS), ',');
         $page = array_key_exists('page', $params) ? $params['page'] : 1;
@@ -127,21 +131,25 @@ class AlbumsHandler extends DatabaseHandler
         $query = 'SELECT ' . $selectFields . ' FROM album';
         $query .= ' JOIN ' . $relatedTable . ' ON ' . $relatedTable . '.id = album.' . $relatedTable . '_id';
         $query .= ' WHERE true';
+        $query .= $this->getFilterClause($params);
         if (isset($id)) {
             $query .= ' AND id = ' . $id;
+        } else {
+            $query .= ' ORDER BY ' . $sortField . ' ' . $sortDirection;
+            $queryWithoutLimit = $query;
+            $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
         }
-        $query .= $this->getFilterClause($params);
-        $query .= ' ORDER BY ' . $sortField . ' ' . $sortDirection;
-        $queryWithoutLimit = $query;
-        $query .= ' LIMIT ' . ($pageSize * ($page - 1))  . ',' . $pageSize;
         try {
             $result = $this->db->query($query);
-            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
+            if (isset($queryWithoutLimit)) {
+                $resultWithoutLimit = $this->db->query($queryWithoutLimit);
+            }
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
+        $totalRecords = isset($queryWithoutLimit) ? $resultWithoutLimit->rowCount() : 1;
         $object = [
-            'total_number_of_records' => $resultWithoutLimit->rowCount(),
+            'total_number_of_records' => $totalRecords,
             'query' => $query,
             'sortby' => $sortBy,
             'sortdirection' => $sortDirection,
