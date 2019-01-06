@@ -8,9 +8,14 @@ abstract class DatabaseHandler extends DatabaseConnection
 {
     public const SORT_DIRECTION = ['ASC', 'DESC'];
 
-    abstract public function get($params);
+    abstract public function select($params);
+
+    abstract public function insert($body);
+
+    abstract public function update($id, $body);
 
     /**
+     * Generic delete function to handle all delete requests.
      * @param string $table
      * @param int $id
      * @return int
@@ -31,8 +36,9 @@ abstract class DatabaseHandler extends DatabaseConnection
     }
 
     /**
+     * Return arrays for keys and values to be used in an SQL INSERT statement.
      * @param array $postData
-     * @return mixed
+     * @return array
      */
     protected function formatPostdataForInsert($postData)
     {
@@ -48,8 +54,9 @@ abstract class DatabaseHandler extends DatabaseConnection
     }
 
     /**
+     * Return string with key=value pairs, to be used in an SQL UPDATE statement.
      * @param array $postData
-     * @return bool | array
+     * @return string
      */
     protected function formatPostdataForUpdate($postData)
     {
@@ -63,6 +70,7 @@ abstract class DatabaseHandler extends DatabaseConnection
     }
 
     /**
+     * Get id from last inserted record in the specified table.
      * @param string $table
      * @return int
      * @throws \Exception
@@ -82,16 +90,18 @@ abstract class DatabaseHandler extends DatabaseConnection
     }
 
     /**
+     * Get the id entry from $params. In some cases $params is updated.
+     * If $params is not set, it is assigned an empty array.
+     * If $params is not an array, we assume it is the id of a record. Set $params to [];
      * @param array | int $params
-     * @return mixed | null
+     * @return int
      */
     protected function getIdFromParams(&$params)
     {
         if (!isset($params)) {
+            $id = 0;
             $params = [];
-            return 0;
-        }
-        if (!is_array($params)) {
+        } else if (!is_array($params)) {
             $id = $params;
             $params = [];
         } else {

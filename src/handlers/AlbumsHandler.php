@@ -56,7 +56,7 @@ class AlbumsHandler extends DatabaseHandler
      * @return array
      * @throws \Exception
      */
-    public function get($params)
+    public function select($params)
     {
         $id = $this->getIdFromParams($params);
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
@@ -181,7 +181,7 @@ class AlbumsHandler extends DatabaseHandler
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
-        return $this->get($id);
+        return $this->select($id);
     }
 
     /**
@@ -204,7 +204,7 @@ class AlbumsHandler extends DatabaseHandler
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         };
-        return $this->get($id);
+        return $this->select($id);
     }
 
     private function getFilterClause($params)
@@ -247,28 +247,28 @@ class AlbumsHandler extends DatabaseHandler
         ]);
         if (array_key_exists('artist_id', $albumData)) {
             try {
-                $artist = $this->artistsHandler->get($albumData['artist_id'])['body'];
+                $artist = $this->artistsHandler->select($albumData['artist_id'])['body'];
                 $newAlbum->setArtist($artist);
             } catch (\Exception $e) {
             }
         }
         if (array_key_exists('genre_id', $albumData)) {
             try {
-                $genre = $this->genresHandler->get($albumData['genre_id'])['body'];
+                $genre = $this->genresHandler->select($albumData['genre_id'])['body'];
                 $newAlbum->setGenre($genre);
             } catch (\Exception $e) {
             }
         }
         if (array_key_exists('label_id', $albumData)) {
             try {
-                $label = $this->labelsHandler->get($albumData['label_id'])['body'];
+                $label = $this->labelsHandler->select($albumData['label_id'])['body'];
                 $newAlbum->setLabel($label);
             } catch (\Exception $e) {
             }
         }
         if (array_key_exists('format_id', $albumData)) {
             try {
-                $format = $this->formatsHandler->get($albumData['format_id'])['body'];
+                $format = $this->formatsHandler->select($albumData['format_id'])['body'];
                 $newAlbum->setFormat($format);
             } catch (\Exception $e) {
             }
@@ -298,15 +298,15 @@ class AlbumsHandler extends DatabaseHandler
         }
         // check existence of artist, genre, label and format
         try {
-            $artist = $this->artistsHandler->get($postData['artist_id']);
-            $format = $this->formatsHandler->get($postData['format_id']);
+            $artist = $this->artistsHandler->select($postData['artist_id']);
+            $format = $this->formatsHandler->select($postData['format_id']);
             if (array_key_exists('label_id', $postData)) {
-                $label = $this->labelsHandler->get($postData['label_id']);
+                $label = $this->labelsHandler->select($postData['label_id']);
             } else {
                 $label = false;
             }
             if (array_key_exists('genre_id', $postData)) {
-                $genre = $this->genresHandler->get($postData['genre_id']);
+                $genre = $this->genresHandler->select($postData['genre_id']);
             } else {
                 $genre = false;
             }

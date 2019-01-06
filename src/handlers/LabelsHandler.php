@@ -18,7 +18,7 @@ class LabelsHandler extends DatabaseHandler
      * @throws \Exception
      * @return Label | Label[]
      */
-    public function get($params)
+    public function select($params)
     {
         $id = $this->getIdFromParams($params);
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
@@ -70,7 +70,7 @@ class LabelsHandler extends DatabaseHandler
      * @return Label
      * @throws \Exception
      */
-    public function insertLabel($labelData)
+    public function insert($labelData)
     {
         try {
             $this->validatePostData($labelData);
@@ -86,7 +86,7 @@ class LabelsHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), 500);
         };
         $id = $this->getLastInsertedRecordId('label');
-        return $this->get($id);
+        return $this->select($id);
     }
 
     /**
@@ -95,7 +95,7 @@ class LabelsHandler extends DatabaseHandler
      * @return Label
      * @throws \Exception
      */
-    public function updateLabel($id, $labelData)
+    public function update($id, $labelData)
     {
         try {
             $this->validatePostData($labelData);
@@ -109,7 +109,7 @@ class LabelsHandler extends DatabaseHandler
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         };
-        return $this->get($id);
+        return $this->select($id);
     }
 
     /**

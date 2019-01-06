@@ -18,7 +18,7 @@ class GenresHandler extends DatabaseHandler
      * @throws \Exception
      * @return array
      */
-    public function get($params)
+    public function select($params)
     {
         $id = $this->getIdFromParams($params);
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
@@ -67,10 +67,10 @@ class GenresHandler extends DatabaseHandler
 
     /**
      * @param array $genreData
-     * @return Genre
+     * @return array
      * @throws \Exception
      */
-    public function insertGenre($genreData)
+    public function insert($genreData)
     {
         try {
             $this->validatePostData($genreData);
@@ -86,16 +86,16 @@ class GenresHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), 500);
         };
         $id = $this->getLastInsertedRecordId('genre');
-        return $this->get($id);
+        return $this->select($id);
     }
 
     /**
      * @param $id
      * @param $genreData
-     * @return Genre
+     * @return array
      * @throws \Exception
      */
-    public function updateGenre($id, $genreData)
+    public function update($id, $genreData)
     {
         try {
             $this->validatePostData($genreData);
@@ -109,7 +109,7 @@ class GenresHandler extends DatabaseHandler
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         };
-        return $this->get($id);
+        return $this->select($id);
     }
 
     /**

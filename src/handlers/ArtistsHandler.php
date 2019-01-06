@@ -18,7 +18,7 @@ class ArtistsHandler extends DatabaseHandler
      * @throws \Exception
      * @return array
      */
-    public function get($params)
+    public function select($params)
     {
         $id = $this->getIdFromParams($params);
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
@@ -67,10 +67,10 @@ class ArtistsHandler extends DatabaseHandler
 
     /**
      * @param $artistData
-     * @return Artist
+     * @return array
      * @throws \Exception
      */
-    public function insertArtist($artistData)
+    public function insert($artistData)
     {
         try {
             $this->validatePostData($artistData);
@@ -86,16 +86,16 @@ class ArtistsHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), 500);
         };
         $id = $this->getLastInsertedRecordId('artist');
-        return $this->get(['id' => $id]);
+        return $this->select(['id' => $id]);
     }
 
     /**
      * @param $id
      * @param $artistData
-     * @return Artist
+     * @return array
      * @throws \Exception
      */
-    public function updateArtist($id, $artistData)
+    public function update($id, $artistData)
     {
         try {
             $this->validatePostData($artistData);
@@ -109,7 +109,7 @@ class ArtistsHandler extends DatabaseHandler
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         };
-        return $this->get($id);
+        return $this->select($id);
     }
 
     /**

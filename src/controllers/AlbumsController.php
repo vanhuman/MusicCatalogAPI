@@ -7,8 +7,9 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 
 use Handlers\AlbumsHandler;
-use Templates\AlbumsTemplate;
+use Models\Album;
 use Templates\AlbumTemplate;
+use Templates\AlbumsTemplate;
 
 class AlbumsController extends Controller
 {
@@ -61,31 +62,10 @@ class AlbumsController extends Controller
         return $response->withJson($returnObject, 200);
     }
 
-    public function post(Request $request, Response $response, $args)
-    {
-        $body = $request->getParsedBody();
-        try {
-            $result = $this->handler->insert($body);
-        } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
-        }
-        $template = $this->newTemplate($result['body']);
-        return $response->withJson($template->getArray(), 200);
-    }
-
-    public function put(Request $request, Response $response, $args)
-    {
-        $id = $args['id'];
-        $body = $request->getParsedBody();
-        try {
-            $result = $this->handler->update($id, $body);
-        } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
-        }
-        $template = $this->newTemplate($result['body']);
-        return $response->withJson($template->getArray(), 200);
-    }
-
+    /**
+     * @param Album | Album[] $albums
+     * @return AlbumsTemplate | AlbumTemplate
+     */
     protected function newTemplate($albums)
     {
         if (is_array($albums)) {

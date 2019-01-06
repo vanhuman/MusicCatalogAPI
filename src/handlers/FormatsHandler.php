@@ -18,7 +18,7 @@ class FormatsHandler extends DatabaseHandler
      * @throws \Exception
      * @return Format | Format[]
      */
-    public function get($params)
+    public function select($params)
     {
         $id = $this->getIdFromParams($params);
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
@@ -70,7 +70,7 @@ class FormatsHandler extends DatabaseHandler
      * @return Format|Format[]
      * @throws \Exception
      */
-    public function insertFormat($formatData)
+    public function insert($formatData)
     {
         try {
             $this->validatePostData($formatData);
@@ -86,7 +86,7 @@ class FormatsHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), 500);
         };
         $id = $this->getLastInsertedRecordId('format');
-        return $this->get($id);
+        return $this->select($id);
     }
 
     /**
@@ -95,7 +95,7 @@ class FormatsHandler extends DatabaseHandler
      * @return Format|Format[]
      * @throws \Exception
      */
-    public function updateFormat($id, $formatData)
+    public function update($id, $formatData)
     {
         try {
             $this->validatePostData($formatData);
@@ -109,7 +109,7 @@ class FormatsHandler extends DatabaseHandler
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         };
-        return $this->get($id);
+        return $this->select($id);
     }
 
     /**

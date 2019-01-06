@@ -20,36 +20,36 @@ class Routes
         /* album routes */
         $app->get('/albums/{id}', AlbumsController::class . ':get');
         $app->get('/albums', AlbumsController::class . ':get');
-        $app->post('/albums', AlbumsController::class . ':postAlbum');
-        $app->put('/albums/{id}', AlbumsController::class . ':putAlbum');
+        $app->post('/albums', AlbumsController::class . ':post');
+        $app->put('/albums/{id}', AlbumsController::class . ':put');
         $app->delete('/albums/{id}', AlbumsController::class . ':delete');
 
         /* artist routes */
         $app->get('/artists/{id}', ArtistsController::class . ':get');
         $app->get('/artists', ArtistsController::class . ':get');
-        $app->post('/artists', ArtistsController::class . ':postArtist');
-        $app->put('/artists/{id}', ArtistsController::class . ':putArtist');
+        $app->post('/artists', ArtistsController::class . ':post');
+        $app->put('/artists/{id}', ArtistsController::class . ':put');
         $app->delete('/artists/{id}', ArtistsController::class . ':delete');
 
         /* label routes */
         $app->get('/labels/{id}', LabelsController::class . ':get');
         $app->get('/labels', LabelsController::class . ':get');
-        $app->post('/labels', LabelsController::class . ':postLabel');
-        $app->put('/labels/{id}', LabelsController::class . ':putLabel');
+        $app->post('/labels', LabelsController::class . ':post');
+        $app->put('/labels/{id}', LabelsController::class . ':put');
         $app->delete('/labels/{id}', LabelsController::class . ':delete');
 
         /* format routes */
         $app->get('/formats/{id}', FormatsController::class . ':get');
         $app->get('/formats', FormatsController::class . ':get');
-        $app->post('/formats', FormatsController::class . ':postFormat');
-        $app->put('/formats/{id}', FormatsController::class . ':putFormat');
+        $app->post('/formats', FormatsController::class . ':post');
+        $app->put('/formats/{id}', FormatsController::class . ':put');
         $app->delete('/formats/{id}', FormatsController::class . ':delete');
 
         /* genre routes */
         $app->get('/genres/{id}', GenresController::class . ':get');
         $app->get('/genres', GenresController::class . ':get');
-        $app->post('/genres', GenresController::class . ':postGenre');
-        $app->put('/genres/{id}', GenresController::class . ':putGenre');
+        $app->post('/genres', GenresController::class . ':post');
+        $app->put('/genres/{id}', GenresController::class . ':put');
         $app->delete('/genres/{id}', GenresController::class . ':delete');
 
         /* migration routes */

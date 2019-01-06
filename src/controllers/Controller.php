@@ -8,7 +8,6 @@ use Slim\Http\Request;
 
 use Handlers\DatabaseHandler;
 use Helpers\TypeUtility;
-use Templates\TemplateInterface;
 
 abstract class Controller
 {
@@ -41,15 +40,53 @@ abstract class Controller
     {
         $params = $this->collectGetParams($request, $args);
         try {
-            $result = $this->handler->get($params);
+            $result = $this->handler->select($params);
         } catch (\Exception $e) {
             return $this->showError($response, $e->getMessage(), $e->getCode());
         }
-        /* @var TemplateInterface $template */
         $template = $this->newTemplate($result['body']);
         $templateArray = $template->getArray();
         $returnObject = $this->buildGetReturnObject($params, $result, $templateArray);
         return $response->withJson($returnObject, 200);
+    }
+
+    /**
+     * Generic post method, for POST requests for all endpoints.
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
+    public function post(Request $request, Response $response, $args)
+    {
+        $body = $request->getParsedBody();
+        try {
+            $result = $this->handler->insert($body);
+        } catch (\Exception $e) {
+            return $this->showError($response, $e->getMessage(), $e->getCode());
+        }
+        $template = $this->newTemplate($result['body']);
+        return $response->withJson($template->getArray(), 200);
+    }
+
+    /**
+     * Generic put method, for PUT requests for all endpoints.
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
+    public function put(Request $request, Response $response, $args)
+    {
+        $id = $args['id'];
+        $body = $request->getParsedBody();
+        try {
+            $result = $this->handler->update($id, $body);
+        } catch (\Exception $e) {
+            return $this->showError($response, $e->getMessage(), $e->getCode());
+        }
+        $template = $this->newTemplate($result['body']);
+        return $response->withJson($template->getArray(), 200);
     }
 
     /**
