@@ -17,40 +17,20 @@ class Routes
      */
     public static function init($app)
     {
-        /* album routes */
-        $app->get('/albums/{id}', AlbumsController::class . ':get');
-        $app->get('/albums', AlbumsController::class . ':get');
-        $app->post('/albums', AlbumsController::class . ':post');
-        $app->put('/albums/{id}', AlbumsController::class . ':put');
-        $app->delete('/albums/{id}', AlbumsController::class . ':delete');
-
-        /* artist routes */
-        $app->get('/artists/{id}', ArtistsController::class . ':get');
-        $app->get('/artists', ArtistsController::class . ':get');
-        $app->post('/artists', ArtistsController::class . ':post');
-        $app->put('/artists/{id}', ArtistsController::class . ':put');
-        $app->delete('/artists/{id}', ArtistsController::class . ':delete');
-
-        /* label routes */
-        $app->get('/labels/{id}', LabelsController::class . ':get');
-        $app->get('/labels', LabelsController::class . ':get');
-        $app->post('/labels', LabelsController::class . ':post');
-        $app->put('/labels/{id}', LabelsController::class . ':put');
-        $app->delete('/labels/{id}', LabelsController::class . ':delete');
-
-        /* format routes */
-        $app->get('/formats/{id}', FormatsController::class . ':get');
-        $app->get('/formats', FormatsController::class . ':get');
-        $app->post('/formats', FormatsController::class . ':post');
-        $app->put('/formats/{id}', FormatsController::class . ':put');
-        $app->delete('/formats/{id}', FormatsController::class . ':delete');
-
-        /* genre routes */
-        $app->get('/genres/{id}', GenresController::class . ':get');
-        $app->get('/genres', GenresController::class . ':get');
-        $app->post('/genres', GenresController::class . ':post');
-        $app->put('/genres/{id}', GenresController::class . ':put');
-        $app->delete('/genres/{id}', GenresController::class . ':delete');
+        $routes = [
+            '/albums' => AlbumsController::class,
+            '/artists' => ArtistsController::class,
+            '/labels' => LabelsController::class,
+            '/formats' => FormatsController::class,
+            '/genres' => GenresController::class,
+        ];
+        foreach ($routes as $route => $controller) {
+            $app->get($route . '/{id}', $controller . ':get');
+            $app->get($route, $controller . ':get');
+            $app->post($route, $controller . ':post');
+            $app->put($route . '/{id}', $controller . ':put');
+            $app->delete($route . '/{id}', $controller . ':delete');
+        }
 
         /* migration routes */
         $app->get('/migrationPre', MigrationController::class . ':migrationPre');

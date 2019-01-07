@@ -70,7 +70,7 @@ class ArtistsHandler extends DatabaseHandler
     }
 
     /**
-     * @param $artistData
+     * @param array $artistData
      * @return array
      * @throws \Exception
      */
@@ -90,12 +90,12 @@ class ArtistsHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), 500);
         };
         $id = $this->getLastInsertedRecordId('artist');
-        return $this->select(['id' => $id]);
+        return $this->select($id);
     }
 
     /**
-     * @param $id
-     * @param $artistData
+     * @param int $id
+     * @param array $artistData
      * @return array
      * @throws \Exception
      */
@@ -117,7 +117,7 @@ class ArtistsHandler extends DatabaseHandler
     }
 
     /**
-     * @param $artistData
+     * @param array $artistData
      * @return Artist
      */
     private function createModelFromDatabaseData($artistData)

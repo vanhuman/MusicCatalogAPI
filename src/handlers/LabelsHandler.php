@@ -70,7 +70,7 @@ class LabelsHandler extends DatabaseHandler
     }
 
     /**
-     * @param $labelData
+     * @param array $labelData
      * @return Label
      * @throws \Exception
      */
@@ -95,7 +95,7 @@ class LabelsHandler extends DatabaseHandler
 
     /**
      * @param int $id
-     * @param $labelData
+     * @param array $labelData
      * @return Label
      * @throws \Exception
      */
@@ -117,7 +117,7 @@ class LabelsHandler extends DatabaseHandler
     }
 
     /**
-     * @param $labelData
+     * @param array $labelData
      * @return Label
      */
     private function createModelFromDatabaseData($labelData)

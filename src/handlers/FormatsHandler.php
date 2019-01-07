@@ -95,7 +95,7 @@ class FormatsHandler extends DatabaseHandler
 
     /**
      * @param int $id
-     * @param $formatData
+     * @param array $formatData
      * @return Format|Format[]
      * @throws \Exception
      */
@@ -117,7 +117,7 @@ class FormatsHandler extends DatabaseHandler
     }
 
     /**
-     * @param $formatData
+     * @param array $formatData
      * @return Format
      */
     private function createModelFromDatabaseData($formatData)

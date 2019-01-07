@@ -94,8 +94,8 @@ class GenresHandler extends DatabaseHandler
     }
 
     /**
-     * @param $id
-     * @param $genreData
+     * @param int $id
+     * @param array $genreData
      * @return array
      * @throws \Exception
      */
@@ -117,7 +117,7 @@ class GenresHandler extends DatabaseHandler
     }
 
     /**
-     * @param $genreData
+     * @param array $genreData
      * @return Genre
      */
     private function createModelFromDatabaseData($genreData)

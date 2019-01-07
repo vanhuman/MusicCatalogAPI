@@ -165,7 +165,7 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param $albumData
+     * @param array $albumData
      * @return array | null
      * @throws \Exception
      */
@@ -215,6 +215,11 @@ class AlbumsHandler extends DatabaseHandler
         return $this->select($id);
     }
 
+    /**
+     * Build part of WHERE clause depending on filter params.
+     * @param array $params
+     * @return string
+     */
     private function getFilterClause($params)
     {
         $filterClause = '';
@@ -241,7 +246,8 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param $albumData
+     * Create the necessary models from the database data to return the full Album model.
+     * @param array $albumData
      * @return Album
      */
     private function createModelFromDatabaseData($albumData)
@@ -285,6 +291,7 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
+     * Post data validation specific for albums.
      * @param array $postData
      * @throws \Exception
      */
