@@ -23,6 +23,11 @@ abstract class Controller
     protected $handler;
 
     /**
+     * @var MessageController $messageController
+     */
+    protected $messageController;
+
+    /**
      * This function is implemented in the subclasses.
      * @param $models
      * @return mixed
@@ -40,12 +45,18 @@ abstract class Controller
     {
         $id = array_key_exists('id', $args) ? $args['id'] : null;
         if (!isset($id)) {
-            return $this->showError($response, 'Id not found', 404);
+            return $this->messageController->showError(
+                $response,
+                new \Exception(
+                    'Trying to retrieve object by id, but the id is not set.',
+                    404
+                )
+            );
         }
         try {
             $result = $this->handler->selectById($id);
         } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
+            return $this->messageController->showError($response, $e);
         }
         $template = $this->newTemplate($result['body']);
         $templateArray = $template->getArray();
@@ -66,7 +77,7 @@ abstract class Controller
         try {
             $result = $this->handler->select($params);
         } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
+            return $this->messageController->showError($response, $e);
         }
         $template = $this->newTemplate($result['body']);
         $templateArray = $template->getArray();
@@ -87,7 +98,7 @@ abstract class Controller
         try {
             $result = $this->handler->insert($body);
         } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
+            return $this->messageController->showError($response, $e);
         }
         $template = $this->newTemplate($result['body']);
         return $response->withJson($template->getArray(), 200);
@@ -107,7 +118,7 @@ abstract class Controller
         try {
             $result = $this->handler->update($id, $body);
         } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
+            return $this->messageController->showError($response, $e);
         }
         $template = $this->newTemplate($result['body']);
         return $response->withJson($template->getArray(), 200);
@@ -128,16 +139,20 @@ abstract class Controller
             // remove the last s since we want singular entity names
             $table = rtrim($table, 's');
         } else {
-            return $this->showError($response, 'ERROR: No route path found.', 500);
+            return $this->messageController->showError($response,
+                new \Exception(
+                    'Trying to delete a record, but unable to determine the table to delete from.',
+                    500
+                )
+            );
         }
         $id = $args['id'];
         try {
             $this->handler->delete($table, $id);
         } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
+            return $this->messageController->showError($response, $e);
         }
-        $result = ucfirst($table) . ' with id ' . $id . ' deleted.';
-        return $response->withJson($result, 200);
+        return $this->messageController->showMessage($response, ucfirst($table) . ' with id ' . $id . ' deleted.');
     }
 
     /**
@@ -196,9 +211,7 @@ abstract class Controller
      */
     protected function getReturnObject($params, $result, $templateArray)
     {
-        /*
-         * current($templateArray) is the first value in the album array
-        */
+        // current($templateArray) is the first value in the album dictionary
         if (current($templateArray) === null || sizeof(current($templateArray)) === 0) {
             $numberOfRecords = 0;
         } else {
@@ -234,17 +247,5 @@ abstract class Controller
         }
         $returnArray = array_merge($returnArray, $templateArray);
         return $returnArray;
-    }
-
-    /**
-     * Generic error messaging.
-     * @param Response $response
-     * @param string $errorMessage
-     * @return Response
-     */
-    protected function showError($response, $errorMessage, $status)
-    {
-        $response = $response->withJson($errorMessage, $status);
-        return $response;
     }
 }

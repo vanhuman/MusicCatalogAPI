@@ -19,6 +19,7 @@ class FormatsController extends Controller
     {
         $this->container = $container;
         $this->handler = new FormatsHandler($this->container->get('db'));
+        $this->messageController = new MessageController();
     }
 
     /**

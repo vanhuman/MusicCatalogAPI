@@ -21,6 +21,7 @@ class AlbumsController extends Controller
     {
         $this->container = $container;
         $this->handler = new AlbumsHandler($this->container->get('db'));
+        $this->messageController = new MessageController();
     }
 
     /**
@@ -54,7 +55,7 @@ class AlbumsController extends Controller
         try {
             $result = $this->handler->getAlbumsSortedOnRelatedTable($params);
         } catch (\Exception $e) {
-            return $this->showError($response, $e->getMessage(), $e->getCode());
+            return $this->messageController->showError($response, $e);
         }
         $template = new AlbumsTemplate($result['body']);
         $templateArray = $template->getArray();

@@ -19,6 +19,7 @@ class ArtistsController extends Controller
     {
         $this->container = $container;
         $this->handler = new ArtistsHandler($this->container->get('db'));
+        $this->messageController = new MessageController();
     }
 
     /**

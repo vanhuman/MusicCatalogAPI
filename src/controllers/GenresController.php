@@ -19,6 +19,7 @@ class GenresController extends Controller
     {
         $this->container = $container;
         $this->handler = new GenresHandler($this->container->get('db'));
+        $this->messageController = new MessageController();
     }
 
     /**

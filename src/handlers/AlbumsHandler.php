@@ -61,10 +61,7 @@ class AlbumsHandler extends DatabaseHandler
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
         }
-        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
-        $query .= ' WHERE true';
-        $query .= $this->getFilterClause($params);
-        $query .= ' AND id = ' . $id;
+        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album WHERE id = ' . $id;
         try {
             $result = $this->db->query($query);
         } catch (\Exception $e) {

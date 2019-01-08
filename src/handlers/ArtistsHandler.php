@@ -2,8 +2,8 @@
 
 namespace Handlers;
 
-use Helpers\TypeUtility;
 use Models\Artist;
+use Helpers\TypeUtility;
 
 class ArtistsHandler extends DatabaseHandler
 {
