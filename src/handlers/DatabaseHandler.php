@@ -32,7 +32,7 @@ abstract class DatabaseHandler extends DatabaseConnection
             throw new \Exception($e->getMessage(), 500);
         };
         if ($result->rowCount() === 0) {
-            throw new \Exception('ERROR: ' . ucfirst($table) . ' with id ' . $id . ' not found.', 404);
+            throw new \Exception(ucfirst($table) . ' with id ' . $id . ' not found.', 404);
         }
         return $result->rowCount();
     }
