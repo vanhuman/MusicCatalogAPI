@@ -2,6 +2,7 @@
 
 namespace Handlers;
 
+use Helpers\TypeUtility;
 use Models\Label;
 
 class LabelsHandler extends DatabaseHandler
@@ -14,59 +15,73 @@ class LabelsHandler extends DatabaseHandler
     private const DEFAULT_SORT_DIRECTION = 'ASC';
 
     /**
-     * @param array | int $params
+     * @param int $id
+     * @throws \Exception
+     * @return Label | Label[]
+     */
+    public function selectById($id)
+    {
+        if (!isset($id) || !TypeUtility::isInteger($id)) {
+            $id = 0;
+        }
+        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM label';
+        $query .= ' WHERE id = ' . $id;
+        try {
+            $result = $this->db->query($query);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), 500);
+        }
+        $object = [
+            'query' => $query,
+        ];
+        if ($result->rowCount() === 0) {
+            $label = null;
+        } else {
+            $labelData = $result->fetch();
+            $label = $this->createModelFromDatabaseData($labelData);
+        }
+        $object['body'] = $label;
+        return $object;
+    }
+
+    /**
+     * @param array $params
      * @throws \Exception
      * @return Label | Label[]
      */
     public function select($params)
     {
-        $id = $this->getIdFromParams($params);
+        if (!isset($params) || !is_array($params)) {
+            $params = [];
+        }
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
         $page = array_key_exists('page', $params) ? $params['page'] : 1;
         $pageSize = array_key_exists('page_size', $params) ? $params['page_size'] : 50;
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM label';
-        if (isset($id)) {
-            $query .= ' WHERE id = ' . $id;
-        } else {
-            $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
-            $queryWithoutLimit = $query;
-            $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
-        }
+        $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        $queryWithoutLimit = $query;
+        $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
         try {
             $result = $this->db->query($query);
-            if (isset($queryWithoutLimit)) {
-                $resultWithoutLimit = $this->db->query($queryWithoutLimit);
-            }
+            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
-        $totalRecords = isset($queryWithoutLimit) ? $resultWithoutLimit->rowCount() : 1;
         $object = [
-            'total_number_of_records' => $totalRecords,
+            'total_number_of_records' => $resultWithoutLimit->rowCount(),
             'query' => $query,
             'sortby' => $sortBy,
             'sortdirection' => $sortDirection,
         ];
-        if (isset($id)) {
-            if ($result->rowCount() === 0) {
-                $label = null;
-            } else {
-                $labelData = $result->fetch();
-                $label = $this->createModelFromDatabaseData($labelData);
-            }
-            $object['body'] = $label;
-            return $object;
-        } else {
-            $labelsData = $result->fetchAll();
-            foreach ($labelsData as $labelData) {
-                $newLabel = $this->createModelFromDatabaseData($labelData);
-                $labels[] = $newLabel;
-            }
-            $labels = isset($labels) ? $labels : [];
-            $object['body'] = $labels;
-            return $object;
+        $labelsData = $result->fetchAll();
+        foreach ($labelsData as $labelData) {
+            $newLabel = $this->createModelFromDatabaseData($labelData);
+            $labels[] = $newLabel;
         }
+        $labels = isset($labels) ? $labels : [];
+        $object['body'] = $labels;
+        return $object;
     }
 
     /**
@@ -90,7 +105,7 @@ class LabelsHandler extends DatabaseHandler
             throw new \Exception($e->getMessage(), 500);
         };
         $id = $this->getLastInsertedRecordId('label');
-        return $this->select($id);
+        return $this->selectById($id);
     }
 
     /**
@@ -113,7 +128,7 @@ class LabelsHandler extends DatabaseHandler
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         };
-        return $this->select($id);
+        return $this->selectById($id);
     }
 
     /**

@@ -52,13 +52,47 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array | int $params
+     * @param int $id
+     * @return array
+     * @throws \Exception
+     */
+    public function selectById($id)
+    {
+        if (!isset($id) || !TypeUtility::isInteger($id)) {
+            $id = 0;
+        }
+        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
+        $query .= ' WHERE true';
+        $query .= $this->getFilterClause($params);
+        $query .= ' AND id = ' . $id;
+        try {
+            $result = $this->db->query($query);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage(), 500);
+        }
+        $object = [
+            'query' => $query,
+        ];
+        if ($result->rowCount() === 0) {
+            $album = null;
+        } else {
+            $albumData = $result->fetch();
+            $album = $this->createModelFromDatabaseData($albumData);
+        }
+        $object['body'] = $album;
+        return $object;
+    }
+
+    /**
+     * @param array $params
      * @return array
      * @throws \Exception
      */
     public function select($params)
     {
-        $id = $this->getIdFromParams($params);
+        if (!isset($params) || !is_array($params)) {
+            $params = [];
+        }
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
         $page = array_key_exists('page', $params) ? $params['page'] : 1;
@@ -66,48 +100,29 @@ class AlbumsHandler extends DatabaseHandler
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
         $query .= ' WHERE true';
         $query .= $this->getFilterClause($params);
-        if (isset($id)) {
-            $query .= ' AND id = ' . $id;
-        } else {
-            $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
-            $queryWithoutLimit = $query;
-            $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
-        }
+        $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        $queryWithoutLimit = $query;
+        $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
         try {
             $result = $this->db->query($query);
-            if (isset($queryWithoutLimit)) {
-                $resultWithoutLimit = $this->db->query($queryWithoutLimit);
-            }
+            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
-        $totalRecords = isset($queryWithoutLimit) ? $resultWithoutLimit->rowCount() : 1;
         $object = [
-            'total_number_of_records' => $totalRecords,
+            'total_number_of_records' => $resultWithoutLimit->rowCount(),
             'query' => $query,
             'sortby' => $sortBy,
             'sortdirection' => $sortDirection,
         ];
-        if (isset($id)) {
-            if ($result->rowCount() === 0) {
-                $album = null;
-            } else {
-                $albumData = $result->fetch();
-                $album = $this->createModelFromDatabaseData($albumData);
-            }
-            $object['body'] = $album;
-            return $object;
-        } else {
-            $albumsData = $result->fetchAll();
-            foreach ($albumsData as $albumData) {
-                $newAlbum = $this->createModelFromDatabaseData($albumData);
-                $albums[] = $newAlbum;
-            }
-            $albums = isset($albums) ? $albums : [];
-            $object['body'] = $albums;
-            return $object;
+        $albumsData = $result->fetchAll();
+        foreach ($albumsData as $albumData) {
+            $newAlbum = $this->createModelFromDatabaseData($albumData);
+            $albums[] = $newAlbum;
         }
-
+        $albums = isset($albums) ? $albums : [];
+        $object['body'] = $albums;
+        return $object;
     }
 
     /**
@@ -117,6 +132,9 @@ class AlbumsHandler extends DatabaseHandler
      */
     public function getAlbumsSortedOnRelatedTable($params)
     {
+        if (!isset($params) || !is_array($params)) {
+            $params = [];
+        }
         $sortBy = $this->getSortByFromParams($params, self::RELATED_SORT_FIELDS, 'id');
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_RELATED_SORT_DIRECTION);
         // sortBy is always formatted as table_field
@@ -132,24 +150,17 @@ class AlbumsHandler extends DatabaseHandler
         $query .= ' JOIN ' . $relatedTable . ' ON ' . $relatedTable . '.id = album.' . $relatedTable . '_id';
         $query .= ' WHERE true';
         $query .= $this->getFilterClause($params);
-        if (isset($id)) {
-            $query .= ' AND id = ' . $id;
-        } else {
-            $query .= ' ORDER BY ' . $sortField . ' ' . $sortDirection;
-            $queryWithoutLimit = $query;
-            $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
-        }
+        $query .= ' ORDER BY ' . $sortField . ' ' . $sortDirection;
+        $queryWithoutLimit = $query;
+        $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
         try {
             $result = $this->db->query($query);
-            if (isset($queryWithoutLimit)) {
-                $resultWithoutLimit = $this->db->query($queryWithoutLimit);
-            }
+            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
-        $totalRecords = isset($queryWithoutLimit) ? $resultWithoutLimit->rowCount() : 1;
         $object = [
-            'total_number_of_records' => $totalRecords,
+            'total_number_of_records' => $resultWithoutLimit->rowCount(),
             'query' => $query,
             'sortby' => $sortBy,
             'sortdirection' => $sortDirection,
@@ -189,7 +200,7 @@ class AlbumsHandler extends DatabaseHandler
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         }
-        return $this->select($id);
+        return $this->selectById($id);
     }
 
     /**
@@ -212,7 +223,7 @@ class AlbumsHandler extends DatabaseHandler
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage(), 500);
         };
-        return $this->select($id);
+        return $this->selectById($id);
     }
 
     /**
@@ -261,28 +272,28 @@ class AlbumsHandler extends DatabaseHandler
         ]);
         if (array_key_exists('artist_id', $albumData)) {
             try {
-                $artist = $this->artistsHandler->select($albumData['artist_id'])['body'];
+                $artist = $this->artistsHandler->selectById($albumData['artist_id'])['body'];
                 $newAlbum->setArtist($artist);
             } catch (\Exception $e) {
             }
         }
         if (array_key_exists('genre_id', $albumData)) {
             try {
-                $genre = $this->genresHandler->select($albumData['genre_id'])['body'];
+                $genre = $this->genresHandler->selectById($albumData['genre_id'])['body'];
                 $newAlbum->setGenre($genre);
             } catch (\Exception $e) {
             }
         }
         if (array_key_exists('label_id', $albumData)) {
             try {
-                $label = $this->labelsHandler->select($albumData['label_id'])['body'];
+                $label = $this->labelsHandler->selectById($albumData['label_id'])['body'];
                 $newAlbum->setLabel($label);
             } catch (\Exception $e) {
             }
         }
         if (array_key_exists('format_id', $albumData)) {
             try {
-                $format = $this->formatsHandler->select($albumData['format_id'])['body'];
+                $format = $this->formatsHandler->selectById($albumData['format_id'])['body'];
                 $newAlbum->setFormat($format);
             } catch (\Exception $e) {
             }
@@ -313,15 +324,15 @@ class AlbumsHandler extends DatabaseHandler
         }
         // check existence of artist, genre, label and format
         try {
-            $artist = $this->artistsHandler->select($postData['artist_id']);
-            $format = $this->formatsHandler->select($postData['format_id']);
+            $artist = $this->artistsHandler->selectById($postData['artist_id']);
+            $format = $this->formatsHandler->selectById($postData['format_id']);
             if (array_key_exists('label_id', $postData)) {
-                $label = $this->labelsHandler->select($postData['label_id']);
+                $label = $this->labelsHandler->selectById($postData['label_id']);
             } else {
                 $label = false;
             }
             if (array_key_exists('genre_id', $postData)) {
-                $genre = $this->genresHandler->select($postData['genre_id']);
+                $genre = $this->genresHandler->selectById($postData['genre_id']);
             } else {
                 $genre = false;
             }

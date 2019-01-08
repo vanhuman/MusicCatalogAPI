@@ -58,7 +58,7 @@ class AlbumsController extends Controller
         }
         $template = new AlbumsTemplate($result['body']);
         $templateArray = $template->getArray();
-        $returnObject = $this->buildGetReturnObject($params, $result, $templateArray);
+        $returnObject = $this->getReturnObject($params, $result, $templateArray);
         return $response->withJson($returnObject, 200);
     }
 

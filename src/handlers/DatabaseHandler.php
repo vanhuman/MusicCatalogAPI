@@ -8,6 +8,8 @@ abstract class DatabaseHandler extends DatabaseConnection
 {
     public const SORT_DIRECTION = ['ASC', 'DESC'];
 
+    abstract public function selectById($params);
+
     abstract public function select($params);
 
     abstract public function insert($body);
@@ -87,27 +89,6 @@ abstract class DatabaseHandler extends DatabaseConnection
             throw new \Exception('Last inserted ' . $table . ' not found.', 500);
         }
         return $result['id'];
-    }
-
-    /**
-     * Get the id entry from $params. In some cases $params is updated.
-     * If $params is not set, it is assigned an empty array.
-     * If $params is not an array, we assume it is the id of a record. Set $params to [];
-     * @param array | int $params
-     * @return int
-     */
-    protected function getIdFromParams(&$params)
-    {
-        if (!isset($params)) {
-            $id = 0;
-            $params = [];
-        } else if (!is_array($params)) {
-            $id = $params;
-            $params = [];
-        } else {
-            $id = array_key_exists('id', $params) ? $params['id'] : 0;
-        }
-        return $id;
     }
 
     /**

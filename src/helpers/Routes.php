@@ -25,7 +25,7 @@ class Routes
             '/genres' => GenresController::class,
         ];
         foreach ($routes as $route => $controller) {
-            $app->get($route . '/{id}', $controller . ':get');
+            $app->get($route . '/{id}', $controller . ':getById');
             $app->get($route, $controller . ':get');
             $app->post($route, $controller . ':post');
             $app->put($route . '/{id}', $controller . ':put');

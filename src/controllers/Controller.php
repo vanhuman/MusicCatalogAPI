@@ -30,7 +30,31 @@ abstract class Controller
     abstract protected function newTemplate($models);
 
     /**
-     * Generic get method, for GET requests for all endpoints.
+     * Generic get method, for GET requests for all endpoints using id.
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
+    public function getById(Request $request, Response $response, $args)
+    {
+        $id = array_key_exists('id', $args) ? $args['id'] : null;
+        if (!isset($id)) {
+            return $this->showError($response, 'Id not found', 404);
+        }
+        try {
+            $result = $this->handler->selectById($id);
+        } catch (\Exception $e) {
+            return $this->showError($response, $e->getMessage(), $e->getCode());
+        }
+        $template = $this->newTemplate($result['body']);
+        $templateArray = $template->getArray();
+        $returnObject = $this->getByIdReturnObject($result, $templateArray);
+        return $response->withJson($returnObject, 200);
+    }
+
+    /**
+     * Generic get method, for GET requests for all endpoints without id.
      * @param Request $request
      * @param Response $response
      * @param $args
@@ -46,7 +70,7 @@ abstract class Controller
         }
         $template = $this->newTemplate($result['body']);
         $templateArray = $template->getArray();
-        $returnObject = $this->buildGetReturnObject($params, $result, $templateArray);
+        $returnObject = $this->getReturnObject($params, $result, $templateArray);
         return $response->withJson($returnObject, 200);
     }
 
@@ -145,7 +169,24 @@ abstract class Controller
     }
 
     /**
-     * Function to build the return object for GET requests around the object template.
+     * Function to build the return object for GET requests with id.
+     * $request is what comes back from the handler, $templateArray is the object template converted to array.
+     * @param array $result
+     * @param array $template
+     * @return array
+     */
+    protected function getByIdReturnObject($result, $templateArray)
+    {
+        if ($this->container->get('settings')->get('showDebug')) {
+            $returnArray['debug'] = [];
+            $returnArray['debug']['query'] = $result['query'];
+        }
+        $returnArray = array_merge($returnArray, $templateArray);
+        return $returnArray;
+    }
+
+    /**
+     * Function to build the return object for GET requests without id.
      * $params is what is being sent to the handler, $request is what comes back from the handler,
      * $templateArray is the object template converted to array.
      * @param array $params
@@ -153,46 +194,37 @@ abstract class Controller
      * @param array $template
      * @return array
      */
-    protected function buildGetReturnObject($params, $result, $templateArray)
+    protected function getReturnObject($params, $result, $templateArray)
     {
         /*
-         * in case of the albumsController, current($templateArray) is one album or an array with albums
-         * and current(current($templateArray)) is a specific album id or the first album object, which is an array
+         * current($templateArray) is the first value in the album array
         */
         if (current($templateArray) === null || sizeof(current($templateArray)) === 0) {
-            // we were asking for a list of albums but there are none
             $numberOfRecords = 0;
-        } else if (is_array(current(current($templateArray)))) {
-            // we were asking for a list of albums and there is at least one
-            $numberOfRecords = sizeof(current($templateArray));
         } else {
-            // we were asking for one specific album
-            $numberOfRecords = 1;
+            $numberOfRecords = sizeof(current($templateArray));
         }
-        // only show pagination and parameters if we were getting a list of objects
-        if (!isset($params['id'])) {
-            $returnArray['pagination'] = [
-                'page' => (int)$params['page'],
-                'page_size' => $this->container->get('settings')->get('pageSize'),
-                'number_of_records' => $numberOfRecords,
-                'total_number_of_records' => $result['total_number_of_records'],
-            ];
-            if ($this->container->get('settings')->get('showParams')) {
-                $returnArray['parameters'] = [];
-                if (isset($params['sortby'])) {
-                    $returnArray['parameters']['sortby'] = $params['sortby'];
-                } else {
-                    $returnArray['parameters']['sortby'] = $result['sortby'];
-                }
-                if (isset($params['sortdirection'])) {
-                    $returnArray['parameters']['sortdirection'] = $params['sortdirection'];
-                } else {
-                    $returnArray['parameters']['sortdirection'] = $result['sortdirection'];
-                }
-                foreach ($params['filter'] as $key => $value) {
-                    if (isset($params['filter'][$key])) {
-                        $returnArray['parameters'][$key] = $value;
-                    }
+        $returnArray['pagination'] = [
+            'page' => (int)$params['page'],
+            'page_size' => $this->container->get('settings')->get('pageSize'),
+            'number_of_records' => $numberOfRecords,
+            'total_number_of_records' => $result['total_number_of_records'],
+        ];
+        if ($this->container->get('settings')->get('showParams')) {
+            $returnArray['parameters'] = [];
+            if (isset($params['sortby'])) {
+                $returnArray['parameters']['sortby'] = $params['sortby'];
+            } else {
+                $returnArray['parameters']['sortby'] = $result['sortby'];
+            }
+            if (isset($params['sortdirection'])) {
+                $returnArray['parameters']['sortdirection'] = $params['sortdirection'];
+            } else {
+                $returnArray['parameters']['sortdirection'] = $result['sortdirection'];
+            }
+            foreach ($params['filter'] as $key => $value) {
+                if (isset($params['filter'][$key])) {
+                    $returnArray['parameters'][$key] = $value;
                 }
             }
         }
