@@ -8,6 +8,7 @@ use Slim\Http\Request;
 
 use Handlers\DatabaseHandler;
 use Helpers\TypeUtility;
+use Models\Params;
 
 abstract class Controller
 {
@@ -73,7 +74,8 @@ abstract class Controller
      */
     public function get(Request $request, Response $response, $args)
     {
-        $params = $this->collectGetParams($request, $args);
+        $params = $this->collectGetParams($request);
+        std()->show($params);
         try {
             $result = $this->handler->select($params);
         } catch (\Exception $e) {
@@ -158,40 +160,40 @@ abstract class Controller
     /**
      * Function to gather all request arguments in one object.
      * @param Request $request
-     * @param $args
-     * @return array
+     * @return Params
      */
-    protected function collectGetParams(Request $request, $args)
+    protected function collectGetParams(Request $request)
     {
         $page = $request->getParam('page');
         if (!isset($page) || !TypeUtility::isInteger($page)) {
             $page = 1;
         }
         $page = (int)$page;
-        return [
-            'id' => array_key_exists('id', $args) ? $args['id'] : null,
+        $paramsArray = [
             'page' => $page,
-            'page_size' => $this->container->get('settings')->get('pageSize'),
-            'sortby' => $request->getParam('sortby'),
-            'sortdirection' => $request->getParam('sortdirection'),
+            'pageSize' => $this->container->get('settings')->get('pageSize'),
+            'sortBy' => $request->getParam('sortby'),
+            'sortDirection' => $request->getParam('sortdirection'),
             'filter' => [
                 'artist_id' => $request->getParam('artist_id'),
                 'label_id' => $request->getParam('label_id'),
                 'genre_id' => $request->getParam('genre_id'),
                 'format_id' => $request->getParam('format_id'),
-            ]
+            ],
         ];
+        return new Params($paramsArray);
     }
 
     /**
      * Function to build the return object for GET requests with id.
      * $request is what comes back from the handler, $templateArray is the object template converted to array.
      * @param array $result
-     * @param array $template
+     * @param array $templateArray
      * @return array
      */
     protected function getByIdReturnObject($result, $templateArray)
     {
+        $returnArray = [];
         if ($this->container->get('settings')->get('showDebug')) {
             $returnArray['debug'] = [];
             $returnArray['debug']['query'] = $result['query'];
@@ -204,12 +206,12 @@ abstract class Controller
      * Function to build the return object for GET requests without id.
      * $params is what is being sent to the handler, $request is what comes back from the handler,
      * $templateArray is the object template converted to array.
-     * @param array $params
+     * @param Params $params
      * @param array $result
-     * @param array $template
+     * @param array $templateArray
      * @return array
      */
-    protected function getReturnObject($params, $result, $templateArray)
+    protected function getReturnObject(Params $params, $result, $templateArray)
     {
         // current($templateArray) is the first value in the album dictionary
         if (current($templateArray) === null || sizeof(current($templateArray)) === 0) {
@@ -218,26 +220,26 @@ abstract class Controller
             $numberOfRecords = sizeof(current($templateArray));
         }
         $returnArray['pagination'] = [
-            'page' => (int)$params['page'],
-            'page_size' => $this->container->get('settings')->get('pageSize'),
+            'page' => $params->page,
+            'page_size' => $params->pageSize,
             'number_of_records' => $numberOfRecords,
             'total_number_of_records' => $result['total_number_of_records'],
         ];
         if ($this->container->get('settings')->get('showParams')) {
             $returnArray['parameters'] = [];
-            if (isset($params['sortby'])) {
-                $returnArray['parameters']['sortby'] = $params['sortby'];
+            if (isset($params->sortBy)) {
+                $returnArray['parameters']['sortby'] = $params->sortBy;
             } else {
                 $returnArray['parameters']['sortby'] = $result['sortby'];
             }
-            if (isset($params['sortdirection'])) {
-                $returnArray['parameters']['sortdirection'] = $params['sortdirection'];
+            if (isset($params->sortDirection)) {
+                $returnArray['parameters']['sortdirection'] = $params->sortDirection;
             } else {
                 $returnArray['parameters']['sortdirection'] = $result['sortdirection'];
             }
-            foreach ($params['filter'] as $key => $value) {
-                if (isset($params['filter'][$key])) {
-                    $returnArray['parameters'][$key] = $value;
+            foreach ($params->filter as $property => $value) {
+                if (isset($params->filter->{$property})) {
+                    $returnArray['parameters'][$property] = $value;
                 }
             }
         }

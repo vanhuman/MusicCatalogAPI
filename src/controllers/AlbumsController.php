@@ -51,7 +51,8 @@ class AlbumsController extends Controller
      */
     public function getAlbumsSortedOnRelatedTable(Request $request, Response $response, $args)
     {
-        $params = $this->collectGetParams($request, $args);
+        $params = $this->collectGetParams($request);
+        std()->show($params);
         try {
             $result = $this->handler->getAlbumsSortedOnRelatedTable($params);
         } catch (\Exception $e) {

@@ -4,6 +4,7 @@ namespace Handlers;
 
 use Models\Album;
 use Helpers\TypeUtility;
+use Models\Params;
 
 class AlbumsHandler extends DatabaseHandler
 {
@@ -81,19 +82,16 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $params
+     * @param Params $params
      * @return array
      * @throws \Exception
      */
-    public function select($params)
+    public function select(Params $params)
     {
-        if (!isset($params) || !is_array($params)) {
-            $params = [];
-        }
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
-        $page = array_key_exists('page', $params) ? $params['page'] : 1;
-        $pageSize = array_key_exists('page_size', $params) ? $params['page_size'] : 50;
+        $page = $params->page;
+        $pageSize = $params->pageSize;
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
         $query .= ' WHERE true';
         $query .= $this->getFilterClause($params);
@@ -123,15 +121,12 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $params
+     * @param Params $params
      * @return array
      * @throws \Exception
      */
-    public function getAlbumsSortedOnRelatedTable($params)
+    public function getAlbumsSortedOnRelatedTable(Params $params)
     {
-        if (!isset($params) || !is_array($params)) {
-            $params = [];
-        }
         $sortBy = $this->getSortByFromParams($params, self::RELATED_SORT_FIELDS, 'id');
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_RELATED_SORT_DIRECTION);
         // sortBy is always formatted as table_field
@@ -141,8 +136,8 @@ class AlbumsHandler extends DatabaseHandler
             return 'album.' . $field;
         };
         $selectFields = implode(array_map($selectFunc, self::FIELDS), ',');
-        $page = array_key_exists('page', $params) ? $params['page'] : 1;
-        $pageSize = array_key_exists('page_size', $params) ? $params['page_size'] : 50;
+        $page = $params->page;
+        $pageSize = $params->pageSize;
         $query = 'SELECT ' . $selectFields . ' FROM album';
         $query .= ' JOIN ' . $relatedTable . ' ON ' . $relatedTable . '.id = album.' . $relatedTable . '_id';
         $query .= ' WHERE true';
@@ -225,30 +220,24 @@ class AlbumsHandler extends DatabaseHandler
 
     /**
      * Build part of WHERE clause depending on filter params.
-     * @param array $params
+     * @param Params $params
      * @return string
      */
-    private function getFilterClause($params)
+    private function getFilterClause(Params $params)
     {
         $filterClause = '';
-        if (array_key_exists('filter', $params)) {
-            $filter = $params['filter'];
-            $artist_id = array_key_exists('artist_id', $filter) ? $filter['artist_id'] : null;
-            $label_id = array_key_exists('label_id', $filter) ? $filter['label_id'] : null;
-            $genre_id = array_key_exists('genre_id', $filter) ? $filter['genre_id'] : null;
-            $format_id = array_key_exists('format_id', $filter) ? $filter['format_id'] : null;
-            if (isset($artist_id) && TypeUtility::isInteger($artist_id)) {
-                $filterClause .= ' AND artist_id = ' . $artist_id;
-            }
-            if (isset($label_id) && TypeUtility::isInteger($label_id)) {
-                $filterClause .= ' AND label_id = ' . $label_id;
-            }
-            if (isset($genre_id) && TypeUtility::isInteger($genre_id)) {
-                $filterClause .= ' AND genre_id = ' . $genre_id;
-            }
-            if (isset($format_id) && TypeUtility::isInteger($format_id)) {
-                $filterClause .= ' AND format_id = ' . $format_id;
-            }
+        $filter = $params->filter;
+        if (isset($filter->artist_id) && TypeUtility::isInteger($filter->artist_id)) {
+            $filterClause .= ' AND artist_id = ' . $filter->artist_id;
+        }
+        if (isset($filter->label_id) && TypeUtility::isInteger($filter->label_id)) {
+            $filterClause .= ' AND label_id = ' . $filter->label_id;
+        }
+        if (isset($filter->genre_id) && TypeUtility::isInteger($filter->genre_id)) {
+            $filterClause .= ' AND genre_id = ' . $filter->genre_id;
+        }
+        if (isset($filter->format_id) && TypeUtility::isInteger($filter->format_id)) {
+            $filterClause .= ' AND format_id = ' . $filter->format_id;
         }
         return $filterClause;
     }

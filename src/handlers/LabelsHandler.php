@@ -4,6 +4,7 @@ namespace Handlers;
 
 use Helpers\TypeUtility;
 use Models\Label;
+use Models\Params;
 
 class LabelsHandler extends DatabaseHandler
 {
@@ -45,19 +46,16 @@ class LabelsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $params
+     * @param Params $params
      * @throws \Exception
      * @return Label | Label[]
      */
-    public function select($params)
+    public function select(Params $params)
     {
-        if (!isset($params) || !is_array($params)) {
-            $params = [];
-        }
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
-        $page = array_key_exists('page', $params) ? $params['page'] : 1;
-        $pageSize = array_key_exists('page_size', $params) ? $params['page_size'] : 50;
+        $page = $params->page;
+        $pageSize = $params->pageSize;
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM label';
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
