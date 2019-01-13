@@ -20,7 +20,7 @@ class LabelsHandler extends DatabaseHandler
      * @throws \Exception
      * @return Label | Label[]
      */
-    public function selectById($id)
+    public function selectById(int $id)
     {
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
@@ -87,7 +87,7 @@ class LabelsHandler extends DatabaseHandler
      * @return Label
      * @throws \Exception
      */
-    public function insert($labelData)
+    public function insert(array $labelData)
     {
         try {
             $this->validatePostData($labelData);
@@ -112,7 +112,7 @@ class LabelsHandler extends DatabaseHandler
      * @return Label
      * @throws \Exception
      */
-    public function update($id, $labelData)
+    public function update(int $id, array $labelData)
     {
         try {
             $this->validatePostData($labelData);
@@ -133,7 +133,7 @@ class LabelsHandler extends DatabaseHandler
      * @param array $labelData
      * @return Label
      */
-    private function createModelFromDatabaseData($labelData)
+    private function createModelFromDatabaseData(array $labelData)
     {
         $newLabel = new Label([
             'id' => $labelData['id'],
@@ -146,7 +146,7 @@ class LabelsHandler extends DatabaseHandler
      * @param array $postData
      * @throws \Exception
      */
-    private function validatePostData($postData)
+    private function validatePostData(array $postData)
     {
         try {
             $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);

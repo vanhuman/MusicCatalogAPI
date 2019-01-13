@@ -13,9 +13,9 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     abstract public function select(Params $params);
 
-    abstract public function insert($body);
+    abstract public function insert(array $body);
 
-    abstract public function update(int $id, $body);
+    abstract public function update(int $id, array $body);
 
     /**
      * Generic delete function to handle all delete requests.

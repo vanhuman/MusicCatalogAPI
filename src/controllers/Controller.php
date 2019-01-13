@@ -75,7 +75,6 @@ abstract class Controller
     public function get(Request $request, Response $response, $args)
     {
         $params = $this->collectGetParams($request);
-        std()->show($params);
         try {
             $result = $this->handler->select($params);
         } catch (\Exception $e) {
@@ -191,7 +190,7 @@ abstract class Controller
      * @param array $templateArray
      * @return array
      */
-    protected function getByIdReturnObject($result, $templateArray)
+    protected function getByIdReturnObject(array $result, array $templateArray)
     {
         $returnArray = [];
         if ($this->container->get('settings')->get('showDebug')) {
@@ -211,7 +210,7 @@ abstract class Controller
      * @param array $templateArray
      * @return array
      */
-    protected function getReturnObject(Params $params, $result, $templateArray)
+    protected function getReturnObject(Params $params, array $result, array $templateArray)
     {
         // current($templateArray) is the first value in the album dictionary
         if (current($templateArray) === null || sizeof(current($templateArray)) === 0) {

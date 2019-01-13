@@ -20,7 +20,7 @@ class ArtistsHandler extends DatabaseHandler
      * @throws \Exception
      * @return array
      */
-    public function selectById($id)
+    public function selectById(int $id)
     {
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
@@ -87,7 +87,7 @@ class ArtistsHandler extends DatabaseHandler
      * @return array
      * @throws \Exception
      */
-    public function insert($artistData)
+    public function insert(array $artistData)
     {
         try {
             $this->validatePostData($artistData);
@@ -112,7 +112,7 @@ class ArtistsHandler extends DatabaseHandler
      * @return array
      * @throws \Exception
      */
-    public function update($id, $artistData)
+    public function update(int $id, array $artistData)
     {
         try {
             $this->validatePostData($artistData);
@@ -133,7 +133,7 @@ class ArtistsHandler extends DatabaseHandler
      * @param array $artistData
      * @return Artist
      */
-    private function createModelFromDatabaseData($artistData)
+    private function createModelFromDatabaseData(array $artistData)
     {
         $newArtist = new Artist([
             'id' => $artistData['id'],
@@ -146,7 +146,7 @@ class ArtistsHandler extends DatabaseHandler
      * @param array $postData
      * @throws \Exception
      */
-    private function validatePostData($postData)
+    private function validatePostData(array $postData)
     {
         try {
             $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);

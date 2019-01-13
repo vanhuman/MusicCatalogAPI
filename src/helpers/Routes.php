@@ -15,7 +15,7 @@ class Routes
     /**
      * @param App $app
      */
-    public static function init($app)
+    public static function init(App $app)
     {
         $routes = [
             '/albums' => AlbumsController::class,

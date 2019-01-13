@@ -41,9 +41,9 @@ class AlbumsHandler extends DatabaseHandler
 
     /**
      * AlbumsHandler constructor.
-     * @param $db
+     * @param \PDO $db
      */
-    public function __construct($db)
+    public function __construct(\PDO $db)
     {
         parent::__construct($db);
         $this->artistsHandler = new ArtistsHandler($db);
@@ -57,7 +57,7 @@ class AlbumsHandler extends DatabaseHandler
      * @return array
      * @throws \Exception
      */
-    public function selectById($id)
+    public function selectById(int $id)
     {
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
@@ -172,7 +172,7 @@ class AlbumsHandler extends DatabaseHandler
      * @return array | null
      * @throws \Exception
      */
-    public function insert($albumData)
+    public function insert(array $albumData)
     {
         try {
             $this->validatePostData($albumData);
@@ -201,7 +201,7 @@ class AlbumsHandler extends DatabaseHandler
      * @return array
      * @throws \Exception
      */
-    public function update($id, $albumData)
+    public function update(int $id, array $albumData)
     {
         try {
             $this->validatePostData($albumData);
@@ -247,7 +247,7 @@ class AlbumsHandler extends DatabaseHandler
      * @param array $albumData
      * @return Album
      */
-    private function createModelFromDatabaseData($albumData)
+    private function createModelFromDatabaseData(array $albumData)
     {
         $newAlbum = new Album([
             'id' => $albumData['id'],
@@ -292,7 +292,7 @@ class AlbumsHandler extends DatabaseHandler
      * @param array $postData
      * @throws \Exception
      */
-    private function validatePostData($postData)
+    private function validatePostData(array $postData)
     {
         // general validation
         try {

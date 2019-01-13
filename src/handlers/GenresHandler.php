@@ -20,7 +20,7 @@ class GenresHandler extends DatabaseHandler
      * @throws \Exception
      * @return array
      */
-    public function selectById($id)
+    public function selectById(int $id)
     {
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
@@ -87,7 +87,7 @@ class GenresHandler extends DatabaseHandler
      * @return array
      * @throws \Exception
      */
-    public function insert($genreData)
+    public function insert(array $genreData)
     {
         try {
             $this->validatePostData($genreData);
@@ -112,7 +112,7 @@ class GenresHandler extends DatabaseHandler
      * @return array
      * @throws \Exception
      */
-    public function update($id, $genreData)
+    public function update(int $id, array $genreData)
     {
         try {
             $this->validatePostData($genreData);
@@ -133,7 +133,7 @@ class GenresHandler extends DatabaseHandler
      * @param array $genreData
      * @return Genre
      */
-    private function createModelFromDatabaseData($genreData)
+    private function createModelFromDatabaseData(array $genreData)
     {
         $newGenre = new Genre([
             'id' => $genreData['id'],
@@ -147,7 +147,7 @@ class GenresHandler extends DatabaseHandler
      * @param array $postData
      * @throws \Exception
      */
-    private function validatePostData($postData)
+    private function validatePostData(array $postData)
     {
         try {
             $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);

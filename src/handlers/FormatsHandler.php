@@ -20,7 +20,7 @@ class FormatsHandler extends DatabaseHandler
      * @throws \Exception
      * @return Format | Format[]
      */
-    public function selectById($id)
+    public function selectById(int $id)
     {
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
@@ -87,7 +87,7 @@ class FormatsHandler extends DatabaseHandler
      * @return Format|Format[]
      * @throws \Exception
      */
-    public function insert($formatData)
+    public function insert(array $formatData)
     {
         try {
             $this->validatePostData($formatData);
@@ -112,7 +112,7 @@ class FormatsHandler extends DatabaseHandler
      * @return Format|Format[]
      * @throws \Exception
      */
-    public function update($id, $formatData)
+    public function update(int $id, array $formatData)
     {
         try {
             $this->validatePostData($formatData);
@@ -133,7 +133,7 @@ class FormatsHandler extends DatabaseHandler
      * @param array $formatData
      * @return Format
      */
-    private function createModelFromDatabaseData($formatData)
+    private function createModelFromDatabaseData(array $formatData)
     {
         $newFormat = new Format([
             'id' => $formatData['id'],
@@ -147,7 +147,7 @@ class FormatsHandler extends DatabaseHandler
      * @param array $postData
      * @throws \Exception
      */
-    private function validatePostData($postData)
+    private function validatePostData(array $postData)
     {
         try {
             $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
