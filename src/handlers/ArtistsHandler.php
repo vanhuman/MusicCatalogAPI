@@ -4,7 +4,7 @@ namespace Handlers;
 
 use Models\Artist;
 use Helpers\TypeUtility;
-use Models\Params;
+use Models\GetParams;
 
 class ArtistsHandler extends DatabaseHandler
 {
@@ -42,11 +42,11 @@ class ArtistsHandler extends DatabaseHandler
     }
 
     /**
-     * @param Params $params
+     * @param GetParams $params
      * @throws \Exception
      * @return array
      */
-    public function select(Params $params)
+    public function select(GetParams $params)
     {
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);

@@ -4,7 +4,7 @@ namespace Models;
 
 use Helpers\SecurityUtility;
 
-class Session extends DatabaseModel
+class Session extends BaseModel
 {
 
     /**

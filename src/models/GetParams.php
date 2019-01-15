@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Params
+class GetParams
 {
     /**
      * @var int $page

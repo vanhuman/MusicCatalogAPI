@@ -4,7 +4,7 @@ namespace Handlers;
 
 use Helpers\TypeUtility;
 use Models\Genre;
-use Models\Params;
+use Models\GetParams;
 
 class GenresHandler extends DatabaseHandler
 {
@@ -42,11 +42,11 @@ class GenresHandler extends DatabaseHandler
     }
 
     /**
-     * @param Params $params
+     * @param GetParams $params
      * @throws \Exception
      * @return array
      */
-    public function select(Params $params)
+    public function select(GetParams $params)
     {
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);

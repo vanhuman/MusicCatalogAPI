@@ -4,7 +4,7 @@ namespace Handlers;
 
 use Helpers\TypeUtility;
 use Models\Format;
-use Models\Params;
+use Models\GetParams;
 
 class FormatsHandler extends DatabaseHandler
 {
@@ -42,11 +42,11 @@ class FormatsHandler extends DatabaseHandler
     }
 
     /**
-     * @param Params $params
+     * @param GetParams $params
      * @throws \Exception
      * @return Format | Format[]
      */
-    public function select(Params $params)
+    public function select(GetParams $params)
     {
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);

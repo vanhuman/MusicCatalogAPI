@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class User extends DatabaseModel
+class User extends BaseModel
 {
 
     /**

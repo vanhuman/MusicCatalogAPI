@@ -3,7 +3,7 @@
 namespace Handlers;
 
 use Helpers\DatabaseConnection;
-use Models\Params;
+use Models\GetParams;
 
 abstract class DatabaseHandler extends DatabaseConnection
 {
@@ -11,7 +11,7 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     abstract public function selectById(int $id);
 
-    abstract public function select(Params $params);
+    abstract public function select(GetParams $params);
 
     abstract public function insert(array $body);
 
@@ -71,12 +71,12 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     /**
      * Get the sortby parameter or get the default.
-     * @param Params $params
+     * @param GetParams $params
      * @param array $sortFields
      * @param string $defaultSortField
      * @return string
      */
-    protected function getSortByFromParams(Params $params, array $sortFields, string $defaultSortField)
+    protected function getSortByFromParams(GetParams $params, array $sortFields, string $defaultSortField)
     {
         if (!in_array($params->sortBy, $sortFields)) {
             return $defaultSortField;
@@ -87,11 +87,11 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     /**
      * Get the sortdirection parameter or get the default.
-     * @param Params $params
+     * @param GetParams $params
      * @param string $defaultSortDirection
      * @return string
      */
-    protected function getSortDirectionFromParams(Params $params, string $defaultSortDirection)
+    protected function getSortDirectionFromParams(GetParams $params, string $defaultSortDirection)
     {
         if (!in_array(strtoupper($params->sortDirection), self::SORT_DIRECTION)) {
             return $defaultSortDirection;

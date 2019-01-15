@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Album extends DatabaseModel
+class Album extends BaseModel
 {
     private static $DATE_FORMAT = 'Y-m-d H:i:s';
 

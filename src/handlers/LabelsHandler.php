@@ -4,7 +4,7 @@ namespace Handlers;
 
 use Helpers\TypeUtility;
 use Models\Label;
-use Models\Params;
+use Models\GetParams;
 
 class LabelsHandler extends DatabaseHandler
 {
@@ -42,11 +42,11 @@ class LabelsHandler extends DatabaseHandler
     }
 
     /**
-     * @param Params $params
+     * @param GetParams $params
      * @throws \Exception
      * @return Label | Label[]
      */
-    public function select(Params $params)
+    public function select(GetParams $params)
     {
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);

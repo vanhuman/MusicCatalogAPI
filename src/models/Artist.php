@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Label extends DatabaseModel
+class Artist extends BaseModel
 {
     /**
      * @var string $name

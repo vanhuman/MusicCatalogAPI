@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class DatabaseModel
+class BaseModel
 {
     /**
      * @var int $id

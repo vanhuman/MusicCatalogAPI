@@ -4,7 +4,7 @@ namespace Handlers;
 
 use Models\Album;
 use Helpers\TypeUtility;
-use Models\Params;
+use Models\GetParams;
 
 class AlbumsHandler extends DatabaseHandler
 {
@@ -78,11 +78,11 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param Params $params
+     * @param GetParams $params
      * @return array
      * @throws \Exception
      */
-    public function select(Params $params)
+    public function select(GetParams $params)
     {
         $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
@@ -115,11 +115,11 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param Params $params
+     * @param GetParams $params
      * @return array
      * @throws \Exception
      */
-    public function getAlbumsSortedOnRelatedTable(Params $params)
+    public function getAlbumsSortedOnRelatedTable(GetParams $params)
     {
         $sortBy = $this->getSortByFromParams($params, self::RELATED_SORT_FIELDS, 'id');
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_RELATED_SORT_DIRECTION);
@@ -196,10 +196,10 @@ class AlbumsHandler extends DatabaseHandler
 
     /**
      * Build part of WHERE clause depending on filter params.
-     * @param Params $params
+     * @param GetParams $params
      * @return string
      */
-    private function getFilterClause(Params $params)
+    private function getFilterClause(GetParams $params)
     {
         $filterClause = '';
         $filter = $params->filter;

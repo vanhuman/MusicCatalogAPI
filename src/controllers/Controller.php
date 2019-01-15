@@ -8,7 +8,7 @@ use Slim\Http\Request;
 
 use Handlers\DatabaseHandler;
 use Helpers\TypeUtility;
-use Models\Params;
+use Models\GetParams;
 
 abstract class Controller
 {
@@ -164,7 +164,7 @@ abstract class Controller
     /**
      * Function to gather all request arguments in one object.
      * @param Request $request
-     * @return Params
+     * @return GetParams
      */
     protected function collectGetParams(Request $request)
     {
@@ -185,7 +185,7 @@ abstract class Controller
                 'format_id' => $request->getParam('format_id'),
             ],
         ];
-        return new Params($paramsArray);
+        return new GetParams($paramsArray);
     }
 
     /**
@@ -210,12 +210,12 @@ abstract class Controller
      * Function to build the return object for GET requests without id.
      * $params is what is being sent to the handler, $request is what comes back from the handler,
      * $templateArray is the object template converted to array.
-     * @param Params $params
+     * @param GetParams $params
      * @param array $result
      * @param array $templateArray
      * @return array
      */
-    protected function getReturnObject(Params $params, array $result, array $templateArray)
+    protected function getReturnObject(GetParams $params, array $result, array $templateArray)
     {
         // current($templateArray) is the first value in the album dictionary
         if (current($templateArray) === null || sizeof(current($templateArray)) === 0) {
