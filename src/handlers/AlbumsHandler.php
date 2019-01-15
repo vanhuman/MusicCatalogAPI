@@ -63,11 +63,7 @@ class AlbumsHandler extends DatabaseHandler
             $id = 0;
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album WHERE id = ' . $id;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+        $result = $this->db->query($query);
         $object = [
             'query' => $query,
         ];
@@ -92,18 +88,16 @@ class AlbumsHandler extends DatabaseHandler
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
         $page = $params->page;
         $pageSize = $params->pageSize;
+
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
         $query .= ' WHERE true';
         $query .= $this->getFilterClause($params);
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
-        try {
-            $result = $this->db->query($query);
-            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+
+        $result = $this->db->query($query);
+        $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         $object = [
             'total_number_of_records' => $resultWithoutLimit->rowCount(),
             'query' => $query,
@@ -138,6 +132,7 @@ class AlbumsHandler extends DatabaseHandler
         $selectFields = implode(array_map($selectFunc, self::FIELDS), ',');
         $page = $params->page;
         $pageSize = $params->pageSize;
+
         $query = 'SELECT ' . $selectFields . ' FROM album';
         $query .= ' JOIN ' . $relatedTable . ' ON ' . $relatedTable . '.id = album.' . $relatedTable . '_id';
         $query .= ' WHERE true';
@@ -145,12 +140,9 @@ class AlbumsHandler extends DatabaseHandler
         $query .= ' ORDER BY ' . $sortField . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
-        try {
-            $result = $this->db->query($query);
-            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+
+        $result = $this->db->query($query);
+        $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         $object = [
             'total_number_of_records' => $resultWithoutLimit->rowCount(),
             'query' => $query,
@@ -174,24 +166,12 @@ class AlbumsHandler extends DatabaseHandler
      */
     public function insert(array $albumData)
     {
-        try {
-            $this->validatePostData($albumData);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
-        }
+        $this->validatePostData($albumData);
         $postData = $this->formatPostdataForInsert($albumData);
         $query = 'INSERT INTO album (' . $postData['keys'] . ')';
         $query .= ' VALUES (' . $postData['values'] . ')';
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
-        try {
-            $id = $this->getLastInsertedRecordId('album');
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+        $this->db->query($query);
+        $id = $this->db->lastInsertId();
         return $this->selectById($id);
     }
 
@@ -203,18 +183,14 @@ class AlbumsHandler extends DatabaseHandler
      */
     public function update(int $id, array $albumData)
     {
-        try {
-            $this->validatePostData($albumData);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
+        $this->validatePostData($albumData);
+        $query = 'SELECT id FROM album WHERE id = ' . $id;
+        if ($this->db->query($query)->rowCount() === 0) {
+            return null;
         }
         $postData = $this->formatPostdataForUpdate($albumData);
         $query = 'UPDATE album SET ' . $postData . ' WHERE id = ' . $id;
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $this->db->query($query);
         return $this->selectById($id);
     }
 
@@ -295,12 +271,9 @@ class AlbumsHandler extends DatabaseHandler
     private function validatePostData(array $postData)
     {
         // general validation
-        try {
-            $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
-            $this->validateKeys($postData, self::FIELDS);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
-        }
+        $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
+        $this->validateKeys($postData, self::FIELDS);
+
         // year should be 4 digits
         if (array_key_exists('year', $postData)) {
             $year = $postData['year'];
@@ -308,22 +281,19 @@ class AlbumsHandler extends DatabaseHandler
                 throw new \Exception('Year should be a 4 digit number between 1900 and 4000.', 400);
             }
         }
+
         // check existence of artist, genre, label and format
-        try {
-            $artist = $this->artistsHandler->selectById($postData['artist_id']);
-            $format = $this->formatsHandler->selectById($postData['format_id']);
-            if (array_key_exists('label_id', $postData)) {
-                $label = $this->labelsHandler->selectById($postData['label_id']);
-            } else {
-                $label = false;
-            }
-            if (array_key_exists('genre_id', $postData)) {
-                $genre = $this->genresHandler->selectById($postData['genre_id']);
-            } else {
-                $genre = false;
-            }
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 400);
+        $artist = $this->artistsHandler->selectById($postData['artist_id'])['body'];
+        $format = $this->formatsHandler->selectById($postData['format_id'])['body'];
+        if (array_key_exists('label_id', $postData)) {
+            $label = $this->labelsHandler->selectById($postData['label_id'])['body'];
+        } else {
+            $label = false;
+        }
+        if (array_key_exists('genre_id', $postData)) {
+            $genre = $this->genresHandler->selectById($postData['genre_id'])['body'];
+        } else {
+            $genre = false;
         }
         foreach (['artist' => $artist, 'label' => $label, 'genre' => $genre, 'format' => $format] as $key => $entity) {
             if (!isset($entity)) {

@@ -27,11 +27,7 @@ class GenresHandler extends DatabaseHandler
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM genre';
         $query .= ' WHERE id = ' . $id;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+        $result = $this->db->query($query);
         $object = [
             'query' => $query,
         ];
@@ -56,16 +52,14 @@ class GenresHandler extends DatabaseHandler
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
         $page = $params->page;
         $pageSize = $params->pageSize;
+
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM genre';
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
-        try {
-            $result = $this->db->query($query);
-            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+
+        $result = $this->db->query($query);
+        $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         $object = [
             'total_number_of_records' => $resultWithoutLimit->rowCount(),
             'query' => $query,
@@ -89,20 +83,12 @@ class GenresHandler extends DatabaseHandler
      */
     public function insert(array $genreData)
     {
-        try {
-            $this->validatePostData($genreData);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
-        }
+        $this->validatePostData($genreData);
         $postData = $this->formatPostdataForInsert($genreData);
         $query = 'INSERT INTO genre (' . $postData['keys'] . ')';
         $query .= ' VALUES (' . $postData['values'] . ')';
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
-        $id = $this->getLastInsertedRecordId('genre');
+        $this->db->query($query);
+        $id = $this->db->lastInsertId();
         return $this->selectById($id);
     }
 
@@ -114,18 +100,14 @@ class GenresHandler extends DatabaseHandler
      */
     public function update(int $id, array $genreData)
     {
-        try {
-            $this->validatePostData($genreData);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
+        $this->validatePostData($genreData);
+        $query = 'SELECT id FROM genre WHERE id = ' . $id;
+        if ($this->db->query($query)->rowCount() === 0) {
+            return null;
         }
         $postData = $this->formatPostdataForUpdate($genreData);
         $query = 'UPDATE genre SET ' . $postData . ' WHERE id = ' . $id;
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $this->db->query($query);
         return $this->selectById($id);
     }
 
@@ -149,12 +131,8 @@ class GenresHandler extends DatabaseHandler
      */
     private function validatePostData(array $postData)
     {
-        try {
-            $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
-            $this->validateKeys($postData, self::FIELDS);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
-        }
+        $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
+        $this->validateKeys($postData, self::FIELDS);
     }
 
 }

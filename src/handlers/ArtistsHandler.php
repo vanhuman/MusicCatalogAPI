@@ -27,11 +27,7 @@ class ArtistsHandler extends DatabaseHandler
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM artist';
         $query .= ' WHERE id = ' . $id;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+        $result = $this->db->query($query);
         $object = [
             'query' => $query,
         ];
@@ -56,16 +52,14 @@ class ArtistsHandler extends DatabaseHandler
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
         $page = $params->page;
         $pageSize = $params->pageSize;
+
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM artist';
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
-        try {
-            $result = $this->db->query($query);
-            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+
+        $result = $this->db->query($query);
+        $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         $object = [
             'total_number_of_records' => $resultWithoutLimit->rowCount(),
             'query' => $query,
@@ -89,43 +83,31 @@ class ArtistsHandler extends DatabaseHandler
      */
     public function insert(array $artistData)
     {
-        try {
-            $this->validatePostData($artistData);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
-        }
+        $this->validatePostData($artistData);
         $postData = $this->formatPostdataForInsert($artistData);
         $query = 'INSERT INTO artist (' . $postData['keys'] . ')';
         $query .= ' VALUES (' . $postData['values'] . ')';
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
-        $id = $this->getLastInsertedRecordId('artist');
+        $this->db->query($query);
+        $id = $this->db->lastInsertId();
         return $this->selectById($id);
     }
 
     /**
      * @param int $id
      * @param array $artistData
-     * @return array
+     * @return array | null
      * @throws \Exception
      */
     public function update(int $id, array $artistData)
     {
-        try {
-            $this->validatePostData($artistData);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
+        $this->validatePostData($artistData);
+        $query = 'SELECT id FROM artist WHERE id = ' . $id;
+        if ($this->db->query($query)->rowCount() === 0) {
+            return null;
         }
         $postData = $this->formatPostdataForUpdate($artistData);
         $query = 'UPDATE artist SET ' . $postData . ' WHERE id = ' . $id;
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $this->db->query($query);
         return $this->selectById($id);
     }
 
@@ -148,11 +130,7 @@ class ArtistsHandler extends DatabaseHandler
      */
     private function validatePostData(array $postData)
     {
-        try {
-            $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
-            $this->validateKeys($postData, self::FIELDS);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
-        }
+        $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
+        $this->validateKeys($postData, self::FIELDS);
     }
 }

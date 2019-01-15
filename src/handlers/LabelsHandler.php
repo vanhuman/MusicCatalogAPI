@@ -27,11 +27,7 @@ class LabelsHandler extends DatabaseHandler
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM label';
         $query .= ' WHERE id = ' . $id;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+        $result = $this->db->query($query);
         $object = [
             'query' => $query,
         ];
@@ -56,16 +52,14 @@ class LabelsHandler extends DatabaseHandler
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
         $page = $params->page;
         $pageSize = $params->pageSize;
+
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM label';
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
-        try {
-            $result = $this->db->query($query);
-            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+
+        $result = $this->db->query($query);
+        $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         $object = [
             'total_number_of_records' => $resultWithoutLimit->rowCount(),
             'query' => $query,
@@ -89,20 +83,12 @@ class LabelsHandler extends DatabaseHandler
      */
     public function insert(array $labelData)
     {
-        try {
-            $this->validatePostData($labelData);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
-        }
+        $this->validatePostData($labelData);
         $postData = $this->formatPostdataForInsert($labelData);
         $query = 'INSERT INTO label (' . $postData['keys'] . ')';
         $query .= ' VALUES (' . $postData['values'] . ')';
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
-        $id = $this->getLastInsertedRecordId('label');
+        $this->db->query($query);
+        $id = $this->db->lastInsertId();
         return $this->selectById($id);
     }
 
@@ -114,18 +100,14 @@ class LabelsHandler extends DatabaseHandler
      */
     public function update(int $id, array $labelData)
     {
-        try {
-            $this->validatePostData($labelData);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
+        $this->validatePostData($labelData);
+        $query = 'SELECT id FROM label WHERE id = ' . $id;
+        if ($this->db->query($query)->rowCount() === 0) {
+            return null;
         }
         $postData = $this->formatPostdataForUpdate($labelData);
         $query = 'UPDATE label SET ' . $postData . ' WHERE id = ' . $id;
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $this->db->query($query);
         return $this->selectById($id);
     }
 
@@ -148,12 +130,8 @@ class LabelsHandler extends DatabaseHandler
      */
     private function validatePostData(array $postData)
     {
-        try {
-            $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
-            $this->validateKeys($postData, self::FIELDS);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
-        }
+        $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
+        $this->validateKeys($postData, self::FIELDS);
     }
 
 }

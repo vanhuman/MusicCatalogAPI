@@ -87,15 +87,13 @@ class SessionsHandler extends DatabaseConnection
         ]);
         $session->generateToken();
         $session->generateTimeOut();
+
         $query = 'INSERT INTO session (user_id, token, time_out)';
         $query .= ' VALUES (' . $userId . ', "' . $session->getToken() . '", ' . $session->getTimeOut() . ')';
+
         $this->db->query($query);
-        $query = 'SELECT id FROM session ORDER BY id DESC LIMIT 1';
-        $result = $this->db->query($query);
-        if ($result->rowCount() === 0) {
-            return null;
-        }
-        $session->setId($result->fetch()['id']);
+        $id = $this->db->lastInsertId();
+        $session->setId($id);
         return $session;
     }
 }

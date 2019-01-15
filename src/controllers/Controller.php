@@ -121,6 +121,11 @@ abstract class Controller
         } catch (\Exception $e) {
             return $this->messageController->showError($response, $e);
         }
+        if (!isset($result)) {
+            return $this->messageController->showError($response,
+                new \Exception('No record with id ' . $id . ' found to update', 404)
+            );
+        }
         $template = $this->newTemplate($result['body']);
         return $response->withJson($template->getArray(), 200);
     }

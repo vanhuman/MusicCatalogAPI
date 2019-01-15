@@ -27,11 +27,7 @@ class FormatsHandler extends DatabaseHandler
         }
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM format';
         $query .= ' WHERE id = ' . $id;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+        $result = $this->db->query($query);
         $object = [
             'query' => $query,
         ];
@@ -56,16 +52,14 @@ class FormatsHandler extends DatabaseHandler
         $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
         $page = $params->page;
         $pageSize = $params->pageSize;
+
         $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM format';
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
-        try {
-            $result = $this->db->query($query);
-            $resultWithoutLimit = $this->db->query($queryWithoutLimit);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
+
+        $result = $this->db->query($query);
+        $resultWithoutLimit = $this->db->query($queryWithoutLimit);
         $object = [
             'total_number_of_records' => $resultWithoutLimit->rowCount(),
             'query' => $query,
@@ -89,20 +83,12 @@ class FormatsHandler extends DatabaseHandler
      */
     public function insert(array $formatData)
     {
-        try {
-            $this->validatePostData($formatData);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
-        }
+        $this->validatePostData($formatData);
         $postData = $this->formatPostdataForInsert($formatData);
         $query = 'INSERT INTO format (' . $postData['keys'] . ')';
         $query .= ' VALUES (' . $postData['values'] . ')';
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
-        $id = $this->getLastInsertedRecordId('format');
+        $this->db->query($query);
+        $id = $this->db->lastInsertId();
         return $this->selectById($id);
     }
 
@@ -114,18 +100,14 @@ class FormatsHandler extends DatabaseHandler
      */
     public function update(int $id, array $formatData)
     {
-        try {
-            $this->validatePostData($formatData);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
+        $this->validatePostData($formatData);
+        $query = 'SELECT id FROM format WHERE id = ' . $id;
+        if ($this->db->query($query)->rowCount() === 0) {
+            return null;
         }
         $postData = $this->formatPostdataForUpdate($formatData);
         $query = 'UPDATE format SET ' . $postData . ' WHERE id = ' . $id;
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $this->db->query($query);
         return $this->selectById($id);
     }
 
@@ -149,11 +131,7 @@ class FormatsHandler extends DatabaseHandler
      */
     private function validatePostData(array $postData)
     {
-        try {
-            $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
-            $this->validateKeys($postData, self::FIELDS);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
-        }
+        $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
+        $this->validateKeys($postData, self::FIELDS);
     }
 }

@@ -27,11 +27,7 @@ abstract class DatabaseHandler extends DatabaseConnection
     public function delete(string $table, int $id)
     {
         $query = 'DELETE FROM ' . $table . ' WHERE id = ' . $id;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $result = $this->db->query($query);
         if ($result->rowCount() === 0) {
             throw new \Exception(ucfirst($table) . ' with id ' . $id . ' not found.', 404);
         }
@@ -71,26 +67,6 @@ abstract class DatabaseHandler extends DatabaseConnection
         }
         $formattedPostData = implode(',', $formattedPostData);
         return $formattedPostData;
-    }
-
-    /**
-     * Get id from last inserted record in the specified table.
-     * @param string $table
-     * @return int
-     * @throws \Exception
-     */
-    protected function getLastInsertedRecordId(string $table)
-    {
-        $query = 'SELECT * FROM ' . $table . ' ORDER BY id DESC LIMIT 1';
-        try {
-            $result = $this->db->query($query)->fetch();
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        }
-        if (empty($result) || !array_key_exists('id', $result)) {
-            throw new \Exception('Last inserted ' . $table . ' not found.', 500);
-        }
-        return $result['id'];
     }
 
     /**
