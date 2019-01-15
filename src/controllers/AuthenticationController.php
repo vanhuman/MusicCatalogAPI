@@ -96,9 +96,12 @@ class AuthenticationController
         } else {
             $this->user = $this->usersHandler->getUserByCredentials($authParams->username);
             if (!isset($this->user)) {
-                throw new \Exception('User ' . $authParams->username . ' not found.', 404);
+                throw new \Exception('User with username ' . $authParams->username . ' not found.', 404);
             }
             $this->session = $this->sessionsHandler->getSessionByUserId($this->user->getId());
+            if (!isset($this->session)) {
+                throw new \Exception('Session for user with username ' . $authParams->username . ' not found.', 404);
+            }
         }
     }
 }

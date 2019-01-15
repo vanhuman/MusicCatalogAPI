@@ -10,44 +10,34 @@ class UsersHandler extends DatabaseConnection
 
     /**
      * @param int $userId
-     * @return User
+     * @return User | null
      * @throws \Exception
      */
     public function getUserById(int $userId)
     {
         $query = 'SELECT * FROM user WHERE id = ' . $userId;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $result = $this->db->query($query);
         if ($result->rowCount() === 0) {
-            throw new \Exception('User with id ' . $userId . ' not found.', 404);
+            return null;
         }
         $userData = $result->fetch();
-        $user = $this->createModelFromDatabaseData($userData);
-        return $user;
+        return $this->createModelFromDatabaseData($userData);
     }
 
     /**
      * @param string $username
      * @throws \Exception
-     * @return User
+     * @return User | null
      */
     public function getUserByCredentials(string $username)
     {
         $query = 'SELECT * FROM user WHERE username = "' . $username . '"';
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $result = $this->db->query($query);
         if ($result->rowCount() === 0) {
-            throw new \Exception('User with username ' . $username . ' not found.', 404);
+            return null;
         }
         $userData = $result->fetch();
-        $user = $this->createModelFromDatabaseData($userData);
-        return $user;
+        return $this->createModelFromDatabaseData($userData);
     }
 
     /**
@@ -56,11 +46,10 @@ class UsersHandler extends DatabaseConnection
      */
     private function createModelFromDatabaseData(array $userData)
     {
-        $newUser = new User([
+        return new User([
             'id' => $userData['id'],
             'username' => $userData['username'],
             'password' => $userData['password'],
         ]);
-        return $newUser;
     }
 }

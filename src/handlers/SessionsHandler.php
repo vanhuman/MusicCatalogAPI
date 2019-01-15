@@ -11,18 +11,14 @@ class SessionsHandler extends DatabaseConnection
     /**
      * @param int $token
      * @throws \Exception
-     * @return Session
+     * @return Session | null
      */
     public function getSessionByToken(int $token)
     {
         $query = 'SELECT * FROM session WHERE token = ' . $token;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $result = $this->db->query($query);
         if ($result->rowCount() === 0) {
-            throw new \Exception('Token not found', 404);
+            return null;
         }
         return $this->createModelFromDatabaseData($result->fetch());
     }
@@ -31,17 +27,13 @@ class SessionsHandler extends DatabaseConnection
      * Look for existing valid session for this user, otherwise create one
      * @param int $userId
      * @throws \Exception
-     * @return Session
+     * @return Session | null
      */
     public function getSessionByUserId(int $userId)
     {
         // check if session for user exists and is still valid
         $query = 'SELECT * FROM session WHERE user_id = ' . $userId;
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $result = $this->db->query($query);
         if ($result->rowCount() !== 0) {
             $session = $this->createModelFromDatabaseData($result->fetch());
             if (!$session->isExpired()) {
@@ -49,11 +41,7 @@ class SessionsHandler extends DatabaseConnection
                 return $session;
             } else {
                 $query = 'DELETE FROM session WHERE id = ' . $session->getId();
-                try {
-                    $this->db->query($query);
-                } catch (\Exception $e) {
-                    throw new \Exception($e->getMessage(), 500);
-                };
+                $this->db->query($query);
             }
         }
         // otherwise create session
@@ -84,16 +72,12 @@ class SessionsHandler extends DatabaseConnection
     {
         $session->generateTimeOut();
         $query = 'UPDATE session SET time_out = ' . $session->getTimeOut() . ' WHERE id = ' . $session->getId();
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $this->db->query($query);
     }
 
     /**
      * @param int $userId
-     * @return Session
+     * @return Session | null
      * @throws \Exception
      */
     private function createSession(int $userId)
@@ -105,19 +89,11 @@ class SessionsHandler extends DatabaseConnection
         $session->generateTimeOut();
         $query = 'INSERT INTO session (user_id, token, time_out)';
         $query .= ' VALUES (' . $userId . ', "' . $session->getToken() . '", ' . $session->getTimeOut() . ')';
-        try {
-            $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $this->db->query($query);
         $query = 'SELECT id FROM session ORDER BY id DESC LIMIT 1';
-        try {
-            $result = $this->db->query($query);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), 500);
-        };
+        $result = $this->db->query($query);
         if ($result->rowCount() === 0) {
-            throw new \Exception('Last inserted session not found.', 500);
+            return null;
         }
         $session->setId($result->fetch()['id']);
         return $session;
