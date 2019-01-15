@@ -2,6 +2,7 @@
 
 namespace Helpers;
 
+use Controllers\AuthenticationController;
 use Slim\App;
 use Controllers\AlbumsController;
 use Controllers\ArtistsController;
@@ -31,6 +32,9 @@ class Routes
             $app->put($route . '/{id}', $controller . ':put');
             $app->delete($route . '/{id}', $controller . ':delete');
         }
+
+        /* authentication */
+        $app->post('/authenticate', AuthenticationController::class . ':authenticate');
 
         /* migration routes */
         $app->get('/migrationPre', MigrationController::class . ':migrationPre');

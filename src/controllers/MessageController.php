@@ -12,18 +12,24 @@ class MessageController
      * @param \Exception $e
      * @return Response
      */
-    public function showError(Response $response, \Exception $e)
+    public function showError(Response $response, \Exception $exeption)
     {
-        $reference = explode('/', $e->getFile());
+        $code = $exeption->getCode();
+        try {
+            $response->withStatus($code);
+        } catch (\Exception $e) {
+            $code = 500;
+        }
+        $reference = explode('/', $exeption->getFile());
         $reference = explode('.', end($reference));
         $reference = current($reference);
         $returnedError = [
-            'message' => $e->getMessage(),
+            'message' => $exeption->getMessage(),
             'type' => 'ERROR',
             'reference' => $reference,
-            'status' => $e->getCode(),
+            'status' => $exeption->getCode(),
         ];
-        return $response->withJson($returnedError, $e->getCode());
+        return $response->withJson($returnedError, $code);
     }
 
     /**
