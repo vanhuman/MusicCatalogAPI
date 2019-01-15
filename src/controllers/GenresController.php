@@ -9,7 +9,7 @@ use Models\Genre;
 use Templates\GenresTemplate;
 use Templates\GenreTemplate;
 
-class GenresController extends Controller
+class GenresController extends BaseController
 {
     /**
      * GenresController constructor.

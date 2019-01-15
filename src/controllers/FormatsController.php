@@ -9,7 +9,7 @@ use Models\Format;
 use Templates\FormatsTemplate;
 use Templates\FormatTemplate;
 
-class FormatsController extends Controller
+class FormatsController extends BaseController
 {
     /**
      * FormatsController constructor.

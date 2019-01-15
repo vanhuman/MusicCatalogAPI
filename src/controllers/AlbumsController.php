@@ -11,7 +11,7 @@ use Models\Album;
 use Templates\AlbumTemplate;
 use Templates\AlbumsTemplate;
 
-class AlbumsController extends Controller
+class AlbumsController extends BaseController
 {
     /**
      * AlbumsController constructor.

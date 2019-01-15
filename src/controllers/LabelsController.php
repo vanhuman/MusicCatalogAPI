@@ -9,7 +9,7 @@ use Models\Label;
 use Templates\LabelsTemplate;
 use Templates\LabelTemplate;
 
-class LabelsController extends Controller
+class LabelsController extends BaseController
 {
     /**
      * LabelsController constructor.

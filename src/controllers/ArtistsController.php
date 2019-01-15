@@ -9,7 +9,7 @@ use Models\Artist;
 use Templates\ArtistsTemplate;
 use Templates\ArtistTemplate;
 
-class ArtistsController extends Controller
+class ArtistsController extends BaseController
 {
     /**
      * ArtistsController constructor.

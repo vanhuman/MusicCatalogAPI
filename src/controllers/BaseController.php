@@ -10,7 +10,7 @@ use Handlers\DatabaseHandler;
 use Helpers\TypeUtility;
 use Models\GetParams;
 
-abstract class Controller
+abstract class BaseController
 {
     /**
      * @var ContainerInterface $container
