@@ -11,20 +11,15 @@ class FormatTemplate implements TemplateInterface
      */
     protected $format;
 
-    /**
-     * LabelTemplate constructor.
-     * @param Format $format
-     */
-    public function __construct($format)
+    public function __construct(Format $format = null)
     {
         $this->format = $format;
     }
 
     /**
-     * @param bool $includeWrapper
      * @return array|null
      */
-    public function getArray($includeWrapper = true)
+    public function getArray(bool $includeWrapper = true)
     {
         if (isset($this->format)) {
             $format = [

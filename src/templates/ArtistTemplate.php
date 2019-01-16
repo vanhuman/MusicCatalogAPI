@@ -11,20 +11,15 @@ class ArtistTemplate implements TemplateInterface
      */
     protected $artist;
 
-    /**
-     * ArtistTemplate constructor.
-     * @param Artist $artist
-     */
-    public function __construct($artist)
+    public function __construct(Artist $artist = null)
     {
         $this->artist = $artist;
     }
 
     /**
-     * @param bool $includeWrapper
      * @return array|null
      */
-    public function getArray($includeWrapper = true)
+    public function getArray(bool $includeWrapper = true)
     {
         if (isset($this->artist)) {
             $artist = [

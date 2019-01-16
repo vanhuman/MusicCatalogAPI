@@ -12,7 +12,6 @@ class AlbumsTemplate implements TemplateInterface
     protected $albums;
 
     /**
-     * AlbumsTemplate constructor.
      * @param $albums Album[]
      */
     public function __construct($albums)

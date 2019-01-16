@@ -11,27 +11,19 @@ use Models\Album;
 use Templates\AlbumTemplate;
 use Templates\AlbumsTemplate;
 
-class AlbumsController extends BaseController
+class AlbumsController extends RestController
 {
-    /**
-     * AlbumsController constructor.
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
+        $this->initController($container);
         $this->handler = new AlbumsHandler($this->container->get('db'));
-        $this->messageController = new MessageController();
     }
 
     /**
      * For GET requests to the albums endpoint
-     * @param Request $request
-     * @param Response $response
-     * @param $args
      * @return Response
      */
-    public function get(Request $request, Response $response, $args)
+    public function get(Request $request, Response $response, array $args)
     {
         $id = array_key_exists('id', $args) ? $args['id'] : null;
         $sortBy = $request->getParam('sortby');
@@ -44,13 +36,15 @@ class AlbumsController extends BaseController
 
     /**
      * For GET requests to the albums endpoint that use sorting on related tables.
-     * @param Request $request
-     * @param Response $response
-     * @param $args
      * @return Response
      */
-    public function getAlbumsSortedOnRelatedTable(Request $request, Response $response, $args)
+    public function getAlbumsSortedOnRelatedTable(Request $request, Response $response, array $args)
     {
+        try {
+            $this->login($request);
+        } catch (\Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
         $params = $this->collectGetParams($request);
         try {
             $result = $this->handler->getAlbumsSortedOnRelatedTable($params);

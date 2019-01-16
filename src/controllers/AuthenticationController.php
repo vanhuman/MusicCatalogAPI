@@ -23,7 +23,6 @@ class AuthenticationController
     protected $container;
 
     /**
-     * This generic handler is overridden for each separate controller subclass.
      * @var UsersHandler $usersHandler
      */
     protected $usersHandler;
@@ -56,7 +55,10 @@ class AuthenticationController
         $this->messageController = new MessageController();
     }
 
-    public function authenticate(Request $request, Response $response, $args)
+    /**
+     * @return Response
+     */
+    public function authenticate(Request $request, Response $response, array $args)
     {
         $body = $request->getParsedBody();
         if (!array_key_exists('username', $body) || !array_key_exists('password', $body)) {
@@ -85,13 +87,15 @@ class AuthenticationController
     }
 
     /**
-     * @param AuthParams $authParams
      * @throws \Exception
      */
     public function login(AuthParams $authParams)
     {
         if (isset($authParams->token)) {
             $this->session = $this->sessionsHandler->getSessionByToken($authParams->token);
+            if (!isset($this->session)) {
+                throw new \Exception('No valid session for token ' . $authParams->token . ' found.', 404);
+            }
             $this->user = $this->usersHandler->getUserById($this->session->getUserId());
         } else {
             $this->user = $this->usersHandler->getUserByCredentials($authParams->username);

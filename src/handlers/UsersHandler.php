@@ -9,7 +9,6 @@ class UsersHandler extends DatabaseConnection
 {
 
     /**
-     * @param int $userId
      * @return User | null
      * @throws \Exception
      */
@@ -25,7 +24,6 @@ class UsersHandler extends DatabaseConnection
     }
 
     /**
-     * @param string $username
      * @throws \Exception
      * @return User | null
      */
@@ -41,7 +39,6 @@ class UsersHandler extends DatabaseConnection
     }
 
     /**
-     * @param array $userData
      * @return User
      */
     private function createModelFromDatabaseData(array $userData)

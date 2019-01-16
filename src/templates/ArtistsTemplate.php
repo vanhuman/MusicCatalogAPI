@@ -12,7 +12,6 @@ class ArtistsTemplate implements TemplateInterface
     protected $artists;
 
     /**
-     * AlbumsTemplate constructor.
      * @param $artists Artist[]
      */
     public function __construct($artists)

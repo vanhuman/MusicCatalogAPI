@@ -19,8 +19,6 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     /**
      * Generic delete function to handle all delete requests.
-     * @param string $table
-     * @param int $id
      * @return int
      * @throws \Exception
      */
@@ -36,7 +34,6 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     /**
      * Return arrays for keys and values to be used in an SQL INSERT statement.
-     * @param array $postData
      * @return array
      */
     protected function formatPostdataForInsert(array $postData)
@@ -54,7 +51,6 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     /**
      * Return string with key=value pairs, to be used in an SQL UPDATE statement.
-     * @param array $postData
      * @return string
      */
     protected function formatPostdataForUpdate(array $postData)
@@ -71,9 +67,6 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     /**
      * Get the sortby parameter or get the default.
-     * @param GetParams $params
-     * @param array $sortFields
-     * @param string $defaultSortField
      * @return string
      */
     protected function getSortByFromParams(GetParams $params, array $sortFields, string $defaultSortField)
@@ -87,8 +80,6 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     /**
      * Get the sortdirection parameter or get the default.
-     * @param GetParams $params
-     * @param string $defaultSortDirection
      * @return string
      */
     protected function getSortDirectionFromParams(GetParams $params, string $defaultSortDirection)
@@ -102,8 +93,6 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     /**
      * Validate fields indicated in the specific handlers as mandatory.
-     * @param array $postData
-     * @param array $mandatoryFields
      * @throws \Exception
      */
     protected function validateMandatoryFields(array $postData, array $mandatoryFields)
@@ -117,8 +106,6 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     /**
      * Validate that the postdata only holds permitted fields.
-     * @param array $postData
-     * @param array $fields
      * @throws \Exception
      */
     protected function validateKeys(array $postData, array $fields)

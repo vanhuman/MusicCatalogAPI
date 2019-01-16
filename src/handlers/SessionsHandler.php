@@ -9,23 +9,28 @@ class SessionsHandler extends DatabaseConnection
 {
 
     /**
-     * @param int $token
      * @throws \Exception
      * @return Session | null
      */
-    public function getSessionByToken(int $token)
+    public function getSessionByToken(string $token)
     {
-        $query = 'SELECT * FROM session WHERE token = ' . $token;
+        $query = 'SELECT * FROM session WHERE token = "' . $token . '"';
         $result = $this->db->query($query);
-        if ($result->rowCount() === 0) {
-            return null;
+        if ($result->rowCount() !== 0) {
+            $session = $this->createModelFromDatabaseData($result->fetch());
+            if (!$session->isExpired()) {
+                $this->updateSessionTimeout($session);
+                return $session;
+            } else {
+                $query = 'DELETE FROM session WHERE token = "' . $token . '"';
+                $this->db->query($query);
+            }
         }
-        return $this->createModelFromDatabaseData($result->fetch());
+        return null;
     }
 
     /**
      * Look for existing valid session for this user, otherwise create one
-     * @param int $userId
      * @throws \Exception
      * @return Session | null
      */
@@ -50,7 +55,6 @@ class SessionsHandler extends DatabaseConnection
     }
 
     /**
-     * @param array $sessionData
      * @return Session
      */
     private function createModelFromDatabaseData(array $sessionData)
@@ -65,10 +69,9 @@ class SessionsHandler extends DatabaseConnection
 
     /**
      * Regenerate timeout on session
-     * @param Session $session
      * @throws \Exception
      */
-    private function updateSessionTimeout($session)
+    private function updateSessionTimeout(Session $session)
     {
         $session->generateTimeOut();
         $query = 'UPDATE session SET time_out = ' . $session->getTimeOut() . ' WHERE id = ' . $session->getId();
@@ -76,7 +79,6 @@ class SessionsHandler extends DatabaseConnection
     }
 
     /**
-     * @param int $userId
      * @return Session | null
      * @throws \Exception
      */

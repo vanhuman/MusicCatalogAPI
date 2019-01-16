@@ -11,20 +11,15 @@ class LabelTemplate implements TemplateInterface
      */
     protected $label;
 
-    /**
-     * LabelTemplate constructor.
-     * @param Label $label
-     */
-    public function __construct($label)
+    public function __construct(Label $label = null)
     {
         $this->label = $label;
     }
 
     /**
-     * @param bool $includeWrapper
      * @return array|null
      */
-    public function getArray($includeWrapper = true)
+    public function getArray(bool $includeWrapper = true)
     {
         if (isset($this->label)) {
             $label = [

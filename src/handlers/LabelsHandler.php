@@ -16,7 +16,6 @@ class LabelsHandler extends DatabaseHandler
     private const DEFAULT_SORT_DIRECTION = 'ASC';
 
     /**
-     * @param int $id
      * @throws \Exception
      * @return Label | Label[]
      */
@@ -42,7 +41,6 @@ class LabelsHandler extends DatabaseHandler
     }
 
     /**
-     * @param GetParams $params
      * @throws \Exception
      * @return Label | Label[]
      */
@@ -77,7 +75,6 @@ class LabelsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $labelData
      * @return Label
      * @throws \Exception
      */
@@ -93,8 +90,6 @@ class LabelsHandler extends DatabaseHandler
     }
 
     /**
-     * @param int $id
-     * @param array $labelData
      * @return Label
      * @throws \Exception
      */
@@ -112,7 +107,6 @@ class LabelsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $labelData
      * @return Label
      */
     private function createModelFromDatabaseData(array $labelData)
@@ -125,7 +119,6 @@ class LabelsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $postData
      * @throws \Exception
      */
     private function validatePostData(array $postData)

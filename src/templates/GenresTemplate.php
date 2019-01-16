@@ -12,7 +12,6 @@ class GenresTemplate implements TemplateInterface
     protected $genres;
 
     /**
-     * AlbumsTemplate constructor.
      * @param $genres Genre[]
      */
     public function __construct($genres)

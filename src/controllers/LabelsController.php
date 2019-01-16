@@ -9,17 +9,12 @@ use Models\Label;
 use Templates\LabelsTemplate;
 use Templates\LabelTemplate;
 
-class LabelsController extends BaseController
+class LabelsController extends RestController
 {
-    /**
-     * LabelsController constructor.
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
+        $this->initController($container);
         $this->handler = new LabelsHandler($this->container->get('db'));
-        $this->messageController = new MessageController();
     }
 
     /**

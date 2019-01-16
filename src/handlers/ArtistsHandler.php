@@ -16,7 +16,6 @@ class ArtistsHandler extends DatabaseHandler
     private const DEFAULT_SORT_DIRECTION = 'ASC';
 
     /**
-     * @param int $id
      * @throws \Exception
      * @return array
      */
@@ -42,7 +41,6 @@ class ArtistsHandler extends DatabaseHandler
     }
 
     /**
-     * @param GetParams $params
      * @throws \Exception
      * @return array
      */
@@ -77,7 +75,6 @@ class ArtistsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $artistData
      * @return array
      * @throws \Exception
      */
@@ -93,8 +90,6 @@ class ArtistsHandler extends DatabaseHandler
     }
 
     /**
-     * @param int $id
-     * @param array $artistData
      * @return array | null
      * @throws \Exception
      */
@@ -112,7 +107,6 @@ class ArtistsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $artistData
      * @return Artist
      */
     private function createModelFromDatabaseData(array $artistData)
@@ -125,7 +119,6 @@ class ArtistsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $postData
      * @throws \Exception
      */
     private function validatePostData(array $postData)

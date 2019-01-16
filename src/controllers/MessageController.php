@@ -7,9 +7,6 @@ use Slim\Http\Response;
 class MessageController
 {
     /**
-     * Generic error messaging.
-     * @param Response $response
-     * @param \Exception $e
      * @return Response
      */
     public function showError(Response $response, \Exception $exeption)
@@ -33,8 +30,6 @@ class MessageController
     }
 
     /**
-     * @param Response $response
-     * @param string $message
      * @return Response
      */
     public function showMessage(Response $response, string $message)

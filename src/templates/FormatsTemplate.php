@@ -12,7 +12,6 @@ class FormatsTemplate implements TemplateInterface
     protected $formats;
 
     /**
-     * AlbumsTemplate constructor.
      * @param $formats Format[]
      */
     public function __construct($formats)

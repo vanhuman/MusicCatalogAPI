@@ -11,20 +11,15 @@ class AlbumTemplate implements TemplateInterface
      */
     protected $album;
 
-    /**
-     * AlbumTemplate constructor.
-     * @param $album Album
-     */
-    public function __construct($album)
+    public function __construct(Album $album)
     {
         $this->album = $album;
     }
 
     /**
-     * @param boolean $includeWrapper
      * @return array
      */
-    public function getArray($includeWrapper = true)
+    public function getArray(bool $includeWrapper = true)
     {
         if (isset($this->album)) {
             $album = [

@@ -12,7 +12,6 @@ class LabelsTemplate implements TemplateInterface
     protected $labels;
 
     /**
-     * AlbumsTemplate constructor.
      * @param $labels Label[]
      */
     public function __construct($labels)

@@ -11,20 +11,15 @@ class UserTemplate implements TemplateInterface
      */
     protected $user;
 
-    /**
-     * UserTemplate constructor.
-     * @param User $user
-     */
-    public function __construct($user)
+    public function __construct(User $user)
     {
         $this->user = $user;
     }
 
     /**
-     * @param bool $includeWrapper
      * @return array|null
      */
-    public function getArray($includeWrapper = true)
+    public function getArray(bool $includeWrapper = true)
     {
         if (isset($this->user)) {
             $user = [

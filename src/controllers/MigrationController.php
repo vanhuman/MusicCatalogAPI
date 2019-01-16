@@ -7,38 +7,31 @@ use \Slim\Http\Request;
 use \Slim\Http\Response;
 use Handlers\MigrationHandler;
 
-class MigrationController
+class MigrationController extends BaseController
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
     /**
      * @var MigrationHandler $migrationHandler
      */
     protected $migrationHandler;
 
-    /**
-     * MigrationController constructor.
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
+        $this->initController($container);
         $this->migrationHandler = new MigrationHandler($this->container->get('db'));
     }
 
     /**
      * Migration actions 1.
      * Actions prior to migrating artists and labels.
-     * @param Request $request
-     * @param Response $response
-     * @param $args
      * @return Response
      */
-    public function migrationPre(Request $request, Response $response, $args)
+    public function migrationPre(Request $request, Response $response, array $args)
     {
+        try {
+            $this->login($request);
+        } catch (\Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
         try {
             $this->migrationHandler->migrationPre();
         } catch (\Exception $e) {
@@ -50,13 +43,15 @@ class MigrationController
     /**
      * Migration actions 2.
      * Migrating artists.
-     * @param Request $request
-     * @param Response $response
-     * @param $args
      * @return Response
      */
-    public function migrateArtists(Request $request, Response $response, $args)
+    public function migrateArtists(Request $request, Response $response, array $args)
     {
+        try {
+            $this->login($request);
+        } catch (\Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
         $numRecs = $this->migrationHandler->migrateArtists();
         if ($numRecs instanceof \Exception) {
             return $response->withJson($numRecs, 500);
@@ -67,13 +62,15 @@ class MigrationController
     /**
      * Migration actions 3.
      * Migrating labels.
-     * @param Request $request
-     * @param Response $response
-     * @param $args
      * @return Response
      */
-    public function migrateLabels(Request $request, Response $response, $args)
+    public function migrateLabels(Request $request, Response $response, array $args)
     {
+        try {
+            $this->login($request);
+        } catch (\Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
         $numRecs = $this->migrationHandler->migrateLabels();
         if ($numRecs instanceof \Exception) {
             return $response->withJson($numRecs, 500);
@@ -84,13 +81,15 @@ class MigrationController
     /**
      * Migration actions 4.
      * Closing actions, to rename artists and label fields in albums.
-     * @param Request $request
-     * @param Response $response
-     * @param $args
      * @return Response
      */
-    public function migrationPost(Request $request, Response $response, $args)
+    public function migrationPost(Request $request, Response $response, array $args)
     {
+        try {
+            $this->login($request);
+        } catch (\Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
         try {
             $this->migrationHandler->migrationPost();
         } catch (\Exception $e) {
@@ -98,5 +97,4 @@ class MigrationController
         }
         return $response->withJson('Done', 200);
     }
-
 }

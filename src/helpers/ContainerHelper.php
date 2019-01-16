@@ -8,7 +8,6 @@ class ContainerHelper
 {
     /**
      * Initialize the container by adding a PDO object.
-     * @param ContainerInterface $container
      */
     public static function init(ContainerInterface $container)
     {

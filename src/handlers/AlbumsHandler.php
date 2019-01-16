@@ -39,10 +39,6 @@ class AlbumsHandler extends DatabaseHandler
      */
     private $formatsHandler;
 
-    /**
-     * AlbumsHandler constructor.
-     * @param \PDO $db
-     */
     public function __construct(\PDO $db)
     {
         parent::__construct($db);
@@ -53,7 +49,6 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param int $id
      * @return array
      * @throws \Exception
      */
@@ -78,7 +73,6 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param GetParams $params
      * @return array
      * @throws \Exception
      */
@@ -115,7 +109,6 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param GetParams $params
      * @return array
      * @throws \Exception
      */
@@ -160,7 +153,6 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $albumData
      * @return array | null
      * @throws \Exception
      */
@@ -176,8 +168,6 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * @param int $id
-     * @param $albumData
      * @return array
      * @throws \Exception
      */
@@ -196,7 +186,6 @@ class AlbumsHandler extends DatabaseHandler
 
     /**
      * Build part of WHERE clause depending on filter params.
-     * @param GetParams $params
      * @return string
      */
     private function getFilterClause(GetParams $params)
@@ -220,7 +209,6 @@ class AlbumsHandler extends DatabaseHandler
 
     /**
      * Create the necessary models from the database data to return the full Album model.
-     * @param array $albumData
      * @return Album
      */
     private function createModelFromDatabaseData(array $albumData)
@@ -265,7 +253,6 @@ class AlbumsHandler extends DatabaseHandler
 
     /**
      * Post data validation specific for albums.
-     * @param array $postData
      * @throws \Exception
      */
     private function validatePostData(array $postData)

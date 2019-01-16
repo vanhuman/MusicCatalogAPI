@@ -9,17 +9,12 @@ use Models\Artist;
 use Templates\ArtistsTemplate;
 use Templates\ArtistTemplate;
 
-class ArtistsController extends BaseController
+class ArtistsController extends RestController
 {
-    /**
-     * ArtistsController constructor.
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
+        $this->initController($container);
         $this->handler = new ArtistsHandler($this->container->get('db'));
-        $this->messageController = new MessageController();
     }
 
     /**

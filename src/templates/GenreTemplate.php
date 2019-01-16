@@ -11,20 +11,15 @@ class GenreTemplate implements TemplateInterface
      */
     protected $genre;
 
-    /**
-     * GenreTemplate constructor.
-     * @param Genre $genre
-     */
-    public function __construct($genre)
+    public function __construct(Genre $genre = null)
     {
         $this->genre = $genre;
     }
 
     /**
-     * @param bool $includeWrapper
      * @return array|null
      */
-    public function getArray($includeWrapper = true)
+    public function getArray(bool $includeWrapper = true)
     {
         if (isset($this->genre)) {
             $genre = [

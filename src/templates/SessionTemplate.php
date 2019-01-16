@@ -11,20 +11,15 @@ class SessionTemplate
      */
     protected $session;
 
-    /**
-     * SessionTemplate constructor.
-     * @param Session $session
-     */
-    public function __construct($session)
+    public function __construct(Session $session)
     {
         $this->session = $session;
     }
 
     /**
-     * @param bool $includeWrapper
      * @return array|null
      */
-    public function getArray($includeWrapper = true)
+    public function getArray(bool $includeWrapper = true)
     {
         if (isset($this->session)) {
             $session = [

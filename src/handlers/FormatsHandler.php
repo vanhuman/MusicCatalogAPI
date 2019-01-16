@@ -16,7 +16,6 @@ class FormatsHandler extends DatabaseHandler
     private const DEFAULT_SORT_DIRECTION = 'ASC';
 
     /**
-     * @param int $id
      * @throws \Exception
      * @return Format | Format[]
      */
@@ -42,7 +41,6 @@ class FormatsHandler extends DatabaseHandler
     }
 
     /**
-     * @param GetParams $params
      * @throws \Exception
      * @return Format | Format[]
      */
@@ -77,7 +75,6 @@ class FormatsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $formatData
      * @return Format|Format[]
      * @throws \Exception
      */
@@ -93,8 +90,6 @@ class FormatsHandler extends DatabaseHandler
     }
 
     /**
-     * @param int $id
-     * @param array $formatData
      * @return Format|Format[]
      * @throws \Exception
      */
@@ -112,7 +107,6 @@ class FormatsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $formatData
      * @return Format
      */
     private function createModelFromDatabaseData(array $formatData)
@@ -126,7 +120,6 @@ class FormatsHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $postData
      * @throws \Exception
      */
     private function validatePostData(array $postData)

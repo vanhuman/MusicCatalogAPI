@@ -9,17 +9,12 @@ use Models\Genre;
 use Templates\GenresTemplate;
 use Templates\GenreTemplate;
 
-class GenresController extends BaseController
+class GenresController extends RestController
 {
-    /**
-     * GenresController constructor.
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
+        $this->initController($container);
         $this->handler = new GenresHandler($this->container->get('db'));
-        $this->messageController = new MessageController();
     }
 
     /**

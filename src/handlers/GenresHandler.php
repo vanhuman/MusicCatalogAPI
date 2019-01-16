@@ -16,7 +16,6 @@ class GenresHandler extends DatabaseHandler
     private const DEFAULT_SORT_DIRECTION = 'ASC';
 
     /**
-     * @param int $id
      * @throws \Exception
      * @return array
      */
@@ -42,7 +41,6 @@ class GenresHandler extends DatabaseHandler
     }
 
     /**
-     * @param GetParams $params
      * @throws \Exception
      * @return array
      */
@@ -77,7 +75,6 @@ class GenresHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $genreData
      * @return array
      * @throws \Exception
      */
@@ -93,8 +90,6 @@ class GenresHandler extends DatabaseHandler
     }
 
     /**
-     * @param int $id
-     * @param array $genreData
      * @return array
      * @throws \Exception
      */
@@ -112,7 +107,6 @@ class GenresHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $genreData
      * @return Genre
      */
     private function createModelFromDatabaseData(array $genreData)
@@ -126,7 +120,6 @@ class GenresHandler extends DatabaseHandler
     }
 
     /**
-     * @param array $postData
      * @throws \Exception
      */
     private function validatePostData(array $postData)
