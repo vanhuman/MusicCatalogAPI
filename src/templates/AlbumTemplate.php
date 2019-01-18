@@ -11,7 +11,7 @@ class AlbumTemplate implements TemplateInterface
      */
     protected $album;
 
-    public function __construct(Album $album)
+    public function __construct(Album $album = null)
     {
         $this->album = $album;
     }

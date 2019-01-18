@@ -37,9 +37,6 @@ class Routes
         $app->post('/authenticate', AuthenticationController::class . ':authenticate');
 
         /* migration routes */
-        $app->get('/migrationPre', MigrationController::class . ':migrationPre');
-        $app->get('/migrateArtists', MigrationController::class . ':migrateArtists');
-        $app->get('/migrateLabels', MigrationController::class . ':migrateLabels');
-        $app->get('/migrationPost', MigrationController::class . ':migrationPost');
+        $app->get('/migration_phase1', MigrationController::class . ':migrationPhase1');
     }
 }

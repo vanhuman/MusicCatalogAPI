@@ -21,11 +21,9 @@ class MigrationController extends BaseController
     }
 
     /**
-     * Migration actions 1.
-     * Actions prior to migrating artists and labels.
      * @return Response
      */
-    public function migrationPre(Request $request, Response $response, array $args)
+    public function migrationPhase1(Request $request, Response $response, array $args)
     {
         try {
             $this->login($request);
@@ -33,68 +31,50 @@ class MigrationController extends BaseController
             return $this->messageController->showError($response, $e);
         }
         try {
-            $this->migrationHandler->migrationPre();
+            $this->migrationHandler->migration_1_First();
         } catch (\Exception $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
+            return $this->messageController->showError($response, $e);
         }
-        return $response->withJson('Done', 200);
+        try {
+            $numAlbumsArtists = $this->migrationHandler->migration_2_Artists();
+        } catch (\Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+        try {
+            $numAlbumsLabels = $this->migrationHandler->migration_3_Labels();
+        } catch (\Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+        try {
+            $this->migrationHandler->migration_4_AfterArtistAndLabel();
+        } catch (\Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+
+        return $response->withJson([
+            'number of albums for artists migration' => $numAlbumsArtists,
+            'number of albums for labels migration' => $numAlbumsLabels,
+        ], 200);
     }
 
     /**
-     * Migration actions 2.
-     * Migrating artists.
      * @return Response
      */
-    public function migrateArtists(Request $request, Response $response, array $args)
+    public function migrationPhase2(Request $request, Response $response, array $args)
     {
         try {
             $this->login($request);
         } catch (\Exception $e) {
             return $this->messageController->showError($response, $e);
         }
-        $numRecs = $this->migrationHandler->migrateArtists();
-        if ($numRecs instanceof \Exception) {
-            return $response->withJson($numRecs, 500);
+        try {
+            $this->migrationHandler->migration_5_ArtistName();
+        } catch (\Exception $e) {
+            return $this->messageController->showError($response, $e);
         }
-        return $response->withJson(['number of records' => $numRecs], 200);
-    }
 
-    /**
-     * Migration actions 3.
-     * Migrating labels.
-     * @return Response
-     */
-    public function migrateLabels(Request $request, Response $response, array $args)
-    {
-        try {
-            $this->login($request);
-        } catch (\Exception $e) {
-            return $this->messageController->showError($response, $e);
-        }
-        $numRecs = $this->migrationHandler->migrateLabels();
-        if ($numRecs instanceof \Exception) {
-            return $response->withJson($numRecs, 500);
-        }
-        return $response->withJson(['number of records' => $numRecs], 200);
-    }
+        return $response->withJson([
 
-    /**
-     * Migration actions 4.
-     * Closing actions, to rename artists and label fields in albums.
-     * @return Response
-     */
-    public function migrationPost(Request $request, Response $response, array $args)
-    {
-        try {
-            $this->login($request);
-        } catch (\Exception $e) {
-            return $this->messageController->showError($response, $e);
-        }
-        try {
-            $this->migrationHandler->migrationPost();
-        } catch (\Exception $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
-        }
-        return $response->withJson('Done', 200);
+        ], 200);
     }
 }
