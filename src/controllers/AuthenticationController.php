@@ -102,6 +102,9 @@ class AuthenticationController
             if (!isset($this->user)) {
                 throw new \Exception('User with username ' . $authParams->username . ' not found.', 404);
             }
+            if ($this->user->getPassword() !== sha1($authParams->password)) {
+                throw new \Exception('Password for ' . $authParams->username . ' is not valid.', 400);
+            }
             $this->session = $this->sessionsHandler->getSessionByUserId($this->user->getId());
             if (!isset($this->session)) {
                 throw new \Exception('Session for user with username ' . $authParams->username . ' not found.', 404);
