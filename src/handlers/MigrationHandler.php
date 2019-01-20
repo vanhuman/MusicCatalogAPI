@@ -150,12 +150,4 @@ class MigrationHandler extends DatabaseConnection
         $this->db->query($query);
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function migration_5_Artistname()
-    {
-
-    }
-
 }

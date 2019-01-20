@@ -3,6 +3,7 @@
 namespace Helpers;
 
 use Controllers\AuthenticationController;
+use Controllers\HelpController;
 use Slim\App;
 use Controllers\AlbumsController;
 use Controllers\ArtistsController;
@@ -26,6 +27,7 @@ class Routes
             '/genres' => GenresController::class,
         ];
         foreach ($routes as $route => $controller) {
+            $app->get($route . '/help', HelpController::class . ':getHelp');
             $app->get($route . '/{id}', $controller . ':getById');
             $app->get($route, $controller . ':get');
             $app->post($route, $controller . ':post');

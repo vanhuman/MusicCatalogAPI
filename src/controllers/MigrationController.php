@@ -57,24 +57,4 @@ class MigrationController extends BaseController
         ], 200);
     }
 
-    /**
-     * @return Response
-     */
-    public function migrationPhase2(Request $request, Response $response, array $args)
-    {
-        try {
-            $this->login($request);
-        } catch (\Exception $e) {
-            return $this->messageController->showError($response, $e);
-        }
-        try {
-            $this->migrationHandler->migration_5_ArtistName();
-        } catch (\Exception $e) {
-            return $this->messageController->showError($response, $e);
-        }
-
-        return $response->withJson([
-
-        ], 200);
-    }
 }

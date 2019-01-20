@@ -8,16 +8,16 @@ use Models\GetParams;
 
 class AlbumsHandler extends DatabaseHandler
 {
-    private const FIELDS = ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'];
-    private const MANDATORY_FIELDS = ['title', 'artist_id', 'format_id'];
-
-    private const SORT_FIELDS = ['id', 'title', 'year', 'date_added'];
-    private const DEFAULT_SORT_FIELD = 'year';
-    private const DEFAULT_SORT_DIRECTION = 'DESC';
-    private const DEFAULT_RELATED_SORT_DIRECTION = 'ASC';
-
-    // these fields should be in the format table_field
-    public const RELATED_SORT_FIELDS = ['artist_name', 'label_name', 'genre_description', 'format_name'];
+    public static $FIELDS = [
+        'fields' => ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'],
+        'mandatoryFields' => ['title', 'artist_id', 'format_id'],
+        'sortFields' => ['id', 'title', 'year', 'date_added'],
+        'sortDirections' => parent::SORT_DIRECTIONS,
+        'defaultSortField' => 'year',
+        'defaultSortDirection' => 'DESC',
+        'relatedSortFields' => ['artist_name', 'label_name', 'genre_description', 'format_name'],
+        'defaultRelatedSortDirection' => 'ASC',
+    ];
 
     /**
      * @var ArtistsHandler $artistsHandler
@@ -57,7 +57,7 @@ class AlbumsHandler extends DatabaseHandler
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
         }
-        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album WHERE id = ' . $id;
+        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM album WHERE id = ' . $id;
         $result = $this->db->query($query);
         $object = [
             'query' => $query,
@@ -78,12 +78,12 @@ class AlbumsHandler extends DatabaseHandler
      */
     public function select(GetParams $params)
     {
-        $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
-        $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
+        $sortBy = $this->getSortByFromParams($params, self::$FIELDS['sortFields'], self::$FIELDS['defaultSortField']);
+        $sortDirection = $this->getSortDirectionFromParams($params, self::$FIELDS['defaultSortDirection']);
         $page = $params->page;
         $pageSize = $params->pageSize;
 
-        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM album';
+        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM album';
         $query .= ' WHERE true';
         $query .= $this->getFilterClause($params);
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
@@ -114,15 +114,15 @@ class AlbumsHandler extends DatabaseHandler
      */
     public function getAlbumsSortedOnRelatedTable(GetParams $params)
     {
-        $sortBy = $this->getSortByFromParams($params, self::RELATED_SORT_FIELDS, 'id');
-        $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_RELATED_SORT_DIRECTION);
+        $sortBy = $this->getSortByFromParams($params, self::$FIELDS['relatedSortFields'], 'id');
+        $sortDirection = $this->getSortDirectionFromParams($params, self::$FIELDS['defaultRelatedSortDirection']);
         // sortBy is always formatted as table_field
         $relatedTable = explode('_', $sortBy)[0];
         $sortField = str_replace('_', '.', $sortBy);
         $selectFunc = function ($field) {
             return 'album.' . $field;
         };
-        $selectFields = implode(array_map($selectFunc, self::FIELDS), ',');
+        $selectFields = implode(array_map($selectFunc, self::$FIELDS['fields']), ',');
         $page = $params->page;
         $pageSize = $params->pageSize;
 
@@ -258,8 +258,8 @@ class AlbumsHandler extends DatabaseHandler
     private function validatePostData(array $postData)
     {
         // general validation
-        $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
-        $this->validateKeys($postData, self::FIELDS);
+        $this->validateMandatoryFields($postData, self::$FIELDS['mandatoryFields']);
+        $this->validateKeys($postData, self::$FIELDS['fields']);
 
         // year should be 4 digits
         if (array_key_exists('year', $postData)) {

@@ -8,12 +8,14 @@ use Models\GetParams;
 
 class GenresHandler extends DatabaseHandler
 {
-    private const FIELDS = ['id', 'description', 'notes'];
-    private const MANDATORY_FIELDS = ['description'];
-
-    private const SORT_FIELDS = ['id', 'description'];
-    private const DEFAULT_SORT_FIELD = 'id';
-    private const DEFAULT_SORT_DIRECTION = 'ASC';
+    public static $FIELDS = [
+        'fields' => ['id', 'description', 'notes'],
+        'mandatoryFields' => ['description'],
+        'sortFields' => ['id', 'description'],
+        'sortDirections' => parent::SORT_DIRECTIONS,
+        'defaultSortField' => 'id',
+        'defaultSortDirection' => 'ASC',
+    ];
 
     /**
      * @throws \Exception
@@ -24,7 +26,7 @@ class GenresHandler extends DatabaseHandler
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
         }
-        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM genre';
+        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM genre';
         $query .= ' WHERE id = ' . $id;
         $result = $this->db->query($query);
         $object = [
@@ -46,12 +48,12 @@ class GenresHandler extends DatabaseHandler
      */
     public function select(GetParams $params)
     {
-        $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
-        $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
+        $sortBy = $this->getSortByFromParams($params, self::$FIELDS['sortFields'], self::$FIELDS['defaultSortField']);
+        $sortDirection = $this->getSortDirectionFromParams($params, self::$FIELDS['defaultSortDirection']);
         $page = $params->page;
         $pageSize = $params->pageSize;
 
-        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM genre';
+        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM genre';
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
@@ -124,8 +126,8 @@ class GenresHandler extends DatabaseHandler
      */
     private function validatePostData(array $postData)
     {
-        $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
-        $this->validateKeys($postData, self::FIELDS);
+        $this->validateMandatoryFields($postData, self::$FIELDS['mandatoryFields']);
+        $this->validateKeys($postData, self::$FIELDS['fields']);
     }
 
 }

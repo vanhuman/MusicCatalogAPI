@@ -8,12 +8,14 @@ use Models\GetParams;
 
 class ArtistsHandler extends DatabaseHandler
 {
-    private const FIELDS = ['id', 'name'];
-    private const MANDATORY_FIELDS = ['name'];
-
-    private const SORT_FIELDS = ['id', 'name'];
-    private const DEFAULT_SORT_FIELD = 'name';
-    private const DEFAULT_SORT_DIRECTION = 'ASC';
+    public static $FIELDS = [
+        'fields' => ['id', 'name'],
+        'mandatoryFields' => ['name'],
+        'sortFields' => ['id', 'name'],
+        'sortDirections' => parent::SORT_DIRECTIONS,
+        'defaultSortField' => 'name',
+        'defaultSortDirection' => 'ASC',
+    ];
 
     /**
      * @throws \Exception
@@ -24,7 +26,7 @@ class ArtistsHandler extends DatabaseHandler
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
         }
-        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM artist';
+        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM artist';
         $query .= ' WHERE id = ' . $id;
         $result = $this->db->query($query);
         $object = [
@@ -46,12 +48,12 @@ class ArtistsHandler extends DatabaseHandler
      */
     public function select(GetParams $params)
     {
-        $sortBy = $this->getSortByFromParams($params, self::SORT_FIELDS, self::DEFAULT_SORT_FIELD);
-        $sortDirection = $this->getSortDirectionFromParams($params, self::DEFAULT_SORT_DIRECTION);
+        $sortBy = $this->getSortByFromParams($params, self::$FIELDS['sortFields'], self::$FIELDS['defaultSortField']);
+        $sortDirection = $this->getSortDirectionFromParams($params, self::$FIELDS['defaultSortDirection']);
         $page = $params->page;
         $pageSize = $params->pageSize;
 
-        $query = 'SELECT ' . implode(self::FIELDS, ',') . ' FROM artist';
+        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM artist';
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
@@ -123,7 +125,7 @@ class ArtistsHandler extends DatabaseHandler
      */
     private function validatePostData(array $postData)
     {
-        $this->validateMandatoryFields($postData, self::MANDATORY_FIELDS);
-        $this->validateKeys($postData, self::FIELDS);
+        $this->validateMandatoryFields($postData, self::$FIELDS['mandatoryFields']);
+        $this->validateKeys($postData, self::$FIELDS['fields']);
     }
 }

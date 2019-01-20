@@ -7,7 +7,7 @@ use Models\GetParams;
 
 abstract class DatabaseHandler extends DatabaseConnection
 {
-    public const SORT_DIRECTION = ['ASC', 'DESC'];
+    public const SORT_DIRECTIONS = ['ASC', 'DESC'];
 
     abstract public function selectById(int $id);
 
@@ -84,7 +84,7 @@ abstract class DatabaseHandler extends DatabaseConnection
      */
     protected function getSortDirectionFromParams(GetParams $params, string $defaultSortDirection)
     {
-        if (!in_array(strtoupper($params->sortDirection), self::SORT_DIRECTION)) {
+        if (!in_array(strtoupper($params->sortDirection), self::SORT_DIRECTIONS)) {
             return $defaultSortDirection;
         } else {
             return strtoupper($params->sortDirection);
