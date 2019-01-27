@@ -10,17 +10,17 @@ class Session extends BaseModel
     /**
      * @var int $userId
      */
-    private $userId;
+    protected $userId;
 
     /**
      * @var string $token
      */
-    private $token;
+    protected $token;
 
     /**
      * @var int $timeOut
      */
-    private $timeOut;
+    protected $timeOut;
 
     /**
      * @return int

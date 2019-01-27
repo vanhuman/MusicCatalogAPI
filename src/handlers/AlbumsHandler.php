@@ -8,7 +8,7 @@ use Models\GetParams;
 
 class AlbumsHandler extends DatabaseHandler
 {
-    private static $FIELDS = [
+    public static $FIELDS = [
         'fields' => ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'],
         'mandatoryFields' => ['title', 'artist_id', 'format_id'],
         'sortFields' => ['id', 'title', 'year', 'date_added'],
