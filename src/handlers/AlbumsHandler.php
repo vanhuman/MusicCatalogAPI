@@ -8,7 +8,7 @@ use Models\GetParams;
 
 class AlbumsHandler extends DatabaseHandler
 {
-    public static $FIELDS = [
+    private static $FIELDS = [
         'fields' => ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'],
         'mandatoryFields' => ['title', 'artist_id', 'format_id'],
         'sortFields' => ['id', 'title', 'year', 'date_added'],
@@ -46,6 +46,11 @@ class AlbumsHandler extends DatabaseHandler
         $this->genresHandler = new GenresHandler($db);
         $this->labelsHandler = new LabelsHandler($db);
         $this->formatsHandler = new FormatsHandler($db);
+    }
+
+    public function getRelatedSortFields(): array
+    {
+        return self::$FIELDS['relatedSortFields'];
     }
 
     /**

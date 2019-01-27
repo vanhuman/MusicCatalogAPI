@@ -8,7 +8,7 @@ use Models\GetParams;
 
 class ArtistsHandler extends DatabaseHandler
 {
-    public static $FIELDS = [
+    private static $FIELDS = [
         'fields' => ['id', 'name'],
         'mandatoryFields' => ['name'],
         'sortFields' => ['id', 'name'],

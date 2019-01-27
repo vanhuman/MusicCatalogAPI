@@ -8,7 +8,7 @@ use Models\GetParams;
 
 class GenresHandler extends DatabaseHandler
 {
-    public static $FIELDS = [
+    private static $FIELDS = [
         'fields' => ['id', 'description', 'notes'],
         'mandatoryFields' => ['description'],
         'sortFields' => ['id', 'description'],

@@ -8,7 +8,7 @@ use Models\GetParams;
 
 class FormatsHandler extends DatabaseHandler
 {
-    public static $FIELDS = [
+    private static $FIELDS = [
         'fields' => ['id', 'name', 'description'],
         'mandatoryFields' => ['name'],
         'sortFields' => ['id', 'name'],

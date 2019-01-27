@@ -27,7 +27,7 @@ class AlbumsController extends RestController
     {
         $id = array_key_exists('id', $args) ? $args['id'] : null;
         $sortBy = $request->getParam('sortby');
-        if (!isset($id) && (in_array($sortBy, $this->handler::FIELDS['relatedSortFields']))) {
+        if (!isset($id) && (in_array($sortBy, $this->handler->getRelatedSortFields()))) {
             return $this->getAlbumsSortedOnRelatedTable($request, $response, $args);
         } else {
             return parent::get($request, $response, $args);
