@@ -55,11 +55,6 @@ class AuthenticationController
         $this->messageController = new MessageController();
     }
 
-    public function getSession(): Session
-    {
-        return $this->session;
-    }
-
     /**
      * @return Response
      */

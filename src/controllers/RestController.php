@@ -222,7 +222,6 @@ abstract class RestController extends BaseController
             'number_of_records' => $numberOfRecords,
             'total_number_of_records' => $result['total_number_of_records'],
         ];
-        $returnArray['session'] = $this->authController->getSession()->toArray();
         if ($this->container->get('settings')->get('showParams')) {
             $returnArray['parameters'] = [];
             if (isset($params->sortBy)) {
