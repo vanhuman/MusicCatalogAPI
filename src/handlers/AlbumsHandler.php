@@ -13,7 +13,7 @@ class AlbumsHandler extends DatabaseHandler
         'mandatoryFields' => ['title', 'artist_id', 'format_id'],
         'sortFields' => ['id', 'title', 'year', 'date_added'],
         'sortDirections' => parent::SORT_DIRECTIONS,
-        'defaultSortField' => 'year',
+        'defaultSortField' => 'date_added',
         'defaultSortDirection' => 'DESC',
         'relatedSortFields' => ['artist_name', 'label_name', 'genre_description', 'format_name'],
         'defaultRelatedSortDirection' => 'ASC',
