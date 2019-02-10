@@ -66,6 +66,7 @@ class HelpTemplate implements TemplateInterface
                 'query_string_arguments' => [
                     'token' => 'integer | mandatory',
                     'page' => 'integer | default: 1',
+                    'keywords' => 'string',
                     'sortby' => 'string | one of: ' . implode($this->fields['sortFields'], ', ') . $relatedSortFieldsText
                         . ' | default: ' . $this->fields['defaultSortField'],
                     'sortdirection' => 'string | one of: ' . implode($this->fields['sortDirections'], ', ')

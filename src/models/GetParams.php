@@ -30,6 +30,11 @@ class GetParams
     public $filter;
 
     /**
+     * @var string $keywords
+     */
+    public $keywords;
+
+    /**
      * ParamsInterface constructor.
      * @param array $args
      */

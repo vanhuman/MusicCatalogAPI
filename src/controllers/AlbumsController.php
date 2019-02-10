@@ -47,7 +47,7 @@ class AlbumsController extends RestController
         }
         $params = $this->collectGetParams($request);
         try {
-            $result = $this->handler->getAlbumsSortedOnRelatedTable($params);
+            $result = $this->handler->selectSortedOnRelatedTable($params);
         } catch (\Exception $e) {
             return $this->messageController->showError($response, $e);
         }

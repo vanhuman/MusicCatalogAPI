@@ -182,6 +182,7 @@ abstract class RestController extends BaseController
                 'genre_id' => $request->getParam('genre_id'),
                 'format_id' => $request->getParam('format_id'),
             ],
+            'keywords' => $request->getParam('keywords'),
         ];
         return new GetParams($paramsArray);
     }
@@ -224,20 +225,15 @@ abstract class RestController extends BaseController
         ];
         if ($this->container->get('settings')->get('showParams')) {
             $returnArray['parameters'] = [];
-            if (isset($params->sortBy)) {
-                $returnArray['parameters']['sortby'] = $params->sortBy;
-            } else {
-                $returnArray['parameters']['sortby'] = $result['sortby'];
-            }
-            if (isset($params->sortDirection)) {
-                $returnArray['parameters']['sortdirection'] = $params->sortDirection;
-            } else {
-                $returnArray['parameters']['sortdirection'] = $result['sortdirection'];
-            }
+            $returnArray['parameters']['sortby'] = $result['sortby'];
+            $returnArray['parameters']['sortdirection'] = $result['sortdirection'];
             foreach ($params->filter as $property => $value) {
                 if (isset($params->filter->{$property})) {
                     $returnArray['parameters'][$property] = $value;
                 }
+            }
+            if (isset($params->keywords)) {
+                $returnArray['parameters']['keywords'] = $params->keywords;
             }
         }
         if ($this->container->get('settings')->get('showDebug')) {

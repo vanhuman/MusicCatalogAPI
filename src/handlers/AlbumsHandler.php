@@ -17,6 +17,7 @@ class AlbumsHandler extends DatabaseHandler
         'defaultSortDirection' => 'DESC',
         'relatedSortFields' => ['artist_name', 'label_name', 'genre_description', 'format_name'],
         'defaultRelatedSortDirection' => 'ASC',
+        'searchFields' => ['artist.name', 'album.title', 'album.year', 'label.name', 'format.name', 'genre.description']
     ];
 
     /**
@@ -87,11 +88,28 @@ class AlbumsHandler extends DatabaseHandler
         $sortDirection = $this->getSortDirectionFromParams($params, self::$FIELDS['defaultSortDirection']);
         $page = $params->page;
         $pageSize = $params->pageSize;
+        if (!empty($params->keywords)) {
+            $searchLogic = $this->getSearchLogic($params->keywords);
+        }
 
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM album';
+        $selectFunc = function ($field) {
+            return 'album.' . $field;
+        };
+        $selectFields = implode(array_map($selectFunc, self::$FIELDS['fields']), ',');
+        $query = 'SELECT ' . $selectFields;
+        if (isset($searchLogic)) {
+            $query .= $searchLogic['select'];
+        }
+        $query .= ' FROM album';
+        if (isset($searchLogic)) {
+            $query .= $searchLogic['join'];
+        }
         $query .= ' WHERE true';
         $query .= $this->getFilterClause($params);
-        $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        if (isset($searchLogic) && array_key_exists('having', $searchLogic)) {
+            $query .= $searchLogic['having'];
+        }
+        $query .= ' ORDER BY album.' . $sortBy . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
 
@@ -117,7 +135,7 @@ class AlbumsHandler extends DatabaseHandler
      * @return array
      * @throws \Exception
      */
-    public function getAlbumsSortedOnRelatedTable(GetParams $params)
+    public function selectSortedOnRelatedTable(GetParams $params)
     {
         $sortBy = $this->getSortByFromParams($params, self::$FIELDS['relatedSortFields'], 'id');
         $sortDirection = $this->getSortDirectionFromParams($params, self::$FIELDS['defaultRelatedSortDirection']);
@@ -130,11 +148,24 @@ class AlbumsHandler extends DatabaseHandler
         $selectFields = implode(array_map($selectFunc, self::$FIELDS['fields']), ',');
         $page = $params->page;
         $pageSize = $params->pageSize;
+        if (!empty($params->keywords)) {
+            $search_logic = $this->getSearchLogic($params->keywords, $relatedTable);
+        }
 
-        $query = 'SELECT ' . $selectFields . ' FROM album';
-        $query .= ' JOIN ' . $relatedTable . ' ON ' . $relatedTable . '.id = album.' . $relatedTable . '_id';
+        $query = 'SELECT ' . $selectFields;
+        if (isset($search_logic)) {
+            $query .= $search_logic['select'];
+        }
+        $query .= ' FROM album';
+//        $query .= ' JOIN ' . $relatedTable . ' ON ' . $relatedTable . '.id = album.' . $relatedTable . '_id';
+        if (isset($search_logic)) {
+            $query .= $search_logic['join'];
+        }
         $query .= ' WHERE true';
         $query .= $this->getFilterClause($params);
+        if (isset($search_logic) && array_key_exists('having', $search_logic)) {
+            $query .= $search_logic['having'];
+        }
         $query .= ' ORDER BY ' . $sortField . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
@@ -190,10 +221,52 @@ class AlbumsHandler extends DatabaseHandler
     }
 
     /**
-     * Build part of WHERE clause depending on filter params.
-     * @return string
+     * Build seach logic to insert in select method
      */
-    private function getFilterClause(GetParams $params)
+    private function getSearchLogic(string $keywords, string $relatedTable = null): array
+    {
+        $searchFields = self::$FIELDS['searchFields'];
+        $searchTables = [];
+        foreach ($searchFields as $field) {
+            $table = explode('.', $field)[0];
+            if (!in_array($table, $searchTables) && $table !== 'album') {
+                $searchTables[] = $table;
+            }
+        }
+        if (isset($relatedTable) && !in_array($relatedTable, $searchTables)) {
+            $searchTables[] = $relatedTable;
+        }
+
+        $searchLogic['select'] = ", CONCAT_WS(' ', " . implode(',', $searchFields) . ') as concat_name';
+
+        $searchLogic['join'] = '';
+        foreach ($searchTables as $table) {
+            $searchLogic['join'] .= ' JOIN ' . $table .' ON ' . $table . '.id = album.' . $table . '_id';
+        }
+
+        $keywords = explode(' ', $keywords);
+        if (!empty($keywords)) {
+            foreach ($keywords as $keyword) {
+                if (is_string($keyword) && strlen($keyword) > 0) {
+                    $replace = ['"', '/', '\\', ';'];
+                    $cleaned = addslashes(str_replace($replace, '', $keyword));
+                    if (strlen($cleaned) > 0) {
+                        $query_strings[] = "concat_name LIKE '%" . $cleaned . "%'";
+                    }
+                }
+            }
+            if (isset($query_strings)) {
+                $where_query = implode(' AND ', $query_strings);
+                $searchLogic['having'] = ' HAVING (' . $where_query .')';
+            }
+        }
+        return $searchLogic;
+    }
+
+    /**
+     * Build part of WHERE clause depending on filter params.
+     */
+    private function getFilterClause(GetParams $params): string
     {
         $filterClause = '';
         $filter = $params->filter;
