@@ -157,9 +157,10 @@ class AlbumsHandler extends DatabaseHandler
             $query .= $search_logic['select'];
         }
         $query .= ' FROM album';
-//        $query .= ' JOIN ' . $relatedTable . ' ON ' . $relatedTable . '.id = album.' . $relatedTable . '_id';
         if (isset($search_logic)) {
             $query .= $search_logic['join'];
+        } else {
+            $query .= ' JOIN ' . $relatedTable . ' ON ' . $relatedTable . '.id = album.' . $relatedTable . '_id';
         }
         $query .= ' WHERE true';
         $query .= $this->getFilterClause($params);
