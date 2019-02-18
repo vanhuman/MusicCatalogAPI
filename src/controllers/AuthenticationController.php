@@ -66,7 +66,7 @@ class AuthenticationController
                 $response,
                 new \Exception(
                     'Username and password are mandatory to authenticate',
-                    404
+                    401
                 )
             );
         }
@@ -94,20 +94,32 @@ class AuthenticationController
         if (isset($authParams->token)) {
             $this->session = $this->sessionsHandler->getSessionByToken($authParams->token);
             if (!isset($this->session)) {
-                throw new \Exception('No valid session for token ' . $authParams->token . ' found.', 404);
+                throw new \Exception(
+                    'No valid session for token ' . $authParams->token . ' found.',
+                    401
+                );
             }
             $this->user = $this->usersHandler->getUserById($this->session->getUserId());
         } else {
             $this->user = $this->usersHandler->getUserByCredentials($authParams->username);
             if (!isset($this->user)) {
-                throw new \Exception('User with username ' . $authParams->username . ' not found.', 404);
+                throw new \Exception(
+                    'User with username ' . $authParams->username . ' not found.',
+                    401
+                );
             }
             if ($this->user->getPassword() !== sha1($authParams->password)) {
-                throw new \Exception('Password for ' . $authParams->username . ' is not valid.', 400);
+                throw new \Exception(
+                    'Password for ' . $authParams->username . ' is not valid.',
+                    401
+                );
             }
             $this->session = $this->sessionsHandler->getSessionByUserId($this->user->getId());
             if (!isset($this->session)) {
-                throw new \Exception('Session for user with username ' . $authParams->username . ' not found.', 404);
+                throw new \Exception(
+                    'Session for user with username ' . $authParams->username . ' not found.',
+                    401
+                );
             }
         }
     }

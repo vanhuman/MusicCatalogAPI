@@ -13,7 +13,8 @@
             "Handlers\\": "src/handlers/",
             "Controllers\\": "src/controllers/",
             "Templates\\": "src/templates/",
-            "Helpers\\": "src/helpers/"
+            "Helpers\\": "src/helpers/",
+            "Enums\\": "src/enums"
         }
     }
 }

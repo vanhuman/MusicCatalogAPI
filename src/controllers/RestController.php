@@ -41,7 +41,7 @@ abstract class RestController extends BaseController
                 $response,
                 new \Exception(
                     'Trying to retrieve object by id, but the id is not set.',
-                    404
+                    500
                 )
             );
         }
@@ -58,9 +58,8 @@ abstract class RestController extends BaseController
 
     /**
      * Generic get method, for GET requests for all endpoints without id.
-     * @return Response
      */
-    public function get(Request $request, Response $response, array $args)
+    public function get(Request $request, Response $response, array $args): Response
     {
         try {
             $this->login($request);
@@ -81,9 +80,8 @@ abstract class RestController extends BaseController
 
     /**
      * Generic post method, for POST requests for all endpoints.
-     * @return Response
      */
-    public function post(Request $request, Response $response, array $args)
+    public function post(Request $request, Response $response, array $args): Response
     {
         try {
             $this->login($request);
@@ -102,9 +100,8 @@ abstract class RestController extends BaseController
 
     /**
      * Generic put method, for PUT requests for all endpoints.
-     * @return Response
      */
-    public function put(Request $request, Response $response, array $args)
+    public function put(Request $request, Response $response, array $args): Response
     {
         try {
             $this->login($request);
@@ -129,9 +126,8 @@ abstract class RestController extends BaseController
 
     /**
      * Generic delete method, for DELETE requests for all endpoints.
-     * @return Response
      */
-    public function delete(Request $request, Response $response, array $args)
+    public function delete(Request $request, Response $response, array $args): Response
     {
         try {
             $this->login($request);

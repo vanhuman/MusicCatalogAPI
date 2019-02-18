@@ -9,22 +9,21 @@ class MessageController
     /**
      * @return Response
      */
-    public function showError(Response $response, \Exception $exeption)
+    public function showError(Response $response, \Exception $exception)
     {
-        $code = $exeption->getCode();
+        $code = $exception->getCode();
         try {
             $response->withStatus($code);
         } catch (\Exception $e) {
             $code = 500;
         }
-        $reference = explode('/', $exeption->getFile());
+        $reference = explode('/', $exception->getFile());
         $reference = explode('.', end($reference));
         $reference = current($reference);
         $returnedError = [
-            'message' => $exeption->getMessage(),
-            'type' => 'ERROR',
+            'message' => $exception->getMessage(),
             'reference' => $reference,
-            'status' => $exeption->getCode(),
+            'status' => $exception->getCode(),
         ];
         return $response->withJson($returnedError, $code);
     }
@@ -36,7 +35,7 @@ class MessageController
     {
         $returnedMessage = [
             'message' => $message,
-            'type' => 'INFORMATION',
+            'status' => 200,
         ];
         return $response->withJson($returnedMessage, 200);
     }
