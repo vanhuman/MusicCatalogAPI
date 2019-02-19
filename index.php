@@ -13,7 +13,7 @@ $config['addContentLengthHeader'] = false;
 $config['db']['host'] = 'localhost';
 $config['db']['user'] = 'user';
 $config['db']['pass'] = 'password';
-$config['db']['dbname'] = 'media_manager';
+$config['db']['dbname'] = 'music_catalog';
 
 $config['pageSize'] = 50;
 $config['showDebug'] = true;
