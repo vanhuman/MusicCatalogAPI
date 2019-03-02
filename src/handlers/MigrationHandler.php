@@ -34,7 +34,7 @@ class MigrationHandler extends DatabaseConnection
             ' (4, "DVD", ""), (5, "MP3", "Any digital format"), (6, "CAS", "Cassette")';
         $this->db->query($query);
 
-        // change genre field naes
+        // change genre field names
         $query = 'ALTER TABLE genre CHANGE descr description VARCHAR(255) NOT NULL';
         $this->db->query($query);
 
@@ -59,9 +59,9 @@ class MigrationHandler extends DatabaseConnection
         $this->db->query($query);
 
         // add album fields
-        $query = 'ALTER TABLE album ADD artist_id INT(11) NOT NULL';
+        $query = 'ALTER TABLE album ADD artist_id INT(11) NOT NULL AFTER date_added';
         $this->db->query($query);
-        $query = 'ALTER TABLE album ADD label_id INT(11) NOT NULL DEFAULT 0';
+        $query = 'ALTER TABLE album ADD label_id INT(11) NOT NULL DEFAULT 0 AFTER artist_id';
         $this->db->query($query);
 
         // change album date field
@@ -147,6 +147,18 @@ class MigrationHandler extends DatabaseConnection
         $query = 'ALTER TABLE album CHANGE artist artist_deprecated VARCHAR(255)';
         $this->db->query($query);
         $query = 'ALTER TABLE album CHANGE label label_deprecated VARCHAR(255)';
+        $this->db->query($query);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function migration_5_ImageLocation()
+    {
+        // add image fields
+        $query = 'ALTER TABLE album ADD image_thumb VARCHAR(255) AFTER format_id';
+        $this->db->query($query);
+        $query = 'ALTER TABLE album ADD image VARCHAR(255) AFTER image_thumb';
         $this->db->query($query);
     }
 

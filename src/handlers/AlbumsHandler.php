@@ -9,7 +9,8 @@ use Models\GetParams;
 class AlbumsHandler extends DatabaseHandler
 {
     public static $FIELDS = [
-        'fields' => ['id', 'title', 'year', 'date_added', 'notes', 'artist_id', 'genre_id', 'label_id', 'format_id'],
+        'fields' => ['id', 'title', 'year', 'date_added', 'notes', 'image_thumb', 'image',
+            'artist_id', 'genre_id', 'label_id', 'format_id'],
         'mandatoryFields' => ['title', 'artist_id', 'format_id'],
         'sortFields' => ['id', 'title', 'year', 'date_added'],
         'sortDirections' => parent::SORT_DIRECTIONS,
@@ -195,7 +196,7 @@ class AlbumsHandler extends DatabaseHandler
      */
     public function insert(array $albumData)
     {
-        $this->validatePostData($albumData);
+        $this->validatePostData($albumData, 'post');
         $postData = $this->formatPostdataForInsert($albumData);
         $query = 'INSERT INTO album (' . $postData['keys'] . ')';
         $query .= ' VALUES (' . $postData['values'] . ')';
@@ -210,7 +211,7 @@ class AlbumsHandler extends DatabaseHandler
      */
     public function update(int $id, array $albumData)
     {
-        $this->validatePostData($albumData);
+        $this->validatePostData($albumData, 'put');
         $query = 'SELECT id FROM album WHERE id = ' . $id;
         if ($this->db->query($query)->rowCount() === 0) {
             return null;
@@ -297,6 +298,8 @@ class AlbumsHandler extends DatabaseHandler
             'title' => $albumData['title'],
             'year' => $albumData['year'],
             'dateAdded' => $albumData['date_added'],
+            'imageThumb' => $albumData['image_thumb'],
+            'image' => $albumData['image'],
             'notes' => $albumData['notes'],
         ]);
         if (array_key_exists('artist_id', $albumData)) {
@@ -334,10 +337,14 @@ class AlbumsHandler extends DatabaseHandler
      * Post data validation specific for albums.
      * @throws \Exception
      */
-    private function validatePostData(array $postData)
+    private function validatePostData(array $postData, string $method)
     {
-        // general validation
-        $this->validateMandatoryFields($postData, self::$FIELDS['mandatoryFields']);
+        if (empty($postData)) {
+            throw new \Exception('No data was sent to save', 400);
+        }
+        if ($method === 'post') {
+            $this->validateMandatoryFields($postData, self::$FIELDS['mandatoryFields']);
+        }
         $this->validateKeys($postData, self::$FIELDS['fields']);
 
         // year should be 4 digits
@@ -349,8 +356,16 @@ class AlbumsHandler extends DatabaseHandler
         }
 
         // check existence of artist, genre, label and format
-        $artist = $this->artistsHandler->selectById($postData['artist_id'])['body'];
-        $format = $this->formatsHandler->selectById($postData['format_id'])['body'];
+        if (array_key_exists('artist_id', $postData)) {
+            $artist = $this->artistsHandler->selectById($postData['artist_id'])['body'];
+        } else {
+            $artist = false;
+        }
+        if (array_key_exists('format_id', $postData)) {
+            $format = $this->formatsHandler->selectById($postData['format_id'])['body'];
+        } else {
+            $format = false;
+        }
         if (array_key_exists('label_id', $postData)) {
             $label = $this->labelsHandler->selectById($postData['label_id'])['body'];
         } else {

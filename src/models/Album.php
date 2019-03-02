@@ -47,6 +47,16 @@ class Album extends BaseModel
     protected $notes = '';
 
     /**
+     * @var string $imageThumb
+     */
+    protected $imageThumb;
+
+    /**
+     * @var string $image
+     */
+    protected $image;
+
+    /**
      * @return string
      */
     public function getTitle()
@@ -140,6 +150,38 @@ class Album extends BaseModel
     public function setFormat($format)
     {
         $this->format = $format;
+    }
+
+    /**
+     * @param string $image
+     */
+    public function setImageThumb($image)
+    {
+        $this->imageThumb = $image;
+    }
+
+    /**
+     * @return string | null
+     */
+    public function getImageThumb()
+    {
+        return $this->imageThumb;
+    }
+
+    /**
+     * @param string $image
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+    }
+
+    /**
+     * @return string | null
+     */
+    public function getImage()
+    {
+        return $this->image;
     }
 
     /**

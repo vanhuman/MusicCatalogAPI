@@ -22,16 +22,19 @@ class AlbumTemplate implements TemplateInterface
     public function getArray(bool $includeWrapper = true)
     {
         if (isset($this->album)) {
+            std()->show($this->album);
             $album = [
                 'id' => $this->album->getId(),
                 'title' => $this->album->getTitle(),
                 'year' => $this->album->getYear(),
                 'date_added' => $this->album->getDateAddedString(),
-                'notes' => $this->album->getNotes(),
+                'image_thumb' => $this->album->getImageThumb(),
+                'image' => $this->album->getImage(),
                 'artist' => (new ArtistTemplate($this->album->getArtist()))->getArray(false),
                 'genre' => (new GenreTemplate($this->album->getGenre()))->getArray(false),
                 'label' => (new LabelTemplate($this->album->getLabel()))->getArray(false),
                 'format' => (new FormatTemplate($this->album->getFormat()))->getArray(false),
+                'notes' => $this->album->getNotes(),
             ];
         } else {
             $album = null;

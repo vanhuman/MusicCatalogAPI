@@ -40,5 +40,6 @@ class Routes
 
         /* migration routes */
         $app->get('/migration_phase1', MigrationController::class . ':migrationPhase1');
+        $app->get('/migration_phase2', MigrationController::class . ':migrationPhase2');
     }
 }
