@@ -167,7 +167,7 @@ abstract class RestController extends BaseController
     protected function collectGetParams(Request $request)
     {
         $page = $request->getParam('page');
-        if (!isset($page) || !TypeUtility::isInteger($page)) {
+        if (!isset($page) || (!TypeUtility::isInteger($page))) {
             $page = 1;
         }
         $page = (int)$page;

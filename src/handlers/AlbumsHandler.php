@@ -112,7 +112,9 @@ class AlbumsHandler extends DatabaseHandler
         }
         $query .= ' ORDER BY album.' . $sortBy . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
-        $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
+        if ($page !== 0) {
+            $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
+        }
 
         $result = $this->db->query($query);
         $resultWithoutLimit = $this->db->query($queryWithoutLimit);

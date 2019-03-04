@@ -22,7 +22,6 @@ class AlbumTemplate implements TemplateInterface
     public function getArray(bool $includeWrapper = true)
     {
         if (isset($this->album)) {
-            std()->show($this->album);
             $album = [
                 'id' => $this->album->getId(),
                 'title' => $this->album->getTitle(),
