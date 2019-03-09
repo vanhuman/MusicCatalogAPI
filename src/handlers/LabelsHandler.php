@@ -55,6 +55,9 @@ class LabelsHandler extends DatabaseHandler
 
         $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM label';
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
+        if ($sortBy !== 'id') {
+            $query .= ', id ' . $sortDirection;
+        }
         $queryWithoutLimit = $query;
         if ($page !== 0) {
             $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;

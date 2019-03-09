@@ -111,9 +111,13 @@ class AlbumsHandler extends DatabaseHandler
             $query .= $searchLogic['having'];
         }
         $query .= ' ORDER BY album.' . $sortBy . ' ' . $sortDirection;
+        if ($sortBy !== 'id') {
+            $query .= ', album.id ' . $sortDirection;
+        }
         $queryWithoutLimit = $query;
         if ($page !== 0) {
-            $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
+            $offset = $pageSize * ($page - 1);
+            $query .= ' LIMIT ' . $offset . ',' . $pageSize;
         }
 
         $result = $this->db->query($query);
@@ -171,6 +175,9 @@ class AlbumsHandler extends DatabaseHandler
             $query .= $search_logic['having'];
         }
         $query .= ' ORDER BY ' . $sortField . ' ' . $sortDirection;
+        if ($sortBy !== 'id') {
+            $query .= ', id ' . $sortDirection;
+        }
         $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
 
