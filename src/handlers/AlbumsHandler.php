@@ -252,7 +252,7 @@ class AlbumsHandler extends DatabaseHandler
 
         $searchLogic['join'] = '';
         foreach ($searchTables as $table) {
-            $searchLogic['join'] .= ' JOIN ' . $table .' ON ' . $table . '.id = album.' . $table . '_id';
+            $searchLogic['join'] .= ' LEFT JOIN ' . $table .' ON ' . $table . '.id = album.' . $table . '_id';
         }
 
         $keywords = explode(' ', $keywords);

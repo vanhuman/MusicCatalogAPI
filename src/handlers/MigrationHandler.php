@@ -48,10 +48,10 @@ class MigrationHandler extends DatabaseConnection
         $query = 'ALTER TABLE album CHANGE genre genre_id INT(11) NOT NULL DEFAULT 0';
         $this->db->query($query);
 
-        $query = 'ALTER TABLE album CHANGE media format_id INT(11) NOT NULL';
+        $query = 'ALTER TABLE album CHANGE media format_id INT(11) NOT NULL DEFAULT 0';
         $this->db->query($query);
 
-        $query = 'ALTER TABLE album CHANGE more notes VARCHAR(2048)';
+        $query = 'ALTER TABLE album CHANGE more notes VARCHAR(2048) DEFAULT ""';
         $this->db->query($query);
 
         // remove album field frontpage
@@ -59,7 +59,7 @@ class MigrationHandler extends DatabaseConnection
         $this->db->query($query);
 
         // add album fields
-        $query = 'ALTER TABLE album ADD artist_id INT(11) NOT NULL AFTER date_added';
+        $query = 'ALTER TABLE album ADD artist_id INT(11) NOT NULL DEFAULT 0 AFTER date_added';
         $this->db->query($query);
         $query = 'ALTER TABLE album ADD label_id INT(11) NOT NULL DEFAULT 0 AFTER artist_id';
         $this->db->query($query);
@@ -156,9 +156,9 @@ class MigrationHandler extends DatabaseConnection
     public function migration_5_ImageLocation()
     {
         // add image fields
-        $query = 'ALTER TABLE album ADD image_thumb VARCHAR(255) AFTER format_id';
+        $query = 'ALTER TABLE album ADD image_thumb VARCHAR(255) DEFAULT "" AFTER format_id';
         $this->db->query($query);
-        $query = 'ALTER TABLE album ADD image VARCHAR(255) AFTER image_thumb';
+        $query = 'ALTER TABLE album ADD image VARCHAR(255)  DEFAULT "" AFTER image_thumb';
         $this->db->query($query);
     }
 
