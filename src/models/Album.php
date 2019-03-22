@@ -57,6 +57,11 @@ class Album extends BaseModel
     protected $image;
 
     /**
+     * @var \DateTime $imageFetchTimestamp
+     */
+    protected $imageFetchTimestamp;
+
+    /**
      * @return string
      */
     public function getTitle()
@@ -225,4 +230,33 @@ class Album extends BaseModel
         $this->notes = $notes;
     }
 
+    /**
+     * @return \DateTime
+     */
+    public function getImageFetchTimestamp(): \DateTime
+    {
+        return $this->imageFetchTimestamp;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImageFetchTimestampString()
+    {
+        if ($this->imageFetchTimestamp) {
+            return date(self::$DATE_FORMAT, $this->imageFetchTimestamp->getTimestamp());
+        }
+        return null;
+    }
+
+    /**
+     * @param \DateTime | null $imageFetchTimestamp
+     */
+    public function setImageFetchTimestamp($imageFetchTimestamp): void
+    {
+        if ($imageFetchTimestamp) {
+            $datetime = \DateTime::createFromFormat(self::$DATE_FORMAT, $imageFetchTimestamp);
+            $this->imageFetchTimestamp = $datetime;
+        }
+    }
 }

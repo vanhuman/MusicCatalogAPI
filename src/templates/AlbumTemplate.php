@@ -29,6 +29,7 @@ class AlbumTemplate implements TemplateInterface
                 'date_added' => $this->album->getDateAddedString(),
                 'image_thumb' => $this->album->getImageThumb(),
                 'image' => $this->album->getImage(),
+                'image_fetch_timestamp' => $this->album->getImageFetchTimestampString(),
                 'artist' => (new ArtistTemplate($this->album->getArtist()))->getArray(false),
                 'genre' => (new GenreTemplate($this->album->getGenre()))->getArray(false),
                 'label' => (new LabelTemplate($this->album->getLabel()))->getArray(false),

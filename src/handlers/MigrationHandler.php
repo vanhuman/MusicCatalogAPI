@@ -160,6 +160,8 @@ class MigrationHandler extends DatabaseConnection
         $this->db->query($query);
         $query = 'ALTER TABLE album ADD image VARCHAR(255)  DEFAULT "" AFTER image_thumb';
         $this->db->query($query);
+        $query = 'ALTER TABLE album ADD image_fetch_timestamp DATETIME AFTER image';
+        $this->db->query($query);
     }
 
 }

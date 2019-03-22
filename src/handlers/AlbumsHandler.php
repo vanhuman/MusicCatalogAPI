@@ -9,7 +9,7 @@ use Models\GetParams;
 class AlbumsHandler extends DatabaseHandler
 {
     public static $FIELDS = [
-        'fields' => ['id', 'title', 'year', 'date_added', 'notes', 'image_thumb', 'image',
+        'fields' => ['id', 'title', 'year', 'date_added', 'notes', 'image_thumb', 'image', 'image_fetch_timestamp',
             'artist_id', 'genre_id', 'label_id', 'format_id'],
         'mandatoryFields' => ['title', 'artist_id', 'format_id'],
         'sortFields' => ['id', 'title', 'year', 'date_added'],
@@ -309,6 +309,7 @@ class AlbumsHandler extends DatabaseHandler
             'dateAdded' => $albumData['date_added'],
             'imageThumb' => $albumData['image_thumb'],
             'image' => $albumData['image'],
+            'imageFetchTimestamp' => $albumData['image_fetch_timestamp'],
             'notes' => $albumData['notes'],
         ]);
         if (array_key_exists('artist_id', $albumData)) {
