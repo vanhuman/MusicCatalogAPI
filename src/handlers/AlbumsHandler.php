@@ -2,9 +2,11 @@
 
 namespace Handlers;
 
+use Enums\ExceptionType;
 use Models\Album;
 use Helpers\TypeUtility;
 use Models\GetParams;
+use Models\McException;
 
 class AlbumsHandler extends DatabaseHandler
 {
@@ -361,7 +363,11 @@ class AlbumsHandler extends DatabaseHandler
         if (array_key_exists('year', $postData)) {
             $year = $postData['year'];
             if (!TypeUtility::isInteger($year) || (int)$year < 1900 || (int)$year > 4000) {
-                throw new \Exception('Year should be a 4 digit number between 1900 and 4000.', 400);
+                throw new McException(
+                    'Year should be a 4 digit number between 1900 and 4000.',
+                    400,
+                    ExceptionType::VALIDATION_EXCEPTION()
+                    );
             }
         }
 
@@ -388,7 +394,11 @@ class AlbumsHandler extends DatabaseHandler
         }
         foreach (['artist' => $artist, 'label' => $label, 'genre' => $genre, 'format' => $format] as $key => $entity) {
             if (!isset($entity)) {
-                throw new \Exception(ucfirst($key) . ' with id ' . $postData[$key . '_id'] . ' cannot be found.', 400);
+                throw new McException(
+                    ucfirst($key) . ' with id ' . $postData[$key . '_id'] . ' cannot be found.',
+                    400,
+                    ExceptionType::VALIDATION_EXCEPTION()
+                    );
             }
         }
     }

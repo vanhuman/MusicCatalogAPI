@@ -2,8 +2,10 @@
 
 namespace Controllers;
 
+use Enums\ExceptionType;
 use Handlers\SessionsHandler;
 use Models\AuthParams;
+use Models\McException;
 use Models\Session;
 use Models\User;
 use Psr\Container\ContainerInterface;
@@ -64,9 +66,10 @@ class AuthenticationController
         if (!array_key_exists('username', $body) || !array_key_exists('password', $body)) {
             return $this->messageController->showError(
                 $response,
-                new \Exception(
+                new McException(
                     'Username and password are mandatory to authenticate',
-                    401
+                    401,
+                    ExceptionType::AUTH_EXCEPTION()
                 )
             );
         }
@@ -94,31 +97,35 @@ class AuthenticationController
         if (isset($authParams->token)) {
             $this->session = $this->sessionsHandler->getSessionByToken($authParams->token);
             if (!isset($this->session)) {
-                throw new \Exception(
-                    'No valid session for token ' . $authParams->token . ' found.',
-                    401
+                throw new McException(
+                    'No valid session for user found. Token is invalid.',
+                    401,
+                    ExceptionType::AUTH_EXCEPTION()
                 );
             }
             $this->user = $this->usersHandler->getUserById($this->session->getUserId());
         } else {
             $this->user = $this->usersHandler->getUserByCredentials($authParams->username);
             if (!isset($this->user)) {
-                throw new \Exception(
+                throw new McException(
                     'User with username ' . $authParams->username . ' not found.',
-                    401
+                    401,
+                    ExceptionType::AUTH_EXCEPTION()
                 );
             }
             if ($this->user->getPassword() !== sha1($authParams->password)) {
-                throw new \Exception(
+                throw new McException(
                     'Password for ' . $authParams->username . ' is not valid.',
-                    401
+                    401,
+                    ExceptionType::AUTH_EXCEPTION()
                 );
             }
             $this->session = $this->sessionsHandler->getSessionByUserId($this->user->getId());
             if (!isset($this->session)) {
-                throw new \Exception(
+                throw new McException(
                     'Session for user with username ' . $authParams->username . ' not found.',
-                    401
+                    401,
+                    ExceptionType::AUTH_EXCEPTION()
                 );
             }
         }

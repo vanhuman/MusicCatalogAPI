@@ -2,6 +2,8 @@
 
 namespace Controllers;
 
+use Enums\ExceptionType;
+use Models\McException;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -49,7 +51,8 @@ class AlbumsController extends RestController
         try {
             $result = $this->handler->selectSortedOnRelatedTable($params);
         } catch (\Exception $e) {
-            return $this->messageController->showError($response, $e);
+            $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
+            return $this->messageController->showError($response, $exception);
         }
         $template = new AlbumsTemplate($result['body']);
         $templateArray = $template->getArray();

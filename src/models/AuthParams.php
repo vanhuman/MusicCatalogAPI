@@ -15,7 +15,7 @@ class AuthParams
     public $password;
 
     /**
-     * @var int $token
+     * @var string $token
      */
     public $token;
 

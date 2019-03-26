@@ -2,6 +2,8 @@
 
 namespace Controllers;
 
+use Enums\ExceptionType;
+use Models\McException;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Request;
 
@@ -38,7 +40,7 @@ abstract class BaseController
     {
         $token = $request->getParam('token');
         if (!isset($token)) {
-            throw new \Exception('Token is required.', 403);
+            throw new McException('Token is required.', 403, ExceptionType::AUTH_EXCEPTION());
         }
         $this->authController->login(new AuthParams([
             'token' => $token,

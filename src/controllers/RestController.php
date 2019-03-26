@@ -2,6 +2,8 @@
 
 namespace Controllers;
 
+use Enums\ExceptionType;
+use Models\McException;
 use Slim\Http\Response;
 use Slim\Http\Request;
 
@@ -48,7 +50,8 @@ abstract class RestController extends BaseController
         try {
             $result = $this->handler->selectById($id);
         } catch (\Exception $e) {
-            return $this->messageController->showError($response, $e);
+            $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
+            return $this->messageController->showError($response, $exception);
         }
         $template = $this->newTemplate($result['body']);
         $templateArray = $template->getArray();
@@ -71,7 +74,8 @@ abstract class RestController extends BaseController
         try {
             $result = $this->handler->select($params);
         } catch (\Exception $e) {
-            return $this->messageController->showError($response, $e);
+            $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
+            return $this->messageController->showError($response, $exception);
         }
         $template = $this->newTemplate($result['body']);
         $templateArray = $template->getArray();
@@ -94,7 +98,8 @@ abstract class RestController extends BaseController
         try {
             $result = $this->handler->insert($body);
         } catch (\Exception $e) {
-            return $this->messageController->showError($response, $e);
+            $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
+            return $this->messageController->showError($response, $exception);
         }
         $template = $this->newTemplate($result['body']);
         return $response->withJson($template->getArray(), 200);
@@ -116,7 +121,8 @@ abstract class RestController extends BaseController
         try {
             $result = $this->handler->update($id, $body);
         } catch (\Exception $e) {
-            return $this->messageController->showError($response, $e);
+            $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
+            return $this->messageController->showError($response, $exception);
         }
         if (!isset($result)) {
             return $this->messageController->showError($response,
@@ -155,7 +161,8 @@ abstract class RestController extends BaseController
         try {
             $this->handler->delete($table, $id);
         } catch (\Exception $e) {
-            return $this->messageController->showError($response, $e);
+            $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
+            return $this->messageController->showError($response, $exception);
         }
         return $this->messageController->showMessage($response, ucfirst($table) . ' with id ' . $id . ' deleted.');
     }
