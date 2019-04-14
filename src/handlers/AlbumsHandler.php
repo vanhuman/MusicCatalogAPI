@@ -382,12 +382,12 @@ class AlbumsHandler extends DatabaseHandler
         } else {
             $format = false;
         }
-        if (array_key_exists('label_id', $postData)) {
+        if (array_key_exists('label_id', $postData) && $postData['label_id'] !== '0') {
             $label = $this->labelsHandler->selectById($postData['label_id'])['body'];
         } else {
             $label = false;
         }
-        if (array_key_exists('genre_id', $postData)) {
+        if (array_key_exists('genre_id', $postData) && $postData['genre_id'] !== '0') {
             $genre = $this->genresHandler->selectById($postData['genre_id'])['body'];
         } else {
             $genre = false;
