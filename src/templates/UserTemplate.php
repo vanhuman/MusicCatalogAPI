@@ -25,6 +25,7 @@ class UserTemplate implements TemplateInterface
             $user = [
                 'id' => $this->user->getId(),
                 'username' => $this->user->getUsername(),
+                'admin' => $this->user->getAdmin(),
             ];
         } else {
             $user = null;
