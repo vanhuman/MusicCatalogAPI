@@ -168,6 +168,42 @@ abstract class RestController extends BaseController
     }
 
     /**
+     * @return Response
+     */
+    public function removeOrphans(Request $request, Response $response, array $args)
+    {
+        try {
+            $this->login($request);
+        } catch (\Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+        if ($request->getUri()->getPath()) {
+            // get the base of the URI ('albums', 'artists', etc)
+            $table = explode('/', $request->getUri()->getPath())[0];
+            // remove the last s since we want singular entity names
+            $table = rtrim($table, 's');
+        } else {
+            return $this->messageController->showError($response,
+                new \Exception(
+                    'Trying to remove orphans, but unable to determine the table to delete from.',
+                    500
+                )
+            );
+        }
+        try {
+            $result = $this->handler->removeOrphans($table);
+        } catch (\Exception $e) {
+            $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
+            return $this->messageController->showError($response, $exception);
+        }
+        $returnObject = [
+            'entity' => $table,
+            'deleted' => $result,
+        ];
+        return $response->withJson($returnObject, 200);
+    }
+
+    /**
      * Function to gather all request arguments in one object.
      * @return GetParams
      */

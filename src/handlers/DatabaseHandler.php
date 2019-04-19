@@ -19,16 +19,30 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     /**
      * Generic delete function to handle all delete requests.
-     * @return int
      * @throws \Exception
      */
-    public function delete(string $table, int $id)
+    public function delete(string $table, int $id): int
     {
         $query = 'DELETE FROM ' . $table . ' WHERE id = ' . $id;
         $result = $this->db->query($query);
         if ($result->rowCount() === 0) {
             throw new \Exception(ucfirst($table) . ' with id ' . $id . ' not found.', 404);
         }
+        return $result->rowCount();
+    }
+
+    /**
+     * Function to delete rows that are not referenced on any album
+     * @return int
+     * @throws \Exception
+     */
+    public function removeOrphans(string $table): int
+    {
+        $query = 'DELETE FROM ' . $table;
+        $query .= ' WHERE NOT EXISTS (';
+        $query .= '   SELECT id FROM album WHERE album.' . $table . '_id = ' . $table . '.id LIMIT 1';
+        $query .= ')';
+        $result = $this->db->query($query);
         return $result->rowCount();
     }
 
@@ -97,7 +111,7 @@ abstract class DatabaseHandler extends DatabaseConnection
      */
     protected function validateMandatoryFields(array $postData, array $mandatoryFields)
     {
-        foreach($mandatoryFields as $field) {
+        foreach ($mandatoryFields as $field) {
             if (!array_key_exists($field, $postData)) {
                 throw new \Exception(ucfirst($field) . ' is a mandatory field.', 400);
             }
@@ -117,5 +131,5 @@ abstract class DatabaseHandler extends DatabaseConnection
             }
         }
     }
-    
+
 }

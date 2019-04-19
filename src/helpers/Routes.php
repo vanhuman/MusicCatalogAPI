@@ -32,6 +32,9 @@ class Routes
             $app->get($route, $controller . ':get');
             $app->post($route, $controller . ':post');
             $app->put($route . '/{id}', $controller . ':put');
+            if ($route !== '/albums') {
+                $app->delete($route . '/remove_orphans', $controller . ':removeOrphans');
+            }
             $app->delete($route . '/{id}', $controller . ':delete');
         }
 
