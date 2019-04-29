@@ -11,6 +11,10 @@ class MigrationHandler extends DatabaseConnection
      */
     public function migration_1_First()
     {
+        // fix issue with default value
+        $query = 'ALTER TABLE cds CHANGE date date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP';
+        $this->db->query($query);
+
         // rename tables
         $query = 'ALTER TABLE cds RENAME album';
         $this->db->query($query);
@@ -59,7 +63,7 @@ class MigrationHandler extends DatabaseConnection
         $this->db->query($query);
 
         // add album fields
-        $query = 'ALTER TABLE album ADD artist_id INT(11) NOT NULL DEFAULT 0 AFTER date_added';
+        $query = 'ALTER TABLE album ADD artist_id INT(11) NOT NULL DEFAULT 0 AFTER date';
         $this->db->query($query);
         $query = 'ALTER TABLE album ADD label_id INT(11) NOT NULL DEFAULT 0 AFTER artist_id';
         $this->db->query($query);

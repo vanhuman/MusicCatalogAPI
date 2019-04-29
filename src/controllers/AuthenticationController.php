@@ -18,6 +18,7 @@ use Templates\UserTemplate;
 
 class AuthenticationController
 {
+    private const REQUEST_METHODS_FOR_PUBLIC = ['GET'];
 
     /**
      * @var ContainerInterface $container
@@ -76,9 +77,10 @@ class AuthenticationController
         $authParams = new AuthParams([
             'username' => $body['username'],
             'password' => $body['password'],
+            'method' => 'POST',
         ]);
         try {
-            $this->login($authParams);
+            $this->login($authParams, true);
         } catch (\Exception $e) {
             return $this->messageController->showError($response, $e);
         }
@@ -92,8 +94,9 @@ class AuthenticationController
     /**
      * @throws \Exception
      */
-    public function login(AuthParams $authParams)
+    public function login(AuthParams $authParams, bool $methodOverride = false)
     {
+        // first get a session
         if (isset($authParams->token)) {
             $this->session = $this->sessionsHandler->getSessionByToken($authParams->token);
             if (!isset($this->session)) {
@@ -128,6 +131,20 @@ class AuthenticationController
                     ExceptionType::AUTH_EXCEPTION()
                 );
             }
+        }
+        // if we have a session, check for admin rights depending on the request method
+        if (!isset($authParams->method) ||
+            (
+                !in_array($authParams->method, self::REQUEST_METHODS_FOR_PUBLIC)
+                && !$methodOverride
+                && !$this->user->getAdmin()
+            )
+        ) {
+            throw new McException(
+                'You have no rights to perform this action',
+                401,
+                ExceptionType::AUTH_EXCEPTION()
+            );
         }
     }
 }

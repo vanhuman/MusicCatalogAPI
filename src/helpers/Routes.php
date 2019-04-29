@@ -42,7 +42,7 @@ class Routes
         $app->post('/authenticate', AuthenticationController::class . ':authenticate');
 
         /* migration routes */
-        $app->get('/migration_phase1', MigrationController::class . ':migrationPhase1');
-        $app->get('/migration_phase2', MigrationController::class . ':migrationPhase2');
+        $app->post('/migration_phase1', MigrationController::class . ':migrationPhase1');
+        $app->post('/migration_phase2', MigrationController::class . ':migrationPhase2');
     }
 }

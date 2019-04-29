@@ -5,19 +5,24 @@ namespace Models;
 class AuthParams
 {
     /**
-     * @var string $username
+     * @var string
      */
     public $username;
 
     /**
-     * @var string $password
+     * @var string
      */
     public $password;
 
     /**
-     * @var string $token
+     * @var string
      */
     public $token;
+
+    /**
+     * @var string
+     */
+    public $method;
 
     /**
      * AuthParams constructor.

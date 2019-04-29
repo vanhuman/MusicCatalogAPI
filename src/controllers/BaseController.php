@@ -44,6 +44,7 @@ abstract class BaseController
         }
         $this->authController->login(new AuthParams([
             'token' => $token,
+            'method' => $request->getMethod(),
         ]));
     }
 }
