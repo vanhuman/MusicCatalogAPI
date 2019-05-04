@@ -3,6 +3,7 @@
 namespace Handlers;
 
 use Enums\ExceptionType;
+use Helpers\Constants;
 use Models\Album;
 use Helpers\TypeUtility;
 use Models\GetParams;
@@ -11,8 +12,8 @@ use Models\McException;
 class AlbumsHandler extends DatabaseHandler
 {
     public static $FIELDS = [
-        'fields' => ['id', 'title', 'year', 'date_added', 'notes', 'image_thumb', 'image', 'image_fetch_timestamp',
-            'artist_id', 'genre_id', 'label_id', 'format_id'],
+        'fields' => ['id', 'title', 'year', 'date_added', 'notes', 'image_thumb', 'image_thumb_local', 'image', 'image_local',
+            'image_fetch_timestamp', 'artist_id', 'genre_id', 'label_id', 'format_id'],
         'mandatoryFields' => ['title', 'artist_id', 'format_id'],
         'sortFields' => ['id', 'title', 'year', 'date_added'],
         'sortDirections' => parent::SORT_DIRECTIONS,
@@ -230,7 +231,37 @@ class AlbumsHandler extends DatabaseHandler
         $postData = $this->formatPostdataForUpdate($albumData);
         $query = 'UPDATE album SET ' . $postData . ' WHERE id = ' . $id;
         $this->db->query($query);
+        $this->fetchImages($id, $albumData);
         return $this->selectById($id);
+    }
+
+    private function fetchImages(int $id, array $albumData): void
+    {
+        if (isset($albumData['image']) && isset($albumData['image_thumb'])) {
+            $this->fetchAndSaveImage($albumData['image'], 'image_local', $id, Constants::$IMAGE_LOCATION);
+            $this->fetchAndSaveImage($albumData['image_thumb'], 'image_thumb_local', $id, Constants::$IMAGE_THUMB_LOCATION);
+        } else {
+            $query = 'SELECT id, image, image_local, image_thumb, image_thumb_local FROM album WHERE id = ' . $id;
+            $result = $this->db->query($query);
+            if ($result->rowCount() === 0) {
+                return;
+            }
+            $album = $result->fetch();
+            if (!isset($album['image_local'])) {
+                $this->fetchAndSaveImage($album['image'], 'image_local', $id, Constants::$IMAGE_LOCATION);
+                $this->fetchAndSaveImage($album['image_thumb'], 'image_thumb_local', $id, Constants::$IMAGE_THUMB_LOCATION);
+            }
+        }
+    }
+
+    private function fetchAndSaveImage(string $url, string $field, int $id, string $dir): void
+    {
+        $index = strrpos($url, '/');
+        $image = substr($url, $index + 1);
+        $path = '..' . $dir . substr($url, $index + 1);
+        file_put_contents($path, file_get_contents($url));
+        $query = 'UPDATE album SET ' . $field . ' = "' . $image . '" WHERE id = ' . $id;
+        $this->db->query($query);
     }
 
     /**
@@ -310,7 +341,9 @@ class AlbumsHandler extends DatabaseHandler
             'year' => $albumData['year'],
             'dateAdded' => $albumData['date_added'],
             'imageThumb' => $albumData['image_thumb'],
+            'imageThumbLocal' => $albumData['image_thumb_local'],
             'image' => $albumData['image'],
+            'imageLocal' => $albumData['image_local'],
             'imageFetchTimestamp' => $albumData['image_fetch_timestamp'],
             'notes' => $albumData['notes'],
         ]);

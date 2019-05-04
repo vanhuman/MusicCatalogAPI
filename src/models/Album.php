@@ -52,9 +52,19 @@ class Album extends BaseModel
     protected $imageThumb;
 
     /**
+     * @var string
+     */
+    protected $imageThumbLocal;
+
+    /**
      * @var string $image
      */
     protected $image;
+
+    /**
+     * @var string
+     */
+    protected $imageLocal;
 
     /**
      * @var \DateTime $imageFetchTimestamp
@@ -229,6 +239,39 @@ class Album extends BaseModel
     {
         $this->notes = $notes;
     }
+
+    /**
+     * @return string | null
+     */
+    public function getImageThumbLocal()
+    {
+        return $this->imageThumbLocal;
+    }
+
+    /**
+     * @param string $imageThumbLocal
+     */
+    public function setImageThumbLocal(string $imageThumbLocal): void
+    {
+        $this->imageThumbLocal = $imageThumbLocal;
+    }
+
+    /**
+     * @return string | null
+     */
+    public function getImageLocal()
+    {
+        return $this->imageLocal;
+    }
+
+    /**
+     * @param string $imageLocal
+     */
+    public function setImageLocal(string $imageLocal): void
+    {
+        $this->imageLocal = $imageLocal;
+    }
+
 
     /**
      * @return \DateTime
