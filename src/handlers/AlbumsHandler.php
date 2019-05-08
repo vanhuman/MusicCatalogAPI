@@ -21,7 +21,7 @@ class AlbumsHandler extends DatabaseHandler
         'defaultSortDirection' => 'DESC',
         'relatedSortFields' => ['artist_name', 'label_name', 'genre_description', 'format_name'],
         'defaultRelatedSortDirection' => 'ASC',
-        'searchFields' => ['artist.name', 'album.title', 'album.year', 'label.name', 'format.name', 'genre.description']
+        'searchFields' => ['artist.name', 'album.title', 'album.year', 'album.notes', 'label.name', 'format.name', 'genre.description']
     ];
 
     /**
