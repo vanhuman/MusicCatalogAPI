@@ -55,7 +55,7 @@ abstract class DatabaseHandler extends DatabaseConnection
         foreach ($postData as $key => $value) {
             if ($key !== 'id') {
                 $keys[] = $key;
-                $values[] = $value;
+                $values[] = urldecode($value);
             }
         }
         $formattedPostData['keys'] = implode($keys, ',');
@@ -72,7 +72,7 @@ abstract class DatabaseHandler extends DatabaseConnection
         $formattedPostData = [];
         foreach ($postData as $key => $value) {
             if ($key !== 'id') {
-                $formattedPostData[] = $key . ' = "' . $value . '"';
+                $formattedPostData[] = $key . ' = "' . urldecode($value) . '"';
             }
         }
         $formattedPostData = implode(',', $formattedPostData);
