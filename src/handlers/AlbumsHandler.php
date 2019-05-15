@@ -247,7 +247,7 @@ class AlbumsHandler extends DatabaseHandler
                 return;
             }
             $album = $result->fetch();
-            if (!isset($album['image_local'])) {
+            if (!isset($album['image_local']) || empty($album['image_local'])) {
                 $this->fetchAndSaveImage($album['image'], 'image_local', $id, Constants::$IMAGE_LOCATION);
                 $this->fetchAndSaveImage($album['image_thumb'], 'image_thumb_local', $id, Constants::$IMAGE_THUMB_LOCATION);
             }
