@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Enums\ExceptionType;
+use Helpers\Constants;
 use Models\McException;
 use Slim\Http\Response;
 use Slim\Http\Request;
@@ -216,7 +217,7 @@ abstract class RestController extends BaseController
         $page = (int)$page;
         $paramsArray = [
             'page' => $page,
-            'pageSize' => $this->container->get('settings')->get('pageSize'),
+            'pageSize' => Constants::$PAGE_SIZE,
             'sortBy' => $request->getParam('sortby'),
             'sortDirection' => $request->getParam('sortdirection'),
             'filter' => [

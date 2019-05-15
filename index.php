@@ -20,7 +20,6 @@ $config['db']['dbname'] = 'music_catalog';
 //$config['db']['pass'] = 'ankerput';
 //$config['db']['dbname'] = 'deb55474_musiccatalog';
 
-$config['pageSize'] = 50;
 $config['showDebug'] = true;
 $config['showParams'] = true;
 

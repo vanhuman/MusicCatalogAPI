@@ -12,7 +12,7 @@ class GetParams
     /**
      * @var int $pageSize
      */
-    public $pageSize = 50;
+    public $pageSize;
 
     /**
      * @var string $sortBy
