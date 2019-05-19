@@ -247,7 +247,8 @@ class AlbumsHandler extends DatabaseHandler
                 return;
             }
             $album = $result->fetch();
-            if (!isset($album['image_local']) || empty($album['image_local'])) {
+            if ((!isset($album['image_local']) || empty($album['image_local']))
+                && isset($album['image']) && !empty($album['image'])) {
                 $this->fetchAndSaveImage($album['image'], 'image_local', $id, Constants::$IMAGE_LOCATION);
                 $this->fetchAndSaveImage($album['image_thumb'], 'image_thumb_local', $id, Constants::$IMAGE_THUMB_LOCATION);
             }
@@ -256,11 +257,12 @@ class AlbumsHandler extends DatabaseHandler
 
     private function fetchAndSaveImage(string $url, string $field, int $id, string $dir): void
     {
+        $prefix = uniqid() . '-';
         $index = strrpos($url, '/');
-        $image = substr($url, $index + 1);
-        $path = '..' . $dir . substr($url, $index + 1);
+        $filename = $prefix . substr($url, $index + 1);
+        $path = '..' . $dir . $filename;
         file_put_contents($path, file_get_contents($url));
-        $query = 'UPDATE album SET ' . $field . ' = "' . $image . '" WHERE id = ' . $id;
+        $query = 'UPDATE album SET ' . $field . ' = "' . $filename . '" WHERE id = ' . $id;
         $this->db->query($query);
     }
 
@@ -285,7 +287,7 @@ class AlbumsHandler extends DatabaseHandler
 
         $searchLogic['join'] = '';
         foreach ($searchTables as $table) {
-            $searchLogic['join'] .= ' LEFT JOIN ' . $table .' ON ' . $table . '.id = album.' . $table . '_id';
+            $searchLogic['join'] .= ' LEFT JOIN ' . $table . ' ON ' . $table . '.id = album.' . $table . '_id';
         }
 
         $keywords = explode(' ', $keywords);
@@ -301,7 +303,7 @@ class AlbumsHandler extends DatabaseHandler
             }
             if (isset($query_strings)) {
                 $where_query = implode(' AND ', $query_strings);
-                $searchLogic['having'] = ' HAVING (' . $where_query .')';
+                $searchLogic['having'] = ' HAVING (' . $where_query . ')';
             }
         }
         return $searchLogic;
@@ -400,7 +402,7 @@ class AlbumsHandler extends DatabaseHandler
                     'Year should be a 4 digit number between 1900 and 4000.',
                     400,
                     ExceptionType::VALIDATION_EXCEPTION()
-                    );
+                );
             }
         }
 
@@ -431,7 +433,7 @@ class AlbumsHandler extends DatabaseHandler
                     ucfirst($key) . ' with id ' . $postData[$key . '_id'] . ' cannot be found.',
                     400,
                     ExceptionType::VALIDATION_EXCEPTION()
-                    );
+                );
             }
         }
     }
