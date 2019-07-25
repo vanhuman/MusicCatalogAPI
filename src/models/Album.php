@@ -37,17 +37,17 @@ class Album extends BaseModel
     protected $format;
 
     /**
-     * @var \DateTime $date
+     * @var \DateTime
      */
     protected $dateAdded;
 
     /**
-     * @var string $notes
+     * @var string
      */
     protected $notes = '';
 
     /**
-     * @var string $imageThumb
+     * @var string
      */
     protected $imageThumb;
 
@@ -57,7 +57,7 @@ class Album extends BaseModel
     protected $imageThumbLocal;
 
     /**
-     * @var string $image
+     * @var string
      */
     protected $image;
 
@@ -67,9 +67,14 @@ class Album extends BaseModel
     protected $imageLocal;
 
     /**
-     * @var \DateTime $imageFetchTimestamp
+     * @var \DateTime
      */
     protected $imageFetchTimestamp;
+
+    /**
+     * @var bool
+     */
+    protected $imageLock;
 
     /**
      * @return string
@@ -301,5 +306,15 @@ class Album extends BaseModel
             $datetime = \DateTime::createFromFormat(self::$DATE_FORMAT, $imageFetchTimestamp);
             $this->imageFetchTimestamp = $datetime;
         }
+    }
+
+    public function getImageLock(): bool
+    {
+        return $this->imageLock;
+    }
+
+    public function setImageLock(int $imageLock): void
+    {
+        $this->imageLock = $imageLock;
     }
 }

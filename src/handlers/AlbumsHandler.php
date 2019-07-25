@@ -13,7 +13,7 @@ class AlbumsHandler extends DatabaseHandler
 {
     public static $FIELDS = [
         'fields' => ['id', 'title', 'year', 'date_added', 'notes', 'image_thumb', 'image_thumb_local', 'image', 'image_local',
-            'image_fetch_timestamp', 'artist_id', 'genre_id', 'label_id', 'format_id'],
+            'image_fetch_timestamp', 'image_lock', 'artist_id', 'genre_id', 'label_id', 'format_id'],
         'mandatoryFields' => ['title', 'artist_id', 'format_id'],
         'sortFields' => ['id', 'title', 'year', 'date_added'],
         'sortDirections' => parent::SORT_DIRECTIONS,
@@ -260,6 +260,7 @@ class AlbumsHandler extends DatabaseHandler
         $prefix = uniqid() . '-';
         $index = strrpos($url, '/');
         $filename = $prefix . substr($url, $index + 1);
+        $filename = str_replace('%', '', $filename);
         $path = '..' . $dir . $filename;
         file_put_contents($path, file_get_contents($url));
         $query = 'UPDATE album SET ' . $field . ' = "' . $filename . '" WHERE id = ' . $id;
@@ -337,6 +338,7 @@ class AlbumsHandler extends DatabaseHandler
      */
     private function createModelFromDatabaseData(array $albumData)
     {
+        std()->show($albumData);
         $newAlbum = new Album([
             'id' => $albumData['id'],
             'title' => $albumData['title'],
@@ -347,6 +349,7 @@ class AlbumsHandler extends DatabaseHandler
             'image' => $albumData['image'],
             'imageLocal' => $albumData['image_local'],
             'imageFetchTimestamp' => $albumData['image_fetch_timestamp'],
+            'imageLock' => $albumData['image_lock'] == 1,
             'notes' => $albumData['notes'],
         ]);
         if (array_key_exists('artist_id', $albumData)) {
