@@ -10,8 +10,8 @@ $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
 
 $config['db']['host'] = 'localhost';
-$config['db']['user'] = 'user';
-$config['db']['pass'] = 'password';
+$config['db']['user'] = '***';
+$config['db']['pass'] = '***';
 $config['db']['dbname'] = 'media_manager';
 
 $app = new \Slim\App(['settings' => $config]);
