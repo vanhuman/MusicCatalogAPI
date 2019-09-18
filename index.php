@@ -12,13 +12,9 @@ $config['addContentLengthHeader'] = false;
 
 $config['db']['host'] = 'localhost';
 
-$config['db']['user'] = 'user';
-$config['db']['pass'] = 'password';
+$config['db']['user'] = '***';
+$config['db']['pass'] = '***';
 $config['db']['dbname'] = 'music_catalog';
-
-//$config['db']['user'] = 'deb55474_musiccatalog';
-//$config['db']['pass'] = 'ankerput';
-//$config['db']['dbname'] = 'deb55474_musiccatalog';
 
 $config['showDebug'] = true;
 $config['showParams'] = true;
