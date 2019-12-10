@@ -338,7 +338,6 @@ class AlbumsHandler extends DatabaseHandler
      */
     private function createModelFromDatabaseData(array $albumData)
     {
-        std()->show($albumData);
         $newAlbum = new Album([
             'id' => $albumData['id'],
             'title' => $albumData['title'],
