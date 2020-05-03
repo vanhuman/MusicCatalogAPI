@@ -20,6 +20,7 @@ class AlbumsHandler extends DatabaseHandler
         'defaultSortField' => 'date_added',
         'defaultSortDirection' => 'DESC',
         'relatedSortFields' => ['artist_name', 'label_name', 'genre_description', 'format_name'],
+        'relatedSortFieldsSecondSortField' => 'album.year',
         'defaultRelatedSortDirection' => 'ASC',
         'searchFields' => ['artist.name', 'album.title', 'album.year', 'album.notes', 'label.name', 'format.name', 'genre.description']
     ];
@@ -152,6 +153,7 @@ class AlbumsHandler extends DatabaseHandler
         // sortBy is always formatted as table_field
         $relatedTable = explode('_', $sortBy)[0];
         $sortField = str_replace('_', '.', $sortBy);
+        $secondSortField = self::$FIELDS['relatedSortFieldsSecondSortField'];
         $selectFunc = function ($field) {
             return 'album.' . $field;
         };
@@ -178,9 +180,7 @@ class AlbumsHandler extends DatabaseHandler
             $query .= $search_logic['having'];
         }
         $query .= ' ORDER BY ' . $sortField . ' ' . $sortDirection;
-        if ($sortBy !== 'id') {
-            $query .= ', id ' . $sortDirection;
-        }
+        $query .= ', ' . $secondSortField . ' ' . $sortDirection;
         $queryWithoutLimit = $query;
         $query .= ' LIMIT ' . ($pageSize * ($page - 1)) . ',' . $pageSize;
 
