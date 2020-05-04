@@ -13,7 +13,7 @@ class AlbumsHandler extends DatabaseHandler
 {
     public static $FIELDS = [
         'fields' => ['id', 'title', 'year', 'date_added', 'notes', 'image_thumb', 'image_thumb_local', 'image', 'image_local',
-            'image_fetch_timestamp', 'image_lock', 'artist_id', 'genre_id', 'label_id', 'format_id'],
+            'image_fetch_timestamp', 'artist_id', 'genre_id', 'label_id', 'format_id'],
         'mandatoryFields' => ['title', 'artist_id', 'format_id'],
         'sortFields' => ['id', 'title', 'year', 'date_added'],
         'sortDirections' => parent::SORT_DIRECTIONS,
@@ -348,7 +348,6 @@ class AlbumsHandler extends DatabaseHandler
             'image' => $albumData['image'],
             'imageLocal' => $albumData['image_local'],
             'imageFetchTimestamp' => $albumData['image_fetch_timestamp'],
-            'imageLock' => $albumData['image_lock'] == 1,
             'notes' => $albumData['notes'],
         ]);
         if (array_key_exists('artist_id', $albumData)) {
