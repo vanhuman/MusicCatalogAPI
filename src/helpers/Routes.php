@@ -3,6 +3,7 @@
 namespace Helpers;
 
 use Controllers\AuthenticationController;
+use Controllers\CleanupController;
 use Controllers\HelpController;
 use Slim\App;
 use Controllers\AlbumsController;
@@ -44,5 +45,8 @@ class Routes
         /* migration routes */
         $app->post('/migration_phase1', MigrationController::class . ':migrationPhase1');
         $app->post('/migration_phase2', MigrationController::class . ':migrationPhase2');
+
+        /* images cleanup route */
+        $app->get('/cleanup_images', CleanupController::class . ':cleanupImages');
     }
 }
