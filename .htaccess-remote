@@ -1,0 +1,10 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [L]
+AuthGroupFile /dev/null
+AuthType Basic
+AuthUserFile /home/deb55474/domains/west28.nl/.htpasswd/public_html/music-catalog-api/.htpasswd
+AuthName "Music Catalog API"
+require valid-user
+ErrorDocument 401 "Unauthorized Access"

@@ -22,7 +22,16 @@ class AlbumsHandler extends DatabaseHandler
         'relatedSortFields' => ['artist_name', 'label_name', 'genre_description', 'format_name'],
         'relatedSortFieldsSecondSortField' => 'album.year',
         'defaultRelatedSortDirection' => 'ASC',
-        'searchFields' => ['artist.name', 'album.title', 'album.year', 'album.notes', 'label.name', 'format.name', 'genre.description']
+        'searchFields' => ['artist.name', 'album.title', 'album.year', 'album.notes', 'label.name', 'format.name', 'genre.description'],
+        'searchFieldMap' => [
+            'artist' => 'artist.name',
+            'title' => 'album.title',
+            'year' => 'album.year',
+            'notes' => 'album.notes',
+            'label' => 'label.name',
+            'format' => 'format.name',
+            'genre' => 'genre.description',
+        ],
     ];
 
     /**
@@ -238,8 +247,8 @@ class AlbumsHandler extends DatabaseHandler
     private function fetchImages(int $id, array $albumData): void
     {
         if (isset($albumData['image']) && isset($albumData['image_thumb'])) {
-            $this->fetchAndSaveImage($albumData['image'], 'image_local', $id, Constants::$IMAGE_LOCATION);
-            $this->fetchAndSaveImage($albumData['image_thumb'], 'image_thumb_local', $id, Constants::$IMAGE_THUMB_LOCATION);
+            $this->fetchAndSaveImage($albumData['image'], 'image', $id, Constants::$IMAGE_LOCATION);
+            $this->fetchAndSaveImage($albumData['image_thumb'], 'image_thumb', $id, Constants::$IMAGE_THUMB_LOCATION);
         } else {
             $query = 'SELECT id, image, image_local, image_thumb, image_thumb_local FROM album WHERE id = ' . $id;
             $result = $this->db->query($query);
@@ -249,20 +258,32 @@ class AlbumsHandler extends DatabaseHandler
             $album = $result->fetch();
             if ((!isset($album['image_local']) || empty($album['image_local']))
                 && isset($album['image']) && !empty($album['image'])) {
-                $this->fetchAndSaveImage($album['image'], 'image_local', $id, Constants::$IMAGE_LOCATION);
-                $this->fetchAndSaveImage($album['image_thumb'], 'image_thumb_local', $id, Constants::$IMAGE_THUMB_LOCATION);
+                $this->fetchAndSaveImage($album['image'], 'image', $id, Constants::$IMAGE_LOCATION);
+                $this->fetchAndSaveImage($album['image_thumb'], 'image_thumb', $id, Constants::$IMAGE_THUMB_LOCATION);
             }
         }
     }
 
     private function fetchAndSaveImage(string $url, string $field, int $id, string $dir): void
     {
+        $lastfm_domain = 'https://lastfm.freetls.fastly.net';
+        if (strpos($url, $lastfm_domain) !== 0) {
+            $url = preg_replace('/http(s?):\/\/[^\/]*/', $lastfm_domain, $url);
+            $query = 'UPDATE album SET ' . $field . ' = "' . $url . '" WHERE id = ' . $id;
+            $this->db->query($query);
+        }
+        $field = $field . '_local';
         $prefix = uniqid() . '-';
         $index = strrpos($url, '/');
         $filename = $prefix . substr($url, $index + 1);
         $filename = str_replace('%', '', $filename);
         $path = '..' . $dir . $filename;
-        file_put_contents($path, file_get_contents($url));
+        try {
+            $new_image = file_get_contents($url);
+        } catch (\Exception $e) {
+            return;
+        }
+        file_put_contents($path, $new_image);
         $query = 'UPDATE album SET ' . $field . ' = "' . $filename . '" WHERE id = ' . $id;
         $this->db->query($query);
     }
@@ -272,7 +293,7 @@ class AlbumsHandler extends DatabaseHandler
      */
     private function getSearchLogic(string $keywords, string $relatedTable = null): array
     {
-        $searchFields = self::$FIELDS['searchFields'];
+        $searchFields = $this->getSearchFields($keywords);
         $searchTables = [];
         foreach ($searchFields as $field) {
             $table = explode('.', $field)[0];
@@ -308,6 +329,20 @@ class AlbumsHandler extends DatabaseHandler
             }
         }
         return $searchLogic;
+    }
+
+    private function getSearchFields(string &$keywords): array
+    {
+        $searchFields = self::$FIELDS['searchFields'];
+        $searchFieldMap = self::$FIELDS['searchFieldMap'];
+        if (strpos($keywords, ':') > 0) {
+            $searchField = trim(explode(':', $keywords)[0]);
+            if (array_key_exists($searchField, $searchFieldMap)) {
+                $keywords = explode(':', $keywords)[1];
+                return [$searchFieldMap[$searchField]];
+            }
+        }
+        return $searchFields;
     }
 
     /**
