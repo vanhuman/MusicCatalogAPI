@@ -42,6 +42,7 @@ class Routes
         /* migration routes */
         $app->post('/migration_phase1', MigrationController::class . ':migrationPhase1');
         $app->post('/migration_phase2', MigrationController::class . ':migrationPhase2');
+        $app->post('/migration_add_salt', MigrationController::class . ':migrationAddSalt');
 
         /* images cleanup route */
         $app->get('/cleanup_images', CleanupController::class . ':cleanupImages');

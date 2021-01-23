@@ -168,4 +168,10 @@ class MigrationHandler extends DatabaseConnection
         $this->db->query($query);
     }
 
+    public function migration_6_add_salt()
+    {
+        $query = 'ALTER TABLE user ADD salt VARCHAR(255) AFTER password';
+        $this->db->query($query);
+    }
+
 }

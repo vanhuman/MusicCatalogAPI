@@ -47,6 +47,7 @@ class UsersHandler extends DatabaseConnection
             'id' => $userData['id'],
             'username' => $userData['username'],
             'password' => $userData['password'],
+            'salt' => $userData['salt'],
             'admin' => $userData['admin'] == 1,
         ]);
     }

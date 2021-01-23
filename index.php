@@ -27,6 +27,11 @@ $config['showParams'] = true;
 $app = new App(['settings' => $config]);
 $container = $app->getContainer();
 
+// Generate salt and hashed password
+//$salt = \Helpers\SecurityUtility::generateToken();
+//$hash = \Helpers\SecurityUtility::hash('Ankerput37!', $salt);
+//std()->show([$salt, $hash]);
+
 try {
     ContainerHelper::init($container);
     Routes::init($app);

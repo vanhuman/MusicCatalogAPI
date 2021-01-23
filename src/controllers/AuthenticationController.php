@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Enums\ExceptionType;
+use Exception;
 use Handlers\SessionsHandler;
 use Models\AuthParams;
 use Models\McException;
@@ -81,7 +82,7 @@ class AuthenticationController
         ]);
         try {
             $this->login($authParams, true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         $sessionWithUser = [
@@ -92,7 +93,7 @@ class AuthenticationController
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function login(AuthParams $authParams, bool $methodOverride = false)
     {
@@ -116,7 +117,7 @@ class AuthenticationController
                     ExceptionType::AUTH_EXCEPTION()
                 );
             }
-            if ($this->user->getPassword() !== sha1($authParams->password)) {
+            if (!$this->user->passwordMatches($authParams->password)) {
                 throw new McException(
                     'Password for ' . $authParams->username . ' is not valid.',
                     401,

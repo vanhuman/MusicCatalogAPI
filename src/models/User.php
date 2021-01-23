@@ -2,6 +2,8 @@
 
 namespace Models;
 
+use Helpers\SecurityUtility;
+
 class User extends BaseModel
 {
 
@@ -14,6 +16,11 @@ class User extends BaseModel
      * @var string
      */
     private $password;
+
+    /**
+     * @var string
+     */
+    private $salt;
 
     /**
      * @var bool
@@ -48,5 +55,26 @@ class User extends BaseModel
     public function setAdmin(bool $admin): void
     {
         $this->admin = $admin;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSalt(): string
+    {
+        return $this->salt;
+    }
+
+    /**
+     * @param string $salt
+     */
+    public function setSalt(string $salt): void
+    {
+        $this->salt = $salt;
+    }
+
+    public function passwordMatches(string $password): bool
+    {
+        return $this->getPassword() === SecurityUtility::hash($password, $this->getSalt());
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Exception;
 use Psr\Container\ContainerInterface;
 use \Slim\Http\Request;
 use \Slim\Http\Response;
@@ -27,27 +28,27 @@ class MigrationController extends BaseController
     {
         try {
             $this->login($request);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         try {
             $this->migrationHandler->migration_1_First();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         try {
             $numAlbumsArtists = $this->migrationHandler->migration_2_Artists();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         try {
             $numAlbumsLabels = $this->migrationHandler->migration_3_Labels();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         try {
             $this->migrationHandler->migration_4_AfterArtistAndLabel();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
 
@@ -64,12 +65,32 @@ class MigrationController extends BaseController
     {
         try {
             $this->login($request);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         try {
             $this->migrationHandler->migration_5_ImageLocation();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+        return $response->withJson([
+            'Result' => 'OK'
+        ], 200);
+    }
+
+    /**
+     * @return Response
+     */
+    public function migrationAddSalt(Request $request, Response $response, array $args)
+    {
+        try {
+            $this->login($request);
+        } catch (Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+        try {
+            $this->migrationHandler->migration_6_add_salt();
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         return $response->withJson([
