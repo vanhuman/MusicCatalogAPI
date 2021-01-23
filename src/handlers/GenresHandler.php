@@ -89,9 +89,8 @@ class GenresHandler extends DatabaseHandler
     {
         $this->validatePostData($genreData);
         $postData = $this->formatPostdataForInsert($genreData);
-        $query = 'INSERT INTO genre (' . $postData['keys'] . ')';
-        $query .= ' VALUES (' . $postData['values'] . ')';
-        $this->db->query($query);
+        $statement = $this->db->prepare('INSERT INTO genre (' . $postData['keys'] . ') VALUES (' . $postData['variables'] . ')');
+        $statement->execute($postData['data']);
         $id = $this->db->lastInsertId();
         return $this->selectById($id);
     }
@@ -108,8 +107,8 @@ class GenresHandler extends DatabaseHandler
             return null;
         }
         $postData = $this->formatPostdataForUpdate($genreData);
-        $query = 'UPDATE genre SET ' . $postData . ' WHERE id = ' . $id;
-        $this->db->query($query);
+        $statement = $this->db->prepare('UPDATE genre SET ' . $postData['keys_variables'] . ' WHERE id = ' . $id);
+        $statement->execute($postData['data']);
         return $this->selectById($id);
     }
 

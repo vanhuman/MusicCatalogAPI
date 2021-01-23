@@ -14,16 +14,16 @@ class SessionsHandler extends DatabaseConnection
      */
     public function getSessionByToken(string $token)
     {
-        $query = 'SELECT * FROM session WHERE token = "' . $token . '"';
-        $result = $this->db->query($query);
-        if ($result->rowCount() !== 0) {
-            $session = $this->createModelFromDatabaseData($result->fetch());
+        $statement = $this->db->prepare('SELECT * FROM session WHERE `token` = :token');
+        $statement->execute([':token' => $token]);
+        if ($statement->rowCount() !== 0) {
+            $session = $this->createModelFromDatabaseData($statement->fetch());
             if (!$session->isExpired()) {
                 $this->updateSessionTimeout($session);
                 return $session;
             } else {
-                $query = 'DELETE FROM session WHERE token = "' . $token . '"';
-                $this->db->query($query);
+                $statement = $this->db->prepare('DELETE FROM session WHERE `token` = :token');
+                $statement->execute([':token' => $token]);
             }
         }
         return null;

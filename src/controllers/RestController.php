@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Enums\ExceptionType;
+use Exception;
 use Helpers\Constants;
 use Models\McException;
 use Slim\Http\Response;
@@ -29,20 +30,19 @@ abstract class RestController extends BaseController
 
     /**
      * Generic get method, for GET requests for all endpoints using id.
-     * @return Response
      */
-    public function getById(Request $request, Response $response, array $args)
+    public function getById(Request $request, Response $response, array $args): Response
     {
         try {
             $this->login($request);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         $id = array_key_exists('id', $args) ? $args['id'] : null;
         if (!isset($id)) {
             return $this->messageController->showError(
                 $response,
-                new \Exception(
+                new Exception(
                     'Trying to retrieve object by id, but the id is not set.',
                     500
                 )
@@ -50,7 +50,7 @@ abstract class RestController extends BaseController
         }
         try {
             $result = $this->handler->selectById($id);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
             return $this->messageController->showError($response, $exception);
         }
@@ -68,13 +68,13 @@ abstract class RestController extends BaseController
     {
         try {
             $this->login($request);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         $params = $this->collectGetParams($request);
         try {
             $result = $this->handler->select($params);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
             return $this->messageController->showError($response, $exception);
         }
@@ -92,13 +92,13 @@ abstract class RestController extends BaseController
     {
         try {
             $this->login($request);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         $body = $request->getParsedBody();
         try {
             $result = $this->handler->insert($body);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
             return $this->messageController->showError($response, $exception);
         }
@@ -114,20 +114,20 @@ abstract class RestController extends BaseController
     {
         try {
             $this->login($request);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         $id = $args['id'];
         $body = $request->getParsedBody();
         try {
             $result = $this->handler->update($id, $body);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
             return $this->messageController->showError($response, $exception);
         }
         if (!isset($result)) {
             return $this->messageController->showError($response,
-                new \Exception('No record with id ' . $id . ' found to update', 404)
+                new Exception('No record with id ' . $id . ' found to update', 404)
             );
         }
         $template = $this->newTemplate($result['body']);
@@ -142,7 +142,7 @@ abstract class RestController extends BaseController
     {
         try {
             $this->login($request);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         if ($request->getUri()->getPath()) {
@@ -152,7 +152,7 @@ abstract class RestController extends BaseController
             $table = rtrim($table, 's');
         } else {
             return $this->messageController->showError($response,
-                new \Exception(
+                new Exception(
                     'Trying to delete a record, but unable to determine the table to delete from.',
                     500
                 )
@@ -161,7 +161,7 @@ abstract class RestController extends BaseController
         $id = $args['id'];
         try {
             $this->handler->delete($table, $id);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
             return $this->messageController->showError($response, $exception);
         }
@@ -175,7 +175,7 @@ abstract class RestController extends BaseController
     {
         try {
             $this->login($request);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         if ($request->getUri()->getPath()) {
@@ -185,7 +185,7 @@ abstract class RestController extends BaseController
             $table = rtrim($table, 's');
         } else {
             return $this->messageController->showError($response,
-                new \Exception(
+                new Exception(
                     'Trying to remove orphans, but unable to determine the table to delete from.',
                     500
                 )
@@ -193,7 +193,7 @@ abstract class RestController extends BaseController
         }
         try {
             $result = $this->handler->removeOrphans($table);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
             return $this->messageController->showError($response, $exception);
         }
@@ -233,7 +233,7 @@ abstract class RestController extends BaseController
 
     /**
      * Function to build the return object for GET requests with id.
-     * $request is what comes back from the handler, $templateArray is the object template converted to array.
+     * $result is what comes back from the handler, $templateArray is the object template converted to array.
      * @return array
      */
     protected function getByIdReturnObject(array $result, array $templateArray)

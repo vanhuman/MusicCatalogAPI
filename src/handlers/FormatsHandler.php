@@ -89,9 +89,8 @@ class FormatsHandler extends DatabaseHandler
     {
         $this->validatePostData($formatData);
         $postData = $this->formatPostdataForInsert($formatData);
-        $query = 'INSERT INTO format (' . $postData['keys'] . ')';
-        $query .= ' VALUES (' . $postData['values'] . ')';
-        $this->db->query($query);
+        $statement = $this->db->prepare('INSERT INTO format (' . $postData['keys'] . ') VALUES (' . $postData['variables'] . ')');
+        $statement->execute($postData['data']);
         $id = $this->db->lastInsertId();
         return $this->selectById($id);
     }
@@ -108,8 +107,8 @@ class FormatsHandler extends DatabaseHandler
             return null;
         }
         $postData = $this->formatPostdataForUpdate($formatData);
-        $query = 'UPDATE format SET ' . $postData . ' WHERE id = ' . $id;
-        $this->db->query($query);
+        $statement = $this->db->prepare('UPDATE format SET ' . $postData['keys_variables'] . ' WHERE id = ' . $id);
+        $statement->execute($postData['data']);
         return $this->selectById($id);
     }
 

@@ -219,9 +219,8 @@ class AlbumsHandler extends DatabaseHandler
     {
         $this->validatePostData($albumData, 'post');
         $postData = $this->formatPostdataForInsert($albumData);
-        $query = 'INSERT INTO album (' . $postData['keys'] . ')';
-        $query .= ' VALUES (' . $postData['values'] . ')';
-        $this->db->query($query);
+        $statement = $this->db->prepare('INSERT INTO album (' . $postData['keys'] . ') VALUES (' . $postData['variables'] . ')');
+        $statement->execute($postData['data']);
         $id = $this->db->lastInsertId();
         return $this->selectById($id);
     }
@@ -238,8 +237,8 @@ class AlbumsHandler extends DatabaseHandler
             return null;
         }
         $postData = $this->formatPostdataForUpdate($albumData);
-        $query = 'UPDATE album SET ' . $postData . ' WHERE id = ' . $id;
-        $this->db->query($query);
+        $statement = $this->db->prepare('UPDATE album SET ' . $postData['keys_variables'] . ' WHERE id = ' . $id);
+        $statement->execute($postData['data']);
         $this->fetchImages($id, $albumData);
         return $this->selectById($id);
     }

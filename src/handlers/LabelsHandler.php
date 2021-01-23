@@ -89,9 +89,8 @@ class LabelsHandler extends DatabaseHandler
     {
         $this->validatePostData($labelData);
         $postData = $this->formatPostdataForInsert($labelData);
-        $query = 'INSERT INTO label (' . $postData['keys'] . ')';
-        $query .= ' VALUES (' . $postData['values'] . ')';
-        $this->db->query($query);
+        $statement = $this->db->prepare('INSERT INTO label (' . $postData['keys'] . ') VALUES (' . $postData['variables'] . ')');
+        $statement->execute($postData['data']);
         $id = $this->db->lastInsertId();
         return $this->selectById($id);
     }
@@ -108,8 +107,8 @@ class LabelsHandler extends DatabaseHandler
             return null;
         }
         $postData = $this->formatPostdataForUpdate($labelData);
-        $query = 'UPDATE label SET ' . $postData . ' WHERE id = ' . $id;
-        $this->db->query($query);
+        $statement = $this->db->prepare('UPDATE label SET ' . $postData['keys_variables'] . ' WHERE id = ' . $id);
+        $statement->execute($postData['data']);
         return $this->selectById($id);
     }
 

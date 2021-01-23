@@ -89,9 +89,8 @@ class ArtistsHandler extends DatabaseHandler
     {
         $this->validatePostData($artistData);
         $postData = $this->formatPostdataForInsert($artistData);
-        $query = 'INSERT INTO artist (' . $postData['keys'] . ')';
-        $query .= ' VALUES (' . $postData['values'] . ')';
-        $this->db->query($query);
+        $statement = $this->db->prepare('INSERT INTO artist (' . $postData['keys'] . ') VALUES (' . $postData['variables'] . ')');
+        $statement->execute($postData['data']);
         $id = $this->db->lastInsertId();
         return $this->selectById($id);
     }
@@ -108,8 +107,8 @@ class ArtistsHandler extends DatabaseHandler
             return null;
         }
         $postData = $this->formatPostdataForUpdate($artistData);
-        $query = 'UPDATE artist SET ' . $postData . ' WHERE id = ' . $id;
-        $this->db->query($query);
+        $statement = $this->db->prepare('UPDATE artist SET ' . $postData['keys_variables'] . ' WHERE id = ' . $id);
+        $statement->execute($postData['data']);
         return $this->selectById($id);
     }
 

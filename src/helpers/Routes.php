@@ -15,10 +15,7 @@ use Controllers\MigrationController;
 
 class Routes
 {
-    /**
-     * @param App $app
-     */
-    public static function init(App $app)
+    public static function init(App $app): void
     {
         $routes = [
             '/albums' => AlbumsController::class,

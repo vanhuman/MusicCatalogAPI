@@ -2,6 +2,7 @@
 
 namespace Handlers;
 
+use Exception;
 use Helpers\DatabaseConnection;
 use Models\GetParams;
 
@@ -19,14 +20,14 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     /**
      * Generic delete function to handle all delete requests.
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(string $table, int $id): int
     {
-        $query = 'DELETE FROM ' . $table . ' WHERE id = ' . $id;
+        $query = 'DELETE FROM ' . $table . ' WHERE id = ' . (int)$id;
         $result = $this->db->query($query);
         if ($result->rowCount() === 0) {
-            throw new \Exception(ucfirst($table) . ' with id ' . $id . ' not found.', 404);
+            throw new Exception(ucfirst($table) . ' with id ' . $id . ' not found.', 404);
         }
         return $result->rowCount();
     }
@@ -34,7 +35,7 @@ abstract class DatabaseHandler extends DatabaseConnection
     /**
      * Function to delete rows that are not referenced on any album
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     public function removeOrphans(string $table): int
     {
@@ -47,35 +48,43 @@ abstract class DatabaseHandler extends DatabaseConnection
     }
 
     /**
-     * Return arrays for keys and values to be used in an SQL INSERT statement.
+     * Return arrays for keys, variables and data to be used in an SQL INSERT prepared statement.
      * @return array
      */
     protected function formatPostdataForInsert(array $postData)
     {
+        $count = 0;
         foreach ($postData as $key => $value) {
             if ($key !== 'id') {
                 $keys[] = $key;
                 $values[] = urldecode($value);
+                $variables[] = ':variable' . $count;
+                $data[':variable' . $count] = urldecode($value);
+                $count++;
             }
         }
-        $formattedPostData['keys'] = implode($keys, ',');
-        $formattedPostData['values'] = '"' . implode($values, '","') . '"';
+        $formattedPostData['keys'] = '`' . implode($keys, '`, `') . '`';
+        $formattedPostData['variables'] = implode($variables, ', ');
+        $formattedPostData['data'] = $data;
         return $formattedPostData;
     }
 
     /**
-     * Return string with key=value pairs, to be used in an SQL UPDATE statement.
-     * @return string
+     * Return array with keys/variables and data to be used in an SQL UPDATE prepared statement.
+     * @return array
      */
     protected function formatPostdataForUpdate(array $postData)
     {
-        $formattedPostData = [];
+        $count = 0;
         foreach ($postData as $key => $value) {
             if ($key !== 'id') {
-                $formattedPostData[] = $key . ' = "' . urldecode($value) . '"';
+                $keys_variables[] = '`' . $key . '` = :variable' . $count;
+                $data[':variable' . $count] = urldecode($value);
+                $count++;
             }
         }
-        $formattedPostData = implode(',', $formattedPostData);
+        $formattedPostData['keys_variables'] = implode(', ', $keys_variables);
+        $formattedPostData['data'] = $data;
         return $formattedPostData;
     }
 
@@ -107,27 +116,27 @@ abstract class DatabaseHandler extends DatabaseConnection
 
     /**
      * Validate fields indicated in the specific handlers as mandatory.
-     * @throws \Exception
+     * @throws Exception
      */
     protected function validateMandatoryFields(array $postData, array $mandatoryFields)
     {
         foreach ($mandatoryFields as $field) {
             if (!array_key_exists($field, $postData)) {
-                throw new \Exception(ucfirst($field) . ' is a mandatory field.', 400);
+                throw new Exception(ucfirst($field) . ' is a mandatory field.', 400);
             }
         }
     }
 
     /**
      * Validate that the postdata only holds permitted fields.
-     * @throws \Exception
+     * @throws Exception
      */
     protected function validateKeys(array $postData, array $fields)
     {
         // other keys than the database fields are not allowed
         foreach ($postData as $key => $value) {
             if (!in_array($key, $fields)) {
-                throw new \Exception($key . ' is not a valid field for this endpoint.', 400);
+                throw new Exception($key . ' is not a valid field for this endpoint.', 400);
             }
         }
     }

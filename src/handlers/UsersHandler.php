@@ -14,7 +14,7 @@ class UsersHandler extends DatabaseConnection
      */
     public function getUserById(int $userId)
     {
-        $query = 'SELECT * FROM user WHERE id = ' . $userId;
+        $query = 'SELECT * FROM user WHERE `id` = ' . $userId;
         $result = $this->db->query($query);
         if ($result->rowCount() === 0) {
             return null;
@@ -29,12 +29,12 @@ class UsersHandler extends DatabaseConnection
      */
     public function getUserByCredentials(string $username)
     {
-        $query = 'SELECT * FROM user WHERE username = "' . $username . '"';
-        $result = $this->db->query($query);
-        if ($result->rowCount() === 0) {
+        $statement = $this->db->prepare('SELECT * FROM user WHERE `username` = :username');
+        $statement->execute([':username' => $username]);
+        if ($statement->rowCount() === 0) {
             return null;
         }
-        $userData = $result->fetch();
+        $userData = $statement->fetch();
         return $this->createModelFromDatabaseData($userData);
     }
 
@@ -47,7 +47,7 @@ class UsersHandler extends DatabaseConnection
             'id' => $userData['id'],
             'username' => $userData['username'],
             'password' => $userData['password'],
-            'admin' => $userData['admin'] === '1',
+            'admin' => $userData['admin'] == 1,
         ]);
     }
 }
