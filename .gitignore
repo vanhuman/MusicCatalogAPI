@@ -1,3 +1,5 @@
 vendor
 .idea
 database_backups
+/settings.php
+tools

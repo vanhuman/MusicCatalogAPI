@@ -1,6 +1,9 @@
 <?php
 
+/* @var array $settings */
+
 require 'vendor/autoload.php';
+include 'settings.php';
 
 use Slim\App;
 
@@ -9,28 +12,19 @@ use Helpers\Routes;
 
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
-
 $config['db']['host'] = 'localhost';
 
-$config['db']['user'] = 'user';
-$config['db']['pass'] = 'password';
-$config['db']['dbname'] = 'music_catalog';
-$config['showDebug'] = true;
-$config['showParams'] = true;
+$env = getenv('DEV_ENVIRONMENT') === 'development' ? 'development' : 'production';
+$settings = $settings[$env];
 
-//$config['db']['user'] = 'deb55474_musiccatalog';
-//$config['db']['pass'] = 'ankerput';
-//$config['db']['dbname'] = 'deb55474_musiccatalog';
-//$config['showDebug'] = false;
-//$config['showParams'] = false;
+$config['db']['user'] = $settings['dbuser'];
+$config['db']['pass'] = $settings['dbpassword'];
+$config['db']['dbname'] = $settings['dbname'];
+$config['showDebug'] = $settings['showdebug'];
+$config['showParams'] = $settings['showparams'];
 
 $app = new App(['settings' => $config]);
 $container = $app->getContainer();
-
-// Generate salt and hashed password
-//$salt = \Helpers\SecurityUtility::generateToken();
-//$hash = \Helpers\SecurityUtility::hash('Ankerput37!', $salt);
-//std()->show([$salt, $hash]);
 
 try {
     ContainerHelper::init($container);
