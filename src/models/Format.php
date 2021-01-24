@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Format extends DatabaseModel
+class Format extends BaseModel
 {
     /**
      * @var string $name

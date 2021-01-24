@@ -1,32 +1,34 @@
 <?php
 
-require 'vendor/autoload.php';
+/* @var array $settings */
 
-use Handlers\ContainerHandler;
-use Controllers\AlbumsController;
-use Controllers\MigrationController;
+require 'vendor/autoload.php';
+include 'settings.php';
+
+use Slim\App;
+
+use Helpers\ContainerHelper;
+use Helpers\Routes;
 
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
-
 $config['db']['host'] = 'localhost';
-$config['db']['user'] = '***';
-$config['db']['pass'] = '***';
-$config['db']['dbname'] = 'media_manager';
 
-$app = new \Slim\App(['settings' => $config]);
+$env = getenv('DEV_ENVIRONMENT') === 'development' ? 'development' : 'production';
+$settings = $settings[$env];
 
+$config['db']['user'] = $settings['dbuser'];
+$config['db']['pass'] = $settings['dbpassword'];
+$config['db']['dbname'] = $settings['dbname'];
+$config['showDebug'] = $settings['showdebug'];
+$config['showParams'] = $settings['showparams'];
+
+$app = new App(['settings' => $config]);
 $container = $app->getContainer();
 
-ContainerHandler::init($container);
-
-$app->get('/albums/{albumId}', AlbumsController::class . ':getAlbum');
-$app->get('/albums', AlbumsController::class . ':getAlbums');
-
-$app->get('/migrateArtists', MigrationController::class . ':migrateArtists');
-$app->get('/migrateLabels', MigrationController::class . ':migrateLabels');
-
 try {
+    ContainerHelper::init($container);
+    Routes::init($app);
     $app->run();
 } catch (\Exception $ex) {
     echo 'Something went terribly wrong. O-o...';

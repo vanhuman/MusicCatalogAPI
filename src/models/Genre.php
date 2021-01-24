@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Genre extends DatabaseModel
+class Genre extends BaseModel
 {
     /**
      * @var string $description
@@ -12,7 +12,7 @@ class Genre extends DatabaseModel
     /**
      * @var string $notes
      */
-    protected $notes;
+    protected $notes = '';
 
     /**
      * @return string

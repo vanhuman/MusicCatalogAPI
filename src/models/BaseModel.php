@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class DatabaseModel
+class BaseModel
 {
     /**
      * @var int $id
@@ -31,7 +31,7 @@ class DatabaseModel
      */
     public function setId($id)
     {
-        $this->id = $id;
+        $this->id = (int)$id;
     }
 
     /**

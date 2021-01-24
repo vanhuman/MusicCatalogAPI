@@ -2,37 +2,100 @@
 
 namespace Controllers;
 
+use Exception;
 use Psr\Container\ContainerInterface;
 use \Slim\Http\Request;
 use \Slim\Http\Response;
 use Handlers\MigrationHandler;
 
-class MigrationController
+class MigrationController extends BaseController
 {
-    protected $container;
-    protected $albumsHandler;
+    /**
+     * @var MigrationHandler $migrationHandler
+     */
+    protected $migrationHandler;
 
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
+        $this->initController($container);
         $this->migrationHandler = new MigrationHandler($this->container->get('db'));
     }
 
-    public function migrateArtists(Request $request, Response $response, $args)
+    /**
+     * @return Response
+     */
+    public function migrationPhase1(Request $request, Response $response, array $args)
     {
-        $numRecs = $this->migrationHandler->migrateArtists();
-        if ($numRecs instanceof \Exception) {
-            return $response->withJson($numRecs, 500);
+        try {
+            $this->login($request);
+        } catch (Exception $e) {
+            return $this->messageController->showError($response, $e);
         }
-        return $response->withJson(['number of records' => $numRecs], 200);
+        try {
+            $this->migrationHandler->migration_1_First();
+        } catch (Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+        try {
+            $numAlbumsArtists = $this->migrationHandler->migration_2_Artists();
+        } catch (Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+        try {
+            $numAlbumsLabels = $this->migrationHandler->migration_3_Labels();
+        } catch (Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+        try {
+            $this->migrationHandler->migration_4_AfterArtistAndLabel();
+        } catch (Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+
+        return $response->withJson([
+            'number of albums for artists migration' => $numAlbumsArtists,
+            'number of albums for labels migration' => $numAlbumsLabels,
+        ], 200);
     }
 
-    public function migrateLabels(Request $request, Response $response, $args)
+    /**
+     * @return Response
+     */
+    public function migrationPhase2(Request $request, Response $response, array $args)
     {
-        $numRecs = $this->migrationHandler->migrateLabels();
-        if ($numRecs instanceof \Exception) {
-            return $response->withJson($numRecs, 500);
+        try {
+            $this->login($request);
+        } catch (Exception $e) {
+            return $this->messageController->showError($response, $e);
         }
-        return $response->withJson(['number of records' => $numRecs], 200);
+        try {
+            $this->migrationHandler->migration_5_ImageLocation();
+        } catch (Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+        return $response->withJson([
+            'Result' => 'OK'
+        ], 200);
     }
+
+    /**
+     * @return Response
+     */
+    public function migrationAddSalt(Request $request, Response $response, array $args)
+    {
+        try {
+            $this->login($request);
+        } catch (Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+        try {
+            $this->migrationHandler->migration_6_add_salt();
+        } catch (Exception $e) {
+            return $this->messageController->showError($response, $e);
+        }
+        return $response->withJson([
+            'Result' => 'OK'
+        ], 200);
+    }
+
 }
