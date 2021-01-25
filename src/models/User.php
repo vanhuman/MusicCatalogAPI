@@ -58,17 +58,17 @@ class User extends BaseModel
     }
 
     /**
-     * @return string
+     * @return string | null
      */
-    public function getSalt(): string
+    public function getSalt(): ?string
     {
         return $this->salt;
     }
 
     /**
-     * @param string $salt
+     * @param string | null $salt
      */
-    public function setSalt(string $salt): void
+    public function setSalt(?string $salt): void
     {
         $this->salt = $salt;
     }
