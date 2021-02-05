@@ -19,7 +19,7 @@ class HelpController extends RestController
 
     public function __construct(ContainerInterface $container)
     {
-        $this->initController($container);
+        parent::__construct($container);
     }
 
     protected function newTemplate($models) {

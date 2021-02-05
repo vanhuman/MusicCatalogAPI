@@ -15,7 +15,7 @@ class CleanupController extends BaseController
 
     public function __construct(ContainerInterface $container)
     {
-        $this->initController($container);
+        parent::__construct($container);
         $this->cleanupHandler = new CleanupHandler($this->container->get('db'));
     }
 

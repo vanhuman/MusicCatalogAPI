@@ -26,7 +26,7 @@ abstract class BaseController
      */
     protected $authController;
 
-    public function initController(ContainerInterface $container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->messageController = new MessageController();

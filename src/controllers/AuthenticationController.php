@@ -51,7 +51,7 @@ class AuthenticationController
      */
     protected $session;
 
-    public function __construct($container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->usersHandler = new UsersHandler($this->container->get('db'));

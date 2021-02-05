@@ -13,7 +13,7 @@ class ArtistsController extends RestController
 {
     public function __construct(ContainerInterface $container)
     {
-        $this->initController($container);
+        parent::__construct($container);
         $this->handler = new ArtistsHandler($this->container->get('db'));
     }
 

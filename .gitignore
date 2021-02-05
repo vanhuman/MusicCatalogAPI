@@ -3,3 +3,5 @@ vendor
 database_backups
 /settings.php
 tools
+/src/models/.directory
+/.directory

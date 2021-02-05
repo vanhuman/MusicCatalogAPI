@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Enums\ExceptionType;
+use Exception;
 use Models\McException;
 use Slim\Http\Response;
 
@@ -11,12 +12,12 @@ class MessageController
     /**
      * @return Response
      */
-    public function showError(Response $response, \Exception $exception)
+    public function showError(Response $response, Exception $exception)
     {
         $code = $exception->getCode();
         try {
             $response->withStatus($code);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $code = 500;
         }
         $exception_type = ExceptionType::SYS_EXCEPTION;

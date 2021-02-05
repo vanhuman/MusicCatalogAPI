@@ -18,7 +18,7 @@ class AlbumsController extends RestController
 {
     public function __construct(ContainerInterface $container)
     {
-        $this->initController($container);
+        parent::__construct($container);
         $this->handler = new AlbumsHandler($this->container->get('db'));
     }
 

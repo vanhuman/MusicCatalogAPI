@@ -32,7 +32,7 @@ iIZuZtKgrtzAczziLYtvtCTrypxfGSwami7zZ2EMmhs=";
      */
     public static function generateTimeOut()
     {
-        return time() + 14400;
+        return time() + 600;
     }
 
     public static function hash($password, $salt): string

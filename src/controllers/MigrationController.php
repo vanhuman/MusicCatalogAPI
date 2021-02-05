@@ -17,7 +17,7 @@ class MigrationController extends BaseController
 
     public function __construct(ContainerInterface $container)
     {
-        $this->initController($container);
+        parent::__construct($container);
         $this->migrationHandler = new MigrationHandler($this->container->get('db'));
     }
 

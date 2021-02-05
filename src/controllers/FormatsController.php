@@ -13,7 +13,7 @@ class FormatsController extends RestController
 {
     public function __construct(ContainerInterface $container)
     {
-        $this->initController($container);
+        parent::__construct($container);
         $this->handler = new FormatsHandler($this->container->get('db'));
     }
 
