@@ -3,10 +3,11 @@
 namespace Handlers;
 
 use Exception;
-use Helpers\DatabaseConnection;
 use Models\GetParams;
+use PDO;
+use Psr\Container\ContainerInterface;
 
-abstract class DatabaseHandler extends DatabaseConnection
+abstract class DatabaseHandler
 {
     public const SORT_DIRECTIONS = ['ASC', 'DESC'];
 
@@ -17,6 +18,14 @@ abstract class DatabaseHandler extends DatabaseConnection
     abstract public function insert(array $body);
 
     abstract public function update(int $id, array $body);
+
+    /* @var PDO $db */
+    protected $db;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->db = $container->get('databaseConnection')->getDatabase();
+    }
 
     /**
      * Generic delete function to handle all delete requests.

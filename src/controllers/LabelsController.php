@@ -2,9 +2,9 @@
 
 namespace Controllers;
 
+use Helpers\ContainerHelper;
 use Psr\Container\ContainerInterface;
 
-use Handlers\LabelsHandler;
 use Models\Label;
 use Templates\LabelsTemplate;
 use Templates\LabelTemplate;
@@ -13,8 +13,8 @@ class LabelsController extends RestController
 {
     public function __construct(ContainerInterface $container)
     {
-        $this->initController($container);
-        $this->handler = new LabelsHandler($this->container->get('db'));
+        parent::__construct($container);
+        $this->handler = ContainerHelper::get($container, 'labelsHandler');
     }
 
     /**

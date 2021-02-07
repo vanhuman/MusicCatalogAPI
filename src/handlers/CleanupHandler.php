@@ -3,10 +3,19 @@
 namespace Handlers;
 
 use Helpers\Constants;
-use Helpers\DatabaseConnection;
+use PDO;
+use Psr\Container\ContainerInterface;
 
-class CleanupHandler extends DatabaseConnection
+class CleanupHandler
 {
+    /* @var PDO $db */
+    protected $db;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->db = $container->get('databaseConnection')->getDatabase();
+    }
+
     public function cleanupImages(bool $testRun): array
     {
         $albumsImageLocation = $_SERVER['DOCUMENT_ROOT'] . Constants::$IMAGE_LOCATION;

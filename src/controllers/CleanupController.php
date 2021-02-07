@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Handlers\CleanupHandler;
+use Helpers\ContainerHelper;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -15,8 +16,8 @@ class CleanupController extends BaseController
 
     public function __construct(ContainerInterface $container)
     {
-        $this->initController($container);
-        $this->cleanupHandler = new CleanupHandler($this->container->get('db'));
+        parent::__construct($container);
+        $this->cleanupHandler = ContainerHelper::get($container, 'cleanupHandler');
     }
 
     /**

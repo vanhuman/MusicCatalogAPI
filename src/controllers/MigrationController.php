@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Exception;
+use Helpers\ContainerHelper;
 use Psr\Container\ContainerInterface;
 use \Slim\Http\Request;
 use \Slim\Http\Response;
@@ -17,8 +18,8 @@ class MigrationController extends BaseController
 
     public function __construct(ContainerInterface $container)
     {
-        $this->initController($container);
-        $this->migrationHandler = new MigrationHandler($this->container->get('db'));
+        parent::__construct($container);
+        $this->migrationHandler = ContainerHelper::get($container, 'migrationHandler');
     }
 
     /**

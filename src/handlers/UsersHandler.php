@@ -2,11 +2,19 @@
 
 namespace Handlers;
 
-use Helpers\DatabaseConnection;
 use Models\User;
+use PDO;
+use Psr\Container\ContainerInterface;
 
-class UsersHandler extends DatabaseConnection
+class UsersHandler
 {
+    /* @var PDO $db */
+    protected $db;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->db = $container->get('databaseConnection')->getDatabase();
+    }
 
     /**
      * @return User | null

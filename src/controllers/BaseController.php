@@ -26,11 +26,11 @@ abstract class BaseController
      */
     protected $authController;
 
-    public function initController(ContainerInterface $container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->messageController = new MessageController();
-        $this->authController = new AuthenticationController($this->container);
+        $this->messageController = $container->get('messageController');
+        $this->authController = $container->get('authenticationController');
     }
 
     /**

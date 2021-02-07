@@ -2,11 +2,20 @@
 
 namespace Handlers;
 
-use Helpers\DatabaseConnection;
 use Models\Session;
+use PDO;
+use Psr\Container\ContainerInterface;
 
-class SessionsHandler extends DatabaseConnection
+class SessionsHandler
 {
+
+    /* @var PDO $db */
+    protected $db;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->db = $container->get('databaseConnection')->getDatabase();
+    }
 
     /**
      * @throws \Exception

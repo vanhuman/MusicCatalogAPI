@@ -3,11 +3,14 @@
 namespace Handlers;
 
 use Enums\ExceptionType;
+use Exception;
 use Helpers\Constants;
+use Helpers\ContainerHelper;
 use Models\Album;
 use Helpers\TypeUtility;
 use Models\GetParams;
 use Models\McException;
+use Psr\Container\ContainerInterface;
 
 class AlbumsHandler extends DatabaseHandler
 {
@@ -54,13 +57,13 @@ class AlbumsHandler extends DatabaseHandler
      */
     private $formatsHandler;
 
-    public function __construct(\PDO $db)
+    public function __construct(ContainerInterface $container)
     {
-        parent::__construct($db);
-        $this->artistsHandler = new ArtistsHandler($db);
-        $this->genresHandler = new GenresHandler($db);
-        $this->labelsHandler = new LabelsHandler($db);
-        $this->formatsHandler = new FormatsHandler($db);
+        parent::__construct($container);
+        $this->artistsHandler = ContainerHelper::get($container, 'artistsHandler');
+        $this->genresHandler = ContainerHelper::get($container, 'genresHandler');
+        $this->labelsHandler = ContainerHelper::get($container, 'labelsHandler');
+        $this->formatsHandler = ContainerHelper::get($container, 'formatsHandler');
     }
 
     public function getRelatedSortFields(): array
@@ -70,7 +73,7 @@ class AlbumsHandler extends DatabaseHandler
 
     /**
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function selectById(int $id)
     {
@@ -94,7 +97,7 @@ class AlbumsHandler extends DatabaseHandler
 
     /**
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function select(GetParams $params)
     {
@@ -153,7 +156,7 @@ class AlbumsHandler extends DatabaseHandler
 
     /**
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function selectSortedOnRelatedTable(GetParams $params)
     {
@@ -213,7 +216,7 @@ class AlbumsHandler extends DatabaseHandler
 
     /**
      * @return array | null
-     * @throws \Exception
+     * @throws Exception
      */
     public function insert(array $albumData)
     {
@@ -227,7 +230,7 @@ class AlbumsHandler extends DatabaseHandler
 
     /**
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function update(int $id, array $albumData)
     {
@@ -279,7 +282,7 @@ class AlbumsHandler extends DatabaseHandler
         $path = '..' . $dir . $filename;
         try {
             $new_image = file_get_contents($url);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return;
         }
         file_put_contents($path, $new_image);
@@ -388,28 +391,28 @@ class AlbumsHandler extends DatabaseHandler
             try {
                 $artist = $this->artistsHandler->selectById($albumData['artist_id'])['body'];
                 $newAlbum->setArtist($artist);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
             }
         }
         if (array_key_exists('genre_id', $albumData)) {
             try {
                 $genre = $this->genresHandler->selectById($albumData['genre_id'])['body'];
                 $newAlbum->setGenre($genre);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
             }
         }
         if (array_key_exists('label_id', $albumData)) {
             try {
                 $label = $this->labelsHandler->selectById($albumData['label_id'])['body'];
                 $newAlbum->setLabel($label);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
             }
         }
         if (array_key_exists('format_id', $albumData)) {
             try {
                 $format = $this->formatsHandler->selectById($albumData['format_id'])['body'];
                 $newAlbum->setFormat($format);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
             }
         }
         return $newAlbum;
@@ -417,12 +420,12 @@ class AlbumsHandler extends DatabaseHandler
 
     /**
      * Post data validation specific for albums.
-     * @throws \Exception
+     * @throws Exception
      */
     private function validatePostData(array $postData, string $method)
     {
         if (empty($postData)) {
-            throw new \Exception('No data was sent to save', 400);
+            throw new Exception('No data was sent to save', 400);
         }
         if ($method === 'post') {
             $this->validateMandatoryFields($postData, self::$FIELDS['mandatoryFields']);
