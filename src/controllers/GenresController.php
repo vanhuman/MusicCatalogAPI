@@ -2,9 +2,9 @@
 
 namespace Controllers;
 
+use Helpers\ContainerHelper;
 use Psr\Container\ContainerInterface;
 
-use Handlers\GenresHandler;
 use Models\Genre;
 use Templates\GenresTemplate;
 use Templates\GenreTemplate;
@@ -14,7 +14,7 @@ class GenresController extends RestController
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
-        $this->handler = new GenresHandler($this->container->get('db'));
+        $this->handler = ContainerHelper::get($container, 'genresHandler');
     }
 
     /**

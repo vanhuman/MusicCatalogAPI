@@ -5,6 +5,7 @@ namespace Controllers;
 use Enums\ExceptionType;
 use Exception;
 use Handlers\SessionsHandler;
+use Helpers\ContainerHelper;
 use Models\AuthParams;
 use Models\McException;
 use Models\Session;
@@ -54,9 +55,9 @@ class AuthenticationController
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->usersHandler = new UsersHandler($this->container->get('db'));
-        $this->sessionsHandler = new SessionsHandler($this->container->get('db'));
-        $this->messageController = new MessageController();
+        $this->usersHandler = ContainerHelper::get($container, 'usersHandler');
+        $this->sessionsHandler = ContainerHelper::get($container, 'sessionsHandler');
+        $this->messageController = $container->get('messageController');
     }
 
     /**

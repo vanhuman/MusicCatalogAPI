@@ -2,9 +2,9 @@
 
 namespace Controllers;
 
+use Helpers\ContainerHelper;
 use Psr\Container\ContainerInterface;
 
-use Handlers\ArtistsHandler;
 use Models\Artist;
 use Templates\ArtistsTemplate;
 use Templates\ArtistTemplate;
@@ -14,7 +14,7 @@ class ArtistsController extends RestController
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
-        $this->handler = new ArtistsHandler($this->container->get('db'));
+        $this->handler = ContainerHelper::get($container, 'artistsHandler');
     }
 
     /**

@@ -4,12 +4,12 @@ namespace Controllers;
 
 use Enums\ExceptionType;
 use Exception;
+use Helpers\ContainerHelper;
 use Models\McException;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-use Handlers\AlbumsHandler;
 use Models\Album;
 use Templates\AlbumTemplate;
 use Templates\AlbumsTemplate;
@@ -19,7 +19,7 @@ class AlbumsController extends RestController
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
-        $this->handler = new AlbumsHandler($this->container->get('db'));
+        $this->handler = ContainerHelper::get($container, 'albumsHandler');
     }
 
     /**
