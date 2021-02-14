@@ -19,7 +19,7 @@ class LabelsHandler extends DatabaseHandler
 
     /**
      * @throws \Exception
-     * @return Label | Label[]
+     * @return array
      */
     public function selectById(int $id)
     {
@@ -82,7 +82,7 @@ class LabelsHandler extends DatabaseHandler
     }
 
     /**
-     * @return Label
+     * @return array
      * @throws \Exception
      */
     public function insert(array $labelData)
@@ -96,7 +96,7 @@ class LabelsHandler extends DatabaseHandler
     }
 
     /**
-     * @return Label
+     * @return array
      * @throws \Exception
      */
     public function update(int $id, array $labelData)

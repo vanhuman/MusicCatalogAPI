@@ -25,52 +25,16 @@ class MigrationController extends BaseController
     /**
      * @return Response
      */
-    public function migrationPhase1(Request $request, Response $response, array $args)
+    public function migration(Request $request, Response $response, array $args)
     {
+        $migration = array_key_exists('migration', $args) ? $args['migration'] : null;
         try {
             $this->login($request);
         } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
         try {
-            $this->migrationHandler->migration_1_First();
-        } catch (Exception $e) {
-            return $this->messageController->showError($response, $e);
-        }
-        try {
-            $numAlbumsArtists = $this->migrationHandler->migration_2_Artists();
-        } catch (Exception $e) {
-            return $this->messageController->showError($response, $e);
-        }
-        try {
-            $numAlbumsLabels = $this->migrationHandler->migration_3_Labels();
-        } catch (Exception $e) {
-            return $this->messageController->showError($response, $e);
-        }
-        try {
-            $this->migrationHandler->migration_4_AfterArtistAndLabel();
-        } catch (Exception $e) {
-            return $this->messageController->showError($response, $e);
-        }
-
-        return $response->withJson([
-            'number of albums for artists migration' => $numAlbumsArtists,
-            'number of albums for labels migration' => $numAlbumsLabels,
-        ], 200);
-    }
-
-    /**
-     * @return Response
-     */
-    public function migrationPhase2(Request $request, Response $response, array $args)
-    {
-        try {
-            $this->login($request);
-        } catch (Exception $e) {
-            return $this->messageController->showError($response, $e);
-        }
-        try {
-            $this->migrationHandler->migration_5_ImageLocation();
+            $this->migrationHandler->migration($migration);
         } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
@@ -78,25 +42,4 @@ class MigrationController extends BaseController
             'Result' => 'OK'
         ], 200);
     }
-
-    /**
-     * @return Response
-     */
-    public function migrationAddSalt(Request $request, Response $response, array $args)
-    {
-        try {
-            $this->login($request);
-        } catch (Exception $e) {
-            return $this->messageController->showError($response, $e);
-        }
-        try {
-            $this->migrationHandler->migration_6_add_salt();
-        } catch (Exception $e) {
-            return $this->messageController->showError($response, $e);
-        }
-        return $response->withJson([
-            'Result' => 'OK'
-        ], 200);
-    }
-
 }

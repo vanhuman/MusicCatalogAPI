@@ -2,6 +2,8 @@
 
 namespace Handlers;
 
+use Enums\ExceptionType;
+use Models\McException;
 use PDO;
 use Psr\Container\ContainerInterface;
 
@@ -13,6 +15,21 @@ class MigrationHandler
     public function __construct(ContainerInterface $container)
     {
         $this->db = $container->get('databaseConnection')->getDatabase();
+    }
+
+    public function migration(string $migration): void
+    {
+        $class = '\\Models\\migrations\\Migration' . $migration;
+        if (class_exists($class)) {
+            $migration  = new $class($this->db);
+            $migration->run();
+        } else {
+            throw new McException(
+                'Migration class Migration' . $migration . ' not found.',
+                404,
+                ExceptionType::SYS_EXCEPTION()
+            );
+        }
     }
 
     /**
