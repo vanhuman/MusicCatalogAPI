@@ -18,9 +18,9 @@ class MigrationAddLoggingTable implements MigrationInterface
     public function run() {
         $query = 'CREATE TABLE `music_catalog`.`logging` ( ' .
             '`id` INT(11) NOT NULL AUTO_INCREMENT , ' .
-            '`type` ENUM("authentication","query") NOT NULL , ' .
-            '`created` DATETIME NOT NULL , ' .
-            '`user_id` INT(11) NOT NULL , ' .
+            '`type` ENUM("Authentication","Query","Error") NOT NULL , ' .
+            '`date_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, ' .
+            '`user_id` INT(11) NULL , ' .
             '`data` VARCHAR(2048) NULL , PRIMARY KEY (`id`) ' .
             ')';
         $this->db->query($query);

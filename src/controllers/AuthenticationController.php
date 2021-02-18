@@ -3,7 +3,9 @@
 namespace Controllers;
 
 use Enums\ExceptionType;
+use Enums\LoggingType;
 use Exception;
+use Handlers\LoggingHandler;
 use Handlers\SessionsHandler;
 use Helpers\ContainerHelper;
 use Models\AuthParams;
@@ -43,6 +45,11 @@ class AuthenticationController
     protected $messageController;
 
     /**
+     * @var LoggingHandler $loggingHandler
+     */
+    protected $loggingHandler;
+
+    /**
      * @var User $user
      */
     protected $user;
@@ -57,6 +64,7 @@ class AuthenticationController
         $this->container = $container;
         $this->usersHandler = ContainerHelper::get($container, 'usersHandler');
         $this->sessionsHandler = ContainerHelper::get($container, 'sessionsHandler');
+        $this->loggingHandler = $container->get('loggingHandler');
         $this->messageController = $container->get('messageController');
     }
 
@@ -90,6 +98,11 @@ class AuthenticationController
             'session' => (new SessionTemplate($this->session))->getArray(false),
             'user' => (new UserTemplate($this->user))->getArray(false),
         ];
+        $this->loggingHandler->insert([
+            'type' => LoggingType::AUTHENTICATION(),
+            'user_id' => $this->user->getId(),
+            'data' => 'Logged in',
+        ]);
         return $response->withJson($sessionWithUser, 200);
     }
 
@@ -148,5 +161,10 @@ class AuthenticationController
                 ExceptionType::AUTH_EXCEPTION()
             );
         }
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
     }
 }

@@ -39,11 +39,13 @@ class CleanupHandler
         $albumsImageThumb = array_map(function($album) {
             return $album['image_thumb_local'];
         }, $albums);
-
-        return [
-            $this->moveOrphanImages($albumsImage, $albumsImageLocation, $albumsImageBackupLocation, $testRun),
-            $this->moveOrphanImages($albumsImageThumb, $albumsImageThumbLocation, $albumsImageThumbBackupLocation, $testRun)
+        $object = [
+            'query' => $query,
+            'images' => $this->moveOrphanImages($albumsImage, $albumsImageLocation, $albumsImageBackupLocation, $testRun),
+            'thumbs' => $this->moveOrphanImages($albumsImageThumb, $albumsImageThumbLocation, $albumsImageThumbBackupLocation, $testRun),
         ];
+
+        return $object;
     }
 
     private function moveOrphanImages(array $albums, string $imageLocation, string $imageBackupLocation, bool $testRun): array

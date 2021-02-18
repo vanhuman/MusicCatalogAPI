@@ -21,7 +21,7 @@ class ArtistsHandler extends DatabaseHandler
      * @throws \Exception
      * @return array
      */
-    public function selectById(int $id)
+    public function selectById(int $id, array $object = [])
     {
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
@@ -29,9 +29,9 @@ class ArtistsHandler extends DatabaseHandler
         $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM artist';
         $query .= ' WHERE id = ' . $id;
         $result = $this->db->query($query);
-        $object = [
-            'query' => $query,
-        ];
+        if (empty($object['query'])) {
+            $object['query'] = $query;
+        }
         if ($result->rowCount() === 0) {
             $artist = null;
         } else {
@@ -92,7 +92,8 @@ class ArtistsHandler extends DatabaseHandler
         $statement = $this->db->prepare('INSERT INTO artist (' . $postData['keys'] . ') VALUES (' . $postData['variables'] . ')');
         $statement->execute($postData['data']);
         $id = $this->db->lastInsertId();
-        return $this->selectById($id);
+        $object['query'] = $this->buildQuery($statement->queryString, $postData['data']) . ' - insert ID: ' . $id;
+        return $this->selectById($id, $object);
     }
 
     /**
@@ -109,7 +110,8 @@ class ArtistsHandler extends DatabaseHandler
         $postData = $this->formatPostdataForUpdate($artistData);
         $statement = $this->db->prepare('UPDATE artist SET ' . $postData['keys_variables'] . ' WHERE id = ' . $id);
         $statement->execute($postData['data']);
-        return $this->selectById($id);
+        $object['query'] = $this->buildQuery($statement->queryString, $postData['data']);
+        return $this->selectById($id, $object);
     }
 
     /**

@@ -3,12 +3,26 @@
 namespace Controllers;
 
 use Enums\ExceptionType;
+use Enums\LoggingType;
 use Exception;
+use Handlers\LoggingHandler;
 use Models\McException;
+use Psr\Container\ContainerInterface;
 use Slim\Http\Response;
 
 class MessageController
 {
+
+    /**
+     * @var LoggingHandler $loggingHandler
+     */
+    protected $loggingHandler;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->loggingHandler = $container->get('loggingHandler');
+    }
+
     /**
      * @return Response
      */
@@ -36,6 +50,11 @@ class MessageController
             'error_code' => $exception->getCode(),
             'error_type' => $exception_type,
         ];
+        $this->loggingHandler->insert([
+            'type' => $exception_type === ExceptionType::AUTH_EXCEPTION ? LoggingType::AUTHENTICATION : LoggingType::ERROR,
+            'data' => $exception->getMessage(),
+        ]);
+
         return $response->withJson($returnedError, $code);
     }
 

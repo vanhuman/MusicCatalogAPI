@@ -75,16 +75,16 @@ class AlbumsHandler extends DatabaseHandler
      * @return array
      * @throws Exception
      */
-    public function selectById(int $id)
+    public function selectById(int $id, array $object = [])
     {
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
         }
         $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM album WHERE id = ' . $id;
         $result = $this->db->query($query);
-        $object = [
-            'query' => $query,
-        ];
+        if (empty($object['query'])) {
+            $object['query'] = $query;
+        }
         if ($result->rowCount() === 0) {
             $album = null;
         } else {
@@ -225,7 +225,8 @@ class AlbumsHandler extends DatabaseHandler
         $statement = $this->db->prepare('INSERT INTO album (' . $postData['keys'] . ') VALUES (' . $postData['variables'] . ')');
         $statement->execute($postData['data']);
         $id = $this->db->lastInsertId();
-        return $this->selectById($id);
+        $object['query'] = $this->buildQuery($statement->queryString, $postData['data']) . ' - insert ID: ' . $id;
+        return $this->selectById($id, $object);
     }
 
     /**
@@ -242,8 +243,9 @@ class AlbumsHandler extends DatabaseHandler
         $postData = $this->formatPostdataForUpdate($albumData);
         $statement = $this->db->prepare('UPDATE album SET ' . $postData['keys_variables'] . ' WHERE id = ' . $id);
         $statement->execute($postData['data']);
+        $object['query'] = $this->buildQuery($statement->queryString, $postData['data']);
         $this->fetchImages($id, $albumData);
-        return $this->selectById($id);
+        return $this->selectById($id, $object);
     }
 
     private function fetchImages(int $id, array $albumData): void
