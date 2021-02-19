@@ -98,11 +98,14 @@ class AuthenticationController
             'session' => (new SessionTemplate($this->session))->getArray(false),
             'user' => (new UserTemplate($this->user))->getArray(false),
         ];
-        $this->loggingHandler->insert([
-            'type' => LoggingType::AUTHENTICATION(),
-            'user_id' => $this->user->getId(),
-            'data' => 'Logged in',
-        ]);
+        try {
+            $this->loggingHandler->insert([
+                'type' => LoggingType::AUTHENTICATION(),
+                'user_id' => $this->user->getId(),
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'data' => 'Logged in',
+            ]);
+        } catch (Exception $e) {}
         return $response->withJson($sessionWithUser, 200);
     }
 
@@ -122,6 +125,7 @@ class AuthenticationController
                 );
             }
             $this->user = $this->usersHandler->getUserById($this->session->getUserId());
+            $this->container['user_id'] = $this->user->getId();
         } else {
             $this->user = $this->usersHandler->getUserByCredentials($authParams->username);
             if (!isset($this->user)) {
@@ -131,6 +135,7 @@ class AuthenticationController
                     ExceptionType::AUTH_EXCEPTION()
                 );
             }
+            $this->container['user_id'] = $this->user->getId();
             if (!$this->user->passwordMatches($authParams->password)) {
                 throw new McException(
                     'Password for ' . $authParams->username . ' is not valid.',

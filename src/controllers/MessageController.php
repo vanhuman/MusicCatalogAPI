@@ -14,12 +14,18 @@ class MessageController
 {
 
     /**
+     * @var ContainerInterface $container
+     */
+    protected $container;
+
+    /**
      * @var LoggingHandler $loggingHandler
      */
     protected $loggingHandler;
 
     public function __construct(ContainerInterface $container)
     {
+        $this->container = $container;
         $this->loggingHandler = $container->get('loggingHandler');
     }
 
@@ -50,10 +56,14 @@ class MessageController
             'error_code' => $exception->getCode(),
             'error_type' => $exception_type,
         ];
-        $this->loggingHandler->insert([
-            'type' => $exception_type === ExceptionType::AUTH_EXCEPTION ? LoggingType::AUTHENTICATION : LoggingType::ERROR,
-            'data' => $exception->getMessage(),
-        ]);
+        try {
+            $this->loggingHandler->insert([
+                'type' => $exception_type === ExceptionType::AUTH_EXCEPTION ? LoggingType::AUTHENTICATION : LoggingType::ERROR,
+                'user_id' => $this->container->has('user_id') ? $this->container['user_id'] : null,
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'data' => $exception->getMessage(),
+            ]);
+        } catch (Exception $e) {}
 
         return $response->withJson($returnedError, $code);
     }

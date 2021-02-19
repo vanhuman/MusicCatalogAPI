@@ -25,6 +25,11 @@ class Logging extends BaseModel
     protected $userId;
 
     /**
+     * @var string $ipAddress
+     */
+    protected $ipAddress;
+
+    /**
      * @var string $data
      */
     protected $data;
@@ -63,6 +68,16 @@ class Logging extends BaseModel
     public function setUserId(?int $userId): void
     {
         $this->userId = $userId;
+    }
+
+    public function getIpAddress(): string
+    {
+        return $this->ipAddress;
+    }
+
+    public function setIpAddress(string $ipAddress): void
+    {
+        $this->ipAddress = $ipAddress;
     }
 
     public function getData(): string

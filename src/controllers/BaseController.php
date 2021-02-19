@@ -4,6 +4,7 @@ namespace Controllers;
 
 use Enums\ExceptionType;
 use Enums\LoggingType;
+use Exception;
 use Handlers\LoggingHandler;
 use Models\McException;
 use Psr\Container\ContainerInterface;
@@ -43,15 +44,18 @@ abstract class BaseController
 
     protected function logQuery($query): void
     {
-        $this->loggingHandler->insert([
-            'type' => LoggingType::QUERY(),
-            'user_id' => $this->authController->getUser() ? $this->authController->getUser()->getId() : null,
-            'data' => $query,
-        ]);
+        try {
+            $this->loggingHandler->insert([
+                'type' => LoggingType::QUERY(),
+                'user_id' => $this->authController->getUser() ? $this->authController->getUser()->getId() : null,
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'data' => $query,
+            ]);
+        } catch (Exception $e) {}
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function login(Request $request)
     {

@@ -9,7 +9,7 @@ use Models\Logging;
 class LoggingHandler extends DatabaseHandler
 {
     public static $FIELDS = [
-        'fields' => ['id', 'type', 'date_created', 'user_id', 'data'],
+        'fields' => ['id', 'type', 'date_created', 'user_id', 'ip_address', 'data'],
         'mandatoryFields' => ['type'],
     ];
 

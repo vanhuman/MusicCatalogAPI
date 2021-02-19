@@ -21,6 +21,7 @@ class MigrationAddLoggingTable implements MigrationInterface
             '`type` ENUM("Authentication","Query","Error") NOT NULL , ' .
             '`date_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, ' .
             '`user_id` INT(11) NULL , ' .
+            '`ip_address` VARCHAR(256) NULL , ' .
             '`data` VARCHAR(2048) NULL , PRIMARY KEY (`id`) ' .
             ')';
         $this->db->query($query);
