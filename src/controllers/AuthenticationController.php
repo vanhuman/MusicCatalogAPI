@@ -144,7 +144,7 @@ class AuthenticationController
             $this->user = $this->usersHandler->getUserByCredentials($authParams->username);
             if (!isset($this->user)) {
                 throw new McException(
-                    'User with username ' . $authParams->username . ' not found.',
+                    'Combination username and password is not valid.',
                     401,
                     ExceptionType::AUTH_EXCEPTION()
                 );
@@ -152,7 +152,7 @@ class AuthenticationController
             $this->container['user_id'] = $this->user->getId();
             if (!$this->user->passwordMatches($authParams->password)) {
                 throw new McException(
-                    'Password for user ' . $authParams->username . ' is not valid.',
+                    'Combination username and password is not valid.',
                     401,
                     ExceptionType::AUTH_EXCEPTION()
                 );

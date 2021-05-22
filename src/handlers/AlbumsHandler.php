@@ -271,7 +271,7 @@ class AlbumsHandler extends DatabaseHandler
     private function fetchAndSaveImage(string $url, string $field, int $id, string $dir): void
     {
         $lastfm_domain = 'https://lastfm.freetls.fastly.net';
-        if (strpos($url, $lastfm_domain) !== 0) {
+        if (strpos($url, $lastfm_domain) !== false) {
             $url = preg_replace('/http(s?):\/\/[^\/]*/', $lastfm_domain, $url);
             $query = 'UPDATE album SET ' . $field . ' = "' . $url . '" WHERE id = ' . $id;
             $this->db->query($query);
