@@ -85,8 +85,8 @@ abstract class DatabaseHandler
                 $count++;
             }
         }
-        $formattedPostData['keys'] = '`' . implode($keys, '`, `') . '`';
-        $formattedPostData['variables'] = implode($variables, ', ');
+        $formattedPostData['keys'] = '`' . implode('`, `', $keys) . '`';
+        $formattedPostData['variables'] = implode(', ', $variables);
         $formattedPostData['data'] = $data;
         return $formattedPostData;
     }

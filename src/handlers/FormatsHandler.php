@@ -26,7 +26,7 @@ class FormatsHandler extends DatabaseHandler
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
         }
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM format';
+        $query = 'SELECT ' . implode(',', self::$FIELDS['fields']) . ' FROM format';
         $query .= ' WHERE id = ' . $id;
         $result = $this->db->query($query);
         if (empty($object['query'])) {
@@ -53,7 +53,7 @@ class FormatsHandler extends DatabaseHandler
         $page = $params->page;
         $pageSize = $params->pageSize;
 
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM format';
+        $query = 'SELECT ' . implode(',', self::$FIELDS['fields']) . ' FROM format';
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         if ($sortBy !== 'id') {
             $query .= ', id ' . $sortDirection;

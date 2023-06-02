@@ -22,7 +22,7 @@ class LoggingHandler extends DatabaseHandler
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
         }
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM logging';
+        $query = 'SELECT ' . implode(',', self::$FIELDS['fields']) . ' FROM logging';
         $query .= ' WHERE id = ' . $id;
         $result = $this->db->query($query);
         $object = [
@@ -47,7 +47,7 @@ class LoggingHandler extends DatabaseHandler
      */
     public function selectByIP(string $ipAddress): array
     {
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM logging';
+        $query = 'SELECT ' . implode(',', self::$FIELDS['fields']) . ' FROM logging';
         $query .= ' WHERE ip_address = "' . $ipAddress . '"';
         $result = $this->db->query($query);
         $loggingsData = $result->fetchAll();

@@ -80,7 +80,7 @@ class AlbumsHandler extends DatabaseHandler
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
         }
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM album WHERE id = ' . $id;
+        $query = 'SELECT ' . implode(',', self::$FIELDS['fields']) . ' FROM album WHERE id = ' . $id;
         $result = $this->db->query($query);
         if (empty($object['query'])) {
             $object['query'] = $query;
@@ -112,7 +112,7 @@ class AlbumsHandler extends DatabaseHandler
         $selectFunc = function ($field) {
             return 'album.' . $field;
         };
-        $selectFields = implode(array_map($selectFunc, self::$FIELDS['fields']), ',');
+        $selectFields = implode(',', array_map($selectFunc, self::$FIELDS['fields']));
         $query = 'SELECT ' . $selectFields;
         if (isset($searchLogic)) {
             $query .= $searchLogic['select'];
@@ -169,7 +169,7 @@ class AlbumsHandler extends DatabaseHandler
         $selectFunc = function ($field) {
             return 'album.' . $field;
         };
-        $selectFields = implode(array_map($selectFunc, self::$FIELDS['fields']), ',');
+        $selectFields = implode(',', array_map($selectFunc, self::$FIELDS['fields']));
         $page = $params->page;
         $pageSize = $params->pageSize;
         if (!empty($params->keywords)) {
