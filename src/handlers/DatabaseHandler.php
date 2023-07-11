@@ -31,14 +31,15 @@ abstract class DatabaseHandler
      * Generic delete function to handle all delete requests.
      * @throws Exception
      */
-    public function delete(string $table, int $id): int
+    public function delete(string $table, int $id): array
     {
         $query = 'DELETE FROM ' . $table . ' WHERE id = ' . (int)$id;
         $result = $this->db->query($query);
         if ($result->rowCount() === 0) {
             throw new Exception(ucfirst($table) . ' with id ' . $id . ' not found.', 404);
         }
-        return $result->rowCount();
+        $object['query'] = $query;
+        return $object;
     }
 
     /**
@@ -46,14 +47,26 @@ abstract class DatabaseHandler
      * @return int
      * @throws Exception
      */
-    public function removeOrphans(string $table): int
+    public function removeOrphans(string $table): array
     {
         $query = 'DELETE FROM ' . $table;
         $query .= ' WHERE NOT EXISTS (';
         $query .= '   SELECT id FROM album WHERE album.' . $table . '_id = ' . $table . '.id LIMIT 1';
         $query .= ')';
         $result = $this->db->query($query);
-        return $result->rowCount();
+        $object = [
+            'query' => $query . ' - number deleted: ' . $result->rowCount(),
+            'count' => $result->rowCount(),
+        ];
+        return $object;
+    }
+
+    protected function buildQuery(string $query, array $data): string
+    {
+        foreach ($data as $variable => $value) {
+            $query = str_replace($variable, $value, $query);
+        }
+        return $query;
     }
 
     /**
@@ -72,8 +85,8 @@ abstract class DatabaseHandler
                 $count++;
             }
         }
-        $formattedPostData['keys'] = '`' . implode($keys, '`, `') . '`';
-        $formattedPostData['variables'] = implode($variables, ', ');
+        $formattedPostData['keys'] = '`' . implode('`, `', $keys) . '`';
+        $formattedPostData['variables'] = implode(', ', $variables);
         $formattedPostData['data'] = $data;
         return $formattedPostData;
     }

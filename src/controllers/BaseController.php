@@ -3,6 +3,9 @@
 namespace Controllers;
 
 use Enums\ExceptionType;
+use Enums\LoggingType;
+use Exception;
+use Handlers\LoggingHandler;
 use Models\McException;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Request;
@@ -26,15 +29,33 @@ abstract class BaseController
      */
     protected $authController;
 
+    /**
+     * @var LoggingHandler $loggingHandler
+     */
+    protected $loggingHandler;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->messageController = $container->get('messageController');
         $this->authController = $container->get('authenticationController');
+        $this->loggingHandler = $container->get('loggingHandler');
+    }
+
+    protected function logQuery($query): void
+    {
+        try {
+            $this->loggingHandler->insert([
+                'type' => LoggingType::QUERY(),
+                'user_id' => $this->authController->getUser() ? $this->authController->getUser()->getId() : null,
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'data' => $query,
+            ]);
+        } catch (Exception $e) {}
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     protected function login(Request $request)
     {

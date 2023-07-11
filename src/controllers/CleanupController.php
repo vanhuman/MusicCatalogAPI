@@ -32,15 +32,16 @@ class CleanupController extends BaseController
             return $this->messageController->showError($response, $e);
         }
         try {
-            $movedImages = $this->cleanupHandler->cleanupImages($testRun);
+            $result = $this->cleanupHandler->cleanupImages($testRun);
         } catch (Exception $e) {
             return $this->messageController->showError($response, $e);
         }
+        $this->logQuery($result['query']);
         return $response->withJson([
-            'Number of images moved' => count($movedImages[0]),
-            'Images moved' => $movedImages[0],
-            'Number of thumb images moved' => count($movedImages[1]),
-            'Thumb images moved' => $movedImages[1],
+            'Number of images moved' => count($result['images']),
+            'Images moved' => $result['images'][0],
+            'Number of thumb images moved' => count($result['thumbs']),
+            'Thumb images moved' => $result['thumbs'],
         ], 200);
     }
 }

@@ -19,19 +19,19 @@ class FormatsHandler extends DatabaseHandler
 
     /**
      * @throws \Exception
-     * @return Format | Format[]
+     * @return array
      */
-    public function selectById(int $id)
+    public function selectById(int $id, array $object = [])
     {
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
         }
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM format';
+        $query = 'SELECT ' . implode(',', self::$FIELDS['fields']) . ' FROM format';
         $query .= ' WHERE id = ' . $id;
         $result = $this->db->query($query);
-        $object = [
-            'query' => $query,
-        ];
+        if (empty($object['query'])) {
+            $object['query'] = $query;
+        }
         $formatData = $result->fetch();
         if ($result->rowCount() === 0) {
             $format = null;
@@ -53,7 +53,7 @@ class FormatsHandler extends DatabaseHandler
         $page = $params->page;
         $pageSize = $params->pageSize;
 
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM format';
+        $query = 'SELECT ' . implode(',', self::$FIELDS['fields']) . ' FROM format';
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         if ($sortBy !== 'id') {
             $query .= ', id ' . $sortDirection;
@@ -92,7 +92,8 @@ class FormatsHandler extends DatabaseHandler
         $statement = $this->db->prepare('INSERT INTO format (' . $postData['keys'] . ') VALUES (' . $postData['variables'] . ')');
         $statement->execute($postData['data']);
         $id = $this->db->lastInsertId();
-        return $this->selectById($id);
+        $object['query'] = $this->buildQuery($statement->queryString, $postData['data']) . ' - insert ID: ' . $id;
+        return $this->selectById($id, $object);
     }
 
     /**
@@ -109,7 +110,8 @@ class FormatsHandler extends DatabaseHandler
         $postData = $this->formatPostdataForUpdate($formatData);
         $statement = $this->db->prepare('UPDATE format SET ' . $postData['keys_variables'] . ' WHERE id = ' . $id);
         $statement->execute($postData['data']);
-        return $this->selectById($id);
+        $object['query'] = $this->buildQuery($statement->queryString, $postData['data']);
+        return $this->selectById($id, $object);
     }
 
     /**

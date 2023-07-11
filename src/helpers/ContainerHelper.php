@@ -5,23 +5,28 @@ namespace Helpers;
 use Controllers\AuthenticationController;
 use Controllers\MessageController;
 use Enums\DependencyType;
+use Handlers\LoggingHandler;
 use Psr\Container\ContainerInterface;
 
 class ContainerHelper
 {
     public static function init(ContainerInterface $container): void
     {
-        $container['messageController'] = function ($container) {
-            $messageController = new MessageController();
-            return $messageController;
+        $container['databaseConnection'] = function ($container) {
+            $databaseConnection = new DatabaseConnection();
+            return $databaseConnection;
+        };
+        $container['loggingHandler'] = function ($container) {
+            $loggingHandler = new LoggingHandler($container);
+            return $loggingHandler;
         };
         $container['authenticationController'] = function ($container) {
             $authenticationController = new AuthenticationController($container);
             return $authenticationController;
         };
-        $container['databaseConnection'] = function ($container) {
-            $databaseConnection = new DatabaseConnection();
-            return $databaseConnection;
+        $container['messageController'] = function ($container) {
+            $messageController = new MessageController($container);
+            return $messageController;
         };
     }
 

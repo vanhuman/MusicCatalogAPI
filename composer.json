@@ -4,7 +4,7 @@
         "slim/php-view": "^2.0",
         "monolog/monolog": "^1.17",
         "robmorgan/phinx": "^0.5.1",
-        "marc-mabe/php-enum": "2.3.*",
+        "marc-mabe/php-enum": "3.2.0",
         "ext-pdo": "*",
         "ext-json": "*"
     },

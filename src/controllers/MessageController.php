@@ -3,16 +3,33 @@
 namespace Controllers;
 
 use Enums\ExceptionType;
+use Enums\LoggingType;
 use Exception;
+use Handlers\LoggingHandler;
 use Models\McException;
+use Psr\Container\ContainerInterface;
 use Slim\Http\Response;
 
 class MessageController
 {
+
     /**
-     * @return Response
+     * @var ContainerInterface $container
      */
-    public function showError(Response $response, Exception $exception)
+    protected $container;
+
+    /**
+     * @var LoggingHandler $loggingHandler
+     */
+    protected $loggingHandler;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+        $this->loggingHandler = $container->get('loggingHandler');
+    }
+
+    public function showError(Response $response, Exception $exception, bool $skipLogging = false): Response
     {
         $code = $exception->getCode();
         try {
@@ -20,12 +37,9 @@ class MessageController
         } catch (Exception $e) {
             $code = 500;
         }
-        $exception_type = ExceptionType::SYS_EXCEPTION;
+        $exception_type = ExceptionType::SYS_EXCEPTION();
         if ($exception instanceof McException) {
-            $exception_type = [
-                'id' => $exception->exceptionType->getValue()[0],
-                'description' => $exception->exceptionType->getValue()[1],
-            ];
+            $exception_type = $exception->exceptionType;
         }
         $reference = explode('/', $exception->getFile());
         $reference = explode('.', end($reference));
@@ -34,15 +48,25 @@ class MessageController
             'message' => $exception->getMessage(),
             'reference' => $reference,
             'error_code' => $exception->getCode(),
-            'error_type' => $exception_type,
+            'error_type' => $exception_type->getValue(),
         ];
+        if (!$skipLogging) {
+            try {
+                $dataToInsert = [
+                    'type' => $exception_type === ExceptionType::AUTH_EXCEPTION() ? LoggingType::AUTHENTICATION : LoggingType::ERROR,
+                    'ip_address' => $_SERVER['REMOTE_ADDR'],
+                    'data' => $exception->getMessage(),
+                ];
+                if ($this->container->has('user_id')) {
+                    $dataToInsert['user_id'] = $this->container->get('user_id');
+                }
+                $this->loggingHandler->insert($dataToInsert);
+            } catch (Exception $e) {}
+        }
         return $response->withJson($returnedError, $code);
     }
 
-    /**
-     * @return Response
-     */
-    public function showMessage(Response $response, string $message)
+    public function showMessage(Response $response, string $message): Response
     {
         $returnedMessage = [
             'message' => $message,

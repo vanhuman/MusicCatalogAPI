@@ -21,17 +21,17 @@ class GenresHandler extends DatabaseHandler
      * @throws \Exception
      * @return array
      */
-    public function selectById(int $id)
+    public function selectById(int $id, array $object = [])
     {
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
         }
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM genre';
+        $query = 'SELECT ' . implode(',', self::$FIELDS['fields']) . ' FROM genre';
         $query .= ' WHERE id = ' . $id;
         $result = $this->db->query($query);
-        $object = [
-            'query' => $query,
-        ];
+        if (empty($object['query'])) {
+            $object['query'] = $query;
+        }
         if ($result->rowCount() === 0) {
             $genre = null;
         } else {
@@ -53,7 +53,7 @@ class GenresHandler extends DatabaseHandler
         $page = $params->page;
         $pageSize = $params->pageSize;
 
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM genre';
+        $query = 'SELECT ' . implode(',', self::$FIELDS['fields']) . ' FROM genre';
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         if ($sortBy !== 'id') {
             $query .= ', id ' . $sortDirection;
@@ -92,7 +92,8 @@ class GenresHandler extends DatabaseHandler
         $statement = $this->db->prepare('INSERT INTO genre (' . $postData['keys'] . ') VALUES (' . $postData['variables'] . ')');
         $statement->execute($postData['data']);
         $id = $this->db->lastInsertId();
-        return $this->selectById($id);
+        $object['query'] = $this->buildQuery($statement->queryString, $postData['data']) . ' - insert ID: ' . $id;
+        return $this->selectById($id, $object);
     }
 
     /**
@@ -109,7 +110,8 @@ class GenresHandler extends DatabaseHandler
         $postData = $this->formatPostdataForUpdate($genreData);
         $statement = $this->db->prepare('UPDATE genre SET ' . $postData['keys_variables'] . ' WHERE id = ' . $id);
         $statement->execute($postData['data']);
-        return $this->selectById($id);
+        $object['query'] = $this->buildQuery($statement->queryString, $postData['data']);
+        return $this->selectById($id, $object);
     }
 
     /**

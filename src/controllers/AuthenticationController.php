@@ -2,11 +2,15 @@
 
 namespace Controllers;
 
+use DateTime;
 use Enums\ExceptionType;
+use Enums\LoggingType;
 use Exception;
+use Handlers\LoggingHandler;
 use Handlers\SessionsHandler;
 use Helpers\ContainerHelper;
 use Models\AuthParams;
+use Models\Logging;
 use Models\McException;
 use Models\Session;
 use Models\User;
@@ -21,6 +25,7 @@ use Templates\UserTemplate;
 class AuthenticationController
 {
     private const REQUEST_METHODS_FOR_PUBLIC = ['GET'];
+    private const TIMEOUT_BETWEEN_LOGIN_ATTEMPTS = 3;
 
     /**
      * @var ContainerInterface $container
@@ -43,6 +48,11 @@ class AuthenticationController
     protected $messageController;
 
     /**
+     * @var LoggingHandler $loggingHandler
+     */
+    protected $loggingHandler;
+
+    /**
      * @var User $user
      */
     protected $user;
@@ -57,6 +67,7 @@ class AuthenticationController
         $this->container = $container;
         $this->usersHandler = ContainerHelper::get($container, 'usersHandler');
         $this->sessionsHandler = ContainerHelper::get($container, 'sessionsHandler');
+        $this->loggingHandler = $container->get('loggingHandler');
         $this->messageController = $container->get('messageController');
     }
 
@@ -65,12 +76,23 @@ class AuthenticationController
      */
     public function authenticate(Request $request, Response $response, array $args)
     {
-        $body = $request->getParsedBody();
-        if (!array_key_exists('username', $body) || !array_key_exists('password', $body)) {
+        if ($this->assertTimeBetweenLoginAttemptsTooShort()) {
             return $this->messageController->showError(
                 $response,
                 new McException(
-                    'Username and password are mandatory to authenticate',
+                    'Time between login attempts is too short. Please try again.',
+                    401,
+                    ExceptionType::AUTH_EXCEPTION()
+                ),
+                true
+            );
+        }
+        $body = $request->getParsedBody();
+        if (!array_key_exists('username', $body) || !array_key_exists('password', $body) || empty($body['username'])) {
+            return $this->messageController->showError(
+                $response,
+                new McException(
+                    'Username and password are mandatory to authenticate.',
                     401,
                     ExceptionType::AUTH_EXCEPTION()
                 )
@@ -90,6 +112,14 @@ class AuthenticationController
             'session' => (new SessionTemplate($this->session))->getArray(false),
             'user' => (new UserTemplate($this->user))->getArray(false),
         ];
+        try {
+            $this->loggingHandler->insert([
+                'type' => LoggingType::AUTHENTICATION(),
+                'user_id' => $this->user->getId(),
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'data' => 'Logged in',
+            ]);
+        } catch (Exception $e) {}
         return $response->withJson($sessionWithUser, 200);
     }
 
@@ -109,18 +139,20 @@ class AuthenticationController
                 );
             }
             $this->user = $this->usersHandler->getUserById($this->session->getUserId());
+            $this->container['user_id'] = $this->user->getId();
         } else {
             $this->user = $this->usersHandler->getUserByCredentials($authParams->username);
             if (!isset($this->user)) {
                 throw new McException(
-                    'User with username ' . $authParams->username . ' not found.',
+                    'Combination username and password is not valid.',
                     401,
                     ExceptionType::AUTH_EXCEPTION()
                 );
             }
+            $this->container['user_id'] = $this->user->getId();
             if (!$this->user->passwordMatches($authParams->password)) {
                 throw new McException(
-                    'Password for ' . $authParams->username . ' is not valid.',
+                    'Combination username and password is not valid.',
                     401,
                     ExceptionType::AUTH_EXCEPTION()
                 );
@@ -128,7 +160,7 @@ class AuthenticationController
             $this->session = $this->sessionsHandler->getSessionByUserId($this->user->getId());
             if (!isset($this->session)) {
                 throw new McException(
-                    'Session for user with username ' . $authParams->username . ' not found.',
+                    'Session for user ' . $authParams->username . ' not found.',
                     401,
                     ExceptionType::AUTH_EXCEPTION()
                 );
@@ -148,5 +180,27 @@ class AuthenticationController
                 ExceptionType::AUTH_EXCEPTION()
             );
         }
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    private function assertTimeBetweenLoginAttemptsTooShort(): bool
+    {
+        $loggings = $this->loggingHandler->selectByIP($_SERVER['REMOTE_ADDR']);
+        $loggings = array_filter($loggings, function ($logging) {
+           return $logging->getType() === LoggingType::AUTHENTICATION();
+        });
+        if (count($loggings) === 0) {
+            return false;
+        }
+        usort($loggings, function(Logging $log1, Logging $log2) {
+            return $log1->getDateCreated() < $log2->getDateCreated() ? 1 : -1;
+        });
+        $lastLoggingDate = $loggings[0]->getDateCreated();
+        $now = new DateTime();
+        return ($now->getTimestamp() - $lastLoggingDate->getTimestamp()) < self::TIMEOUT_BETWEEN_LOGIN_ATTEMPTS;
     }
 }

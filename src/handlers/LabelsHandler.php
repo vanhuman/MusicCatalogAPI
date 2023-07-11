@@ -19,19 +19,19 @@ class LabelsHandler extends DatabaseHandler
 
     /**
      * @throws \Exception
-     * @return Label | Label[]
+     * @return array
      */
-    public function selectById(int $id)
+    public function selectById(int $id, array $object = [])
     {
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
         }
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM label';
+        $query = 'SELECT ' . implode(',', self::$FIELDS['fields']) . ' FROM label';
         $query .= ' WHERE id = ' . $id;
         $result = $this->db->query($query);
-        $object = [
-            'query' => $query,
-        ];
+        if (empty($object['query'])) {
+            $object['query'] = $query;
+        }
         if ($result->rowCount() === 0) {
             $label = null;
         } else {
@@ -53,7 +53,7 @@ class LabelsHandler extends DatabaseHandler
         $page = $params->page;
         $pageSize = $params->pageSize;
 
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM label';
+        $query = 'SELECT ' . implode(',', self::$FIELDS['fields']) . ' FROM label';
         $query .= ' ORDER BY ' . $sortBy . ' ' . $sortDirection;
         if ($sortBy !== 'id') {
             $query .= ', id ' . $sortDirection;
@@ -82,7 +82,7 @@ class LabelsHandler extends DatabaseHandler
     }
 
     /**
-     * @return Label
+     * @return array
      * @throws \Exception
      */
     public function insert(array $labelData)
@@ -92,11 +92,12 @@ class LabelsHandler extends DatabaseHandler
         $statement = $this->db->prepare('INSERT INTO label (' . $postData['keys'] . ') VALUES (' . $postData['variables'] . ')');
         $statement->execute($postData['data']);
         $id = $this->db->lastInsertId();
-        return $this->selectById($id);
+        $object['query'] = $this->buildQuery($statement->queryString, $postData['data']) . ' - insert ID: ' . $id;
+        return $this->selectById($id, $object);
     }
 
     /**
-     * @return Label
+     * @return array
      * @throws \Exception
      */
     public function update(int $id, array $labelData)
@@ -109,7 +110,8 @@ class LabelsHandler extends DatabaseHandler
         $postData = $this->formatPostdataForUpdate($labelData);
         $statement = $this->db->prepare('UPDATE label SET ' . $postData['keys_variables'] . ' WHERE id = ' . $id);
         $statement->execute($postData['data']);
-        return $this->selectById($id);
+        $object['query'] = $this->buildQuery($statement->queryString, $postData['data']);
+        return $this->selectById($id, $object);
     }
 
     /**

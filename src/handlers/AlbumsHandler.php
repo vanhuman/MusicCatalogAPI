@@ -75,16 +75,16 @@ class AlbumsHandler extends DatabaseHandler
      * @return array
      * @throws Exception
      */
-    public function selectById(int $id)
+    public function selectById(int $id, array $object = [])
     {
         if (!isset($id) || !TypeUtility::isInteger($id)) {
             $id = 0;
         }
-        $query = 'SELECT ' . implode(self::$FIELDS['fields'], ',') . ' FROM album WHERE id = ' . $id;
+        $query = 'SELECT ' . implode(',', self::$FIELDS['fields']) . ' FROM album WHERE id = ' . $id;
         $result = $this->db->query($query);
-        $object = [
-            'query' => $query,
-        ];
+        if (empty($object['query'])) {
+            $object['query'] = $query;
+        }
         if ($result->rowCount() === 0) {
             $album = null;
         } else {
@@ -112,7 +112,7 @@ class AlbumsHandler extends DatabaseHandler
         $selectFunc = function ($field) {
             return 'album.' . $field;
         };
-        $selectFields = implode(array_map($selectFunc, self::$FIELDS['fields']), ',');
+        $selectFields = implode(',', array_map($selectFunc, self::$FIELDS['fields']));
         $query = 'SELECT ' . $selectFields;
         if (isset($searchLogic)) {
             $query .= $searchLogic['select'];
@@ -169,7 +169,7 @@ class AlbumsHandler extends DatabaseHandler
         $selectFunc = function ($field) {
             return 'album.' . $field;
         };
-        $selectFields = implode(array_map($selectFunc, self::$FIELDS['fields']), ',');
+        $selectFields = implode(',', array_map($selectFunc, self::$FIELDS['fields']));
         $page = $params->page;
         $pageSize = $params->pageSize;
         if (!empty($params->keywords)) {
@@ -225,7 +225,8 @@ class AlbumsHandler extends DatabaseHandler
         $statement = $this->db->prepare('INSERT INTO album (' . $postData['keys'] . ') VALUES (' . $postData['variables'] . ')');
         $statement->execute($postData['data']);
         $id = $this->db->lastInsertId();
-        return $this->selectById($id);
+        $object['query'] = $this->buildQuery($statement->queryString, $postData['data']) . ' - insert ID: ' . $id;
+        return $this->selectById($id, $object);
     }
 
     /**
@@ -242,8 +243,9 @@ class AlbumsHandler extends DatabaseHandler
         $postData = $this->formatPostdataForUpdate($albumData);
         $statement = $this->db->prepare('UPDATE album SET ' . $postData['keys_variables'] . ' WHERE id = ' . $id);
         $statement->execute($postData['data']);
+        $object['query'] = $this->buildQuery($statement->queryString, $postData['data']);
         $this->fetchImages($id, $albumData);
-        return $this->selectById($id);
+        return $this->selectById($id, $object);
     }
 
     private function fetchImages(int $id, array $albumData): void
@@ -269,7 +271,7 @@ class AlbumsHandler extends DatabaseHandler
     private function fetchAndSaveImage(string $url, string $field, int $id, string $dir): void
     {
         $lastfm_domain = 'https://lastfm.freetls.fastly.net';
-        if (strpos($url, $lastfm_domain) !== 0) {
+        if (strpos($url, $lastfm_domain) !== false) {
             $url = preg_replace('/http(s?):\/\/[^\/]*/', $lastfm_domain, $url);
             $query = 'UPDATE album SET ' . $field . ' = "' . $url . '" WHERE id = ' . $id;
             $this->db->query($query);

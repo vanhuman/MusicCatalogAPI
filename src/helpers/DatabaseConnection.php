@@ -23,7 +23,7 @@ class DatabaseConnection
     {
         /* @var array $settings */
         include 'settings.php';
-        $env = getenv('DEV_ENVIRONMENT') === 'development' ? 'development' : 'production';
+        $env = getenv('ENVIRONMENT') === 'development' ? 'development' : 'production';
         $settings = $settings[$env];
 
         $options = [

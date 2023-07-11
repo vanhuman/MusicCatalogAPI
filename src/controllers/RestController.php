@@ -78,6 +78,7 @@ abstract class RestController extends BaseController
             $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
             return $this->messageController->showError($response, $exception);
         }
+        $this->logQuery($result['query']);
         $template = $this->newTemplate($result['body']);
         $templateArray = $template->getArray();
         $returnObject = $this->getReturnObject($params, $result, $templateArray);
@@ -102,6 +103,7 @@ abstract class RestController extends BaseController
             $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
             return $this->messageController->showError($response, $exception);
         }
+        $this->logQuery($result['query']);
         $template = $this->newTemplate($result['body']);
         return $response->withJson($template->getArray(), 200);
     }
@@ -130,6 +132,7 @@ abstract class RestController extends BaseController
                 new Exception('No record with id ' . $id . ' found to update', 404)
             );
         }
+        $this->logQuery($result['query']);
         $template = $this->newTemplate($result['body']);
         return $response->withJson($template->getArray(), 200);
     }
@@ -160,11 +163,12 @@ abstract class RestController extends BaseController
         }
         $id = $args['id'];
         try {
-            $this->handler->delete($table, $id);
+            $result = $this->handler->delete($table, $id);
         } catch (Exception $e) {
             $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
             return $this->messageController->showError($response, $exception);
         }
+        $this->logQuery($result['query']);
         return $this->messageController->showMessage($response, ucfirst($table) . ' with id ' . $id . ' deleted.');
     }
 
@@ -197,9 +201,10 @@ abstract class RestController extends BaseController
             $exception = new McException($e->getMessage(), $e->getCode(), ExceptionType::DB_EXCEPTION());
             return $this->messageController->showError($response, $exception);
         }
+        $this->logQuery($result['query']);
         $returnObject = [
             'entity' => $table,
-            'deleted' => $result,
+            'deleted' => $result['count'],
         ];
         return $response->withJson($returnObject, 200);
     }
